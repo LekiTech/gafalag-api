@@ -1,0 +1,177 @@
+Table expression {
+  id uuid [pk]
+  spelling varchar(255) [not null, unique]
+  misspelling boolean [default: false]
+  gender_id int [ref: > gender.id]
+  language_id int [not null, ref: > language.id]
+  dialect_id int [ref: > dialect.id]
+  created_at timestamp
+  updated_at timestamp
+  
+  indexes {
+    created_at [name: 'created_at_index', note: 'Date']
+    updated_at [name: 'updated_at_index', note: 'Date']
+  }
+}
+
+Table gender {
+  id int [pk]
+  name varchar(100) [not null, unique]
+  created_at timestamp
+  updated_at timestamp
+  
+  indexes {
+    created_at [name: 'created_at_index', note: 'Date']
+    updated_at [name: 'updated_at_index', note: 'Date']
+  }
+}
+
+Table part_of_speech {
+  id int [pk]
+  name varchar(255) [not null, unique]
+  created_at timestamp
+  updated_at timestamp
+  
+  indexes {
+    created_at [name: 'created_at_index', note: 'Date']
+    updated_at [name: 'updated_at_index', note: 'Date']
+  }
+}
+
+Table language {
+  id int [pk]
+  name varchar(255) [not null, unique]
+  iso639_2 varchar(2) [unique]
+  iso639_3 varchar(3) 
+  created_at timestamp
+  updated_at timestamp
+  
+  indexes {
+    created_at [name: 'created_at_index', note: 'Date']
+    updated_at [name: 'updated_at_index', note: 'Date']
+  }
+}
+
+Table dialect {
+  id int [pk]
+  language_id int [not null, ref: > language.id]
+  name varchar(255) [not null, unique]
+  created_at timestamp
+  updated_at timestamp
+  
+  indexes {
+    created_at [name: 'created_at_index', note: 'Date']
+    updated_at [name: 'updated_at_index', note: 'Date']
+  }
+}
+
+
+Table mediafile {
+  id int [pk]
+  expression_id uuid [not null, ref: > expression.id]
+  mediatype mediatype [not null]
+  url varchar(255) [not null]
+  created_at timestamp
+  updated_at timestamp
+  
+  indexes {
+    created_at [name: 'created_at_index', note: 'Date']
+    updated_at [name: 'updated_at_index', note: 'Date']
+  }
+}
+enum mediatype {
+  audio
+  image
+}
+
+Table expression_relation {
+  expression_1_id uuid [not null, ref: > expression.id]
+  expression_2_id uuid [not null, ref: > expression.id]
+  relation_type_id int [not null, ref: > relation_type.id]
+  created_at timestamp
+  
+  indexes {
+    (expression_1_id, expression_2_id) [pk] // composite primary key
+    created_at [name: 'created_at_index', note: 'Date']
+  }
+}
+
+Table relation_type {
+  id int [pk]
+  name varchar(255) [not null, unique]
+  created_at timestamp
+  updated_at timestamp
+  
+  indexes {
+    created_at [name: 'created_at_index', note: 'Date']
+    updated_at [name: 'updated_at_index', note: 'Date']
+  }
+}
+
+Table definition_category {
+  definition_id uuid [not null, ref: > definition.id]
+  category_id uuid [not null, ref: > category.id]
+  created_at timestamp
+  
+  indexes {
+    (definition_id, category_id) [pk] // composite primary key
+    created_at [name: 'created_at_index', note: 'Date']
+  }
+}
+
+Table category {
+  id uuid [pk]
+  name varchar(255) [not null, unique]
+  created_at timestamp
+  updated_at timestamp
+  
+  indexes {
+    created_at [name: 'created_at_index', note: 'Date']
+    updated_at [name: 'updated_at_index', note: 'Date']
+  }
+}
+
+Table definition {
+  id uuid [pk]
+  expression_id uuid [not null, ref: > expression.id]
+  part_of_speech_id int [ref: > part_of_speech.id]
+  language_id int [not null, ref: > language.id]
+  source_id uuid [not null, ref: > source.id]
+  definition_text varchar(255) [not null, unique]
+  created_at timestamp
+  updated_at timestamp
+  
+  indexes {
+    created_at [name: 'created_at_index', note: 'Date']
+    updated_at [name: 'updated_at_index', note: 'Date']
+  }
+}
+
+Table source {
+  id uuid [pk]
+  name varchar(255) [not null, unique]
+  url varchar(255)
+  created_at timestamp
+  updated_at timestamp
+  
+  indexes {
+    created_at [name: 'created_at_index', note: 'Date']
+    updated_at [name: 'updated_at_index', note: 'Date']
+  }
+}
+
+Table etymology {
+  id uuid [pk]
+  expression_id uuid [not null, ref: > expression.id]
+  language_id int [not null, ref: > language.id]
+  dialect_id int [ref: > dialect.id]
+  etymology_text varchar(255) [not null, unique]
+  created_at timestamp
+  updated_at timestamp
+  
+  indexes {
+    created_at [name: 'created_at_index', note: 'Date']
+    updated_at [name: 'updated_at_index', note: 'Date']
+  }
+}
+
