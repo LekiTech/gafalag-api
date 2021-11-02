@@ -1,10 +1,12 @@
 CREATE DATABASE gafalag_db;
 
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 CREATE TYPE mediatype AS ENUM ('AUDIO','IMAGE');
 
 -- region TABLES
 CREATE TABLE expression (
-    id          UUID PRIMARY KEY,
+    id          UUID PRIMARY KEY     DEFAULT uuid_generate_v4(),
     spelling    VARCHAR     NOT NULL,
     misspelling BOOLEAN              DEFAULT FALSE,
     inflection  VARCHAR     NOT NULL,
@@ -76,14 +78,14 @@ CREATE TABLE definition_category (
 );
 
 CREATE TABLE category (
-    id         UUID PRIMARY KEY,
+    id         UUID PRIMARY KEY     DEFAULT uuid_generate_v4(),
     name       VARCHAR     NOT NULL UNIQUE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE TABLE definition (
-    id                UUID PRIMARY KEY,
+    id                UUID PRIMARY KEY     DEFAULT uuid_generate_v4(),
     expression_id     UUID        NOT NULL,
     part_of_speech_id INT,
     language_id       INT         NOT NULL,
@@ -94,7 +96,7 @@ CREATE TABLE definition (
 );
 
 CREATE TABLE source (
-    id         UUID PRIMARY KEY,
+    id         UUID PRIMARY KEY     DEFAULT uuid_generate_v4(),
     name       VARCHAR     NOT NULL UNIQUE,
     url        VARCHAR,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -102,7 +104,7 @@ CREATE TABLE source (
 );
 
 CREATE TABLE etymology (
-    id             UUID PRIMARY KEY,
+    id             UUID PRIMARY KEY     DEFAULT uuid_generate_v4(),
     expression_id  UUID        NOT NULL,
     language_id    INT         NOT NULL,
     dialect_id     INT,
