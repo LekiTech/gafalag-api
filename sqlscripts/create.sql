@@ -1,5 +1,3 @@
-CREATE DATABASE gafalag_db;
-
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TYPE mediatype AS ENUM ('AUDIO','IMAGE');
