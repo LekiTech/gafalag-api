@@ -18,21 +18,21 @@ CREATE TABLE expression (
 );
 
 CREATE TABLE gender (
-    id         INT PRIMARY KEY,
+    id         SERIAL PRIMARY KEY,
     name       VARCHAR(100) NOT NULL UNIQUE,
     created_at TIMESTAMPTZ  NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ  NOT NULL DEFAULT now()
 );
 
 CREATE TABLE part_of_speech (
-    id         INT PRIMARY KEY,
+    id         SERIAL PRIMARY KEY,
     name       VARCHAR     NOT NULL UNIQUE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE TABLE language (
-    id         INT PRIMARY KEY,
+    id         SERIAL PRIMARY KEY,
     name       VARCHAR     NOT NULL UNIQUE,
     iso639_2   VARCHAR(2) UNIQUE,
     iso639_3   VARCHAR(3),
@@ -41,7 +41,7 @@ CREATE TABLE language (
 );
 
 CREATE TABLE dialect (
-    id          INT PRIMARY KEY,
+    id          SERIAL PRIMARY KEY,
     language_id INT         NOT NULL,
     name        VARCHAR     NOT NULL UNIQUE,
     created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -49,7 +49,7 @@ CREATE TABLE dialect (
 );
 
 CREATE TABLE mediafile (
-    id            INT PRIMARY KEY,
+    id            SERIAL PRIMARY KEY,
     expression_id UUID        NOT NULL,
     mediatype     mediatype   NOT NULL,
     url           VARCHAR     NOT NULL,
@@ -65,7 +65,7 @@ CREATE TABLE expression_relation (
 );
 
 CREATE TABLE relation_type (
-    id         INT PRIMARY KEY,
+    id         SERIAL PRIMARY KEY,
     name       VARCHAR     NOT NULL UNIQUE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
