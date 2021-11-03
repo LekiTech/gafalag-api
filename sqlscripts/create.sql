@@ -7,7 +7,7 @@ CREATE TABLE expression (
     id          UUID PRIMARY KEY     DEFAULT uuid_generate_v4(),
     spelling    VARCHAR     NOT NULL,
     misspelling BOOLEAN              DEFAULT FALSE,
-    inflection  VARCHAR     NOT NULL,
+    inflection  VARCHAR,
     gender_id   INT,
     language_id INT         NOT NULL,
     dialect_id  INT,
@@ -17,9 +17,9 @@ CREATE TABLE expression (
 
 CREATE TABLE gender (
     id         SERIAL PRIMARY KEY,
-    name       VARCHAR(100) NOT NULL UNIQUE,
-    created_at TIMESTAMPTZ  NOT NULL DEFAULT now(),
-    updated_at TIMESTAMPTZ  NOT NULL DEFAULT now()
+    name       VARCHAR     NOT NULL UNIQUE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE TABLE part_of_speech (
@@ -33,7 +33,7 @@ CREATE TABLE language (
     id         SERIAL PRIMARY KEY,
     name       VARCHAR     NOT NULL UNIQUE,
     iso639_2   VARCHAR(2) UNIQUE,
-    iso639_3   VARCHAR(3),
+    iso639_3   VARCHAR(3) UNIQUE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
