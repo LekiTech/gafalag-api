@@ -22,7 +22,7 @@ public class GafalagApi {
     @PostMapping("/expression")
     public ResponseEntity<Expression> save(@RequestParam("exp") String exp) {
         return new ResponseEntity<>(
-                expressionService.saveExp(new Expression(exp)),
+                expressionService.saveExp(new Expression()),
                 HttpStatus.OK
         );
     }
