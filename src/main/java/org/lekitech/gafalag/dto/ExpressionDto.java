@@ -1,16 +1,20 @@
 package org.lekitech.gafalag.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import com.fasterxml.jackson.annotation.JsonRootName;
+import lombok.*;
+import org.lekitech.gafalag.enumeration.Gender;
 
 @Getter
+@Setter
 @AllArgsConstructor
+@NoArgsConstructor
+@JsonRootName(value = "expression")
 public class ExpressionDto {
 
     private String spelling;
-    private Boolean misspelling;
     private String inflection;
-    private Long genderId;
-    private Long languageId;
+    private Boolean misspelling;
+    private Gender gender;
     private Long dialectId;
+    private Long languageId;
 }
