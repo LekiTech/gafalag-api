@@ -1,32 +1,20 @@
 package org.lekitech.gafalag.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
+import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Set;
 
 @Entity
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "language")
+@RequiredArgsConstructor
+@EqualsAndHashCode(of = {"id", "name", "iso639_2", "iso639_3"})
+@Table(name = "language", uniqueConstraints = @UniqueConstraint(columnNames = {"name", "iso639_2", "iso639_3"}))
 public class Language {
 
     @Id
@@ -34,15 +22,15 @@ public class Language {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "language_seq")
     private Long id;
 
-    @NotNull
+    @NonNull
     @Column(unique = true)
     private String name;
 
-    @NotNull
+    @NonNull
     @Column(unique = true)
     private String iso639_2;
 
-    @NotNull
+    @NonNull
     @Column(unique = true)
     private String iso639_3;
 
@@ -52,7 +40,9 @@ public class Language {
     @UpdateTimestamp
     private Timestamp updatedAt;
 
-    @OneToMany(mappedBy = "gender", fetch = FetchType.LAZY)
-    @OrderBy("spelling")
+    @OneToMany(mappedBy = "language", orphanRemoval = true, fetch = FetchType.EAGER)
+    private Set<Dialect> dialects;
+
+    @OneToMany(mappedBy = "language", orphanRemoval = true, fetch = FetchType.EAGER)
     private Set<Expression> expressions;
 }
