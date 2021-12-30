@@ -14,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -31,20 +32,25 @@ public class ExpressionService {
         return repository.findById(id).orElseThrow();
     }
 
-    public PaginatedResult<Expression> getPaginated(int page, int size) {
-        return getPaginated(page, size, "spelling", false);
+    public PaginatedResult<Expression> getPaginated(int page, int size, Optional<String> languageIso3) {
+        return getPaginated(page, size, languageIso3, "spelling", false);
     }
 
-    public PaginatedResult<Expression> getPaginated(int page, int size, String sortBy) {
-        return getPaginated(page, size, sortBy, false);
+    public PaginatedResult<Expression> getPaginated(int page, int size, Optional<String> languageIso3, String sortBy) {
+        return getPaginated(page, size, languageIso3, sortBy, false);
     }
 
-    public PaginatedResult<Expression> getPaginated(int page, int size, String sortBy, boolean descending) {
+    public PaginatedResult<Expression> getPaginated(int page, int size, Optional<String> languageIso3, String sortBy, boolean descending) {
         var sort = Sort.by(sortBy);
         var pages = PageRequest.of(page, size, descending ? sort.descending() : sort.ascending());
-        var pageDb = repository.findAll(pages);
-        var pageResult = new PaginatedResult<>(pageDb.getTotalElements(), pageDb.getTotalPages(), pageDb.getNumber(), pageDb.getSize(), pageDb.stream().toList());
-        return pageResult;
+        Page<Expression> pageDb;
+        if (languageIso3.isPresent()) {
+            var expressionLanguage = languageService.getByIso3(languageIso3.get());
+            pageDb = repository.findAllByLanguageId(expressionLanguage.id, pages);
+        } else {
+            pageDb = repository.findAll(pages);
+        }
+        return new PaginatedResult<>(pageDb.getTotalElements(), pageDb.getTotalPages(), pageDb.getNumber(), pageDb.getSize(), pageDb.stream().toList());
     }
 
     public Expression save(Expression expression) {

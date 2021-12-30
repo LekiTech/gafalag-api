@@ -27,17 +27,17 @@ public class ExpressionController {
 
     @GetMapping(path = "")
     public PaginatedResult<Expression> getExpressionsPaginated(
-            @RequestParam String languageIso3,
             @RequestParam int page,
             @RequestParam int size,
+            Optional<String> lang,
             @RequestParam Optional<String> sortBy,
             @RequestParam Optional<Boolean> descending) {
         if (sortBy.isPresent() && descending.isPresent()) {
-            return expressionService.getPaginated(page, size, sortBy.get(), descending.get());
+            return expressionService.getPaginated(page, size, lang, sortBy.get(), descending.get());
         } else if (sortBy.isPresent()) {
-            return expressionService.getPaginated(page, size, sortBy.get());
+            return expressionService.getPaginated(page, size, lang, sortBy.get());
         } else {
-            return expressionService.getPaginated(page, size);
+            return expressionService.getPaginated(page, size, lang);
         }
     }
 

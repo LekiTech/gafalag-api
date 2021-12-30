@@ -31,7 +31,7 @@ public class Definition {
 
     @NonNull
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="expression_id")
     public Expression expression;
 
