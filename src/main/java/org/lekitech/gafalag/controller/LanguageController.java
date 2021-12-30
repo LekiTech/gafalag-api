@@ -21,13 +21,13 @@ public class LanguageController {
     private final DialectService dialectService;
     private final LanguageService languageService;
 
-    @GetMapping(path = "/")
+    @GetMapping(path = "")
     public List<Language> getAllLanguages() {
         var langs = languageService.getAll();
         return langs;
     }
 
-    @PostMapping(path = "/")
+    @PostMapping(path = "")
     public void saveLanguage(@RequestBody LanguageDto dto) {
         languageService.save(new Language(dto.getName(), dto.getIso639_2(), dto.getIso639_3()));
     }

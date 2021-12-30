@@ -1,5 +1,6 @@
 package org.lekitech.gafalag.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -29,6 +30,7 @@ public class Definition {
     public String text;
 
     @NonNull
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="expression_id")
     public Expression expression;

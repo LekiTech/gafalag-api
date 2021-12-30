@@ -44,6 +44,7 @@ public class Expression {
     public Gender gender;
 
     @NonNull
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.EAGER)
     public Language language;
 
@@ -58,8 +59,7 @@ public class Expression {
     public Timestamp updatedAt;
 
     // Related tables
-    @JsonIgnore
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "expression")
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "expression")
     public List<Definition> definitions;
 
     public Expression(String spelling, Optional<String> inflection, Language language, List<Definition> definitions) {
