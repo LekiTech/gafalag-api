@@ -5,12 +5,10 @@ import java.util.Optional;
 
 /*
 {
-    source: {
-        name: string,
-        url?: string,
-        expressionLanguageIso3: string, // Expression lang ISO-3 e.g. Lezgi
-        definitionLanguageIso3: string, // Definition lang ISO-3 e.g. Russian
-    },
+    name: string,
+    url?: string,
+    expressionLanguageIso3: string, // Expression lang ISO-3 e.g. Lezgi
+    definitionLanguageIso3: string, // Definition lang ISO-3 e.g. Russian
     dictionary: [
         {
             spelling: string,
@@ -23,10 +21,12 @@ import java.util.Optional;
     ]
 }
  */
-public class ExpressionBatchRequest {
-    public record Source(String name, Optional<String> url, String expressionLanguageIso3, String definitionLanguageIso3){}
-    public Source source;
-
+public record ExpressionBatchRequest (
+    String name,
+    Optional<String> url,
+    String expressionLanguageIso3,
+    String definitionLanguageIso3,
+    List<Article> dictionary
+){
     public record Article(String spelling, Optional<String> inflection, List<String> definitions){}
-    public List<Article> dictionary;
 }

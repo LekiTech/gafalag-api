@@ -32,13 +32,12 @@ public class ExpressionService {
     }
 
     public List<Expression> saveBatch(ExpressionBatchRequest expressionBatchRequest) {
-        var sourceData = expressionBatchRequest.source;
-        var expressionLanguage = languageService.getByIso3(sourceData.expressionLanguageIso3());
-        var definitionLanguage = languageService.getByIso3(sourceData.definitionLanguageIso3());
+        var expressionLanguage = languageService.getByIso3(expressionBatchRequest.expressionLanguageIso3());
+        var definitionLanguage = languageService.getByIso3(expressionBatchRequest.definitionLanguageIso3());
 
-        var source = sourceService.getOrCreate(sourceData.name(), sourceData.url());
+        var source = sourceService.getOrCreate(expressionBatchRequest.name(), expressionBatchRequest.url());
 
-        var expressions = expressionBatchRequest.dictionary.stream()
+        var expressions = expressionBatchRequest.dictionary().stream()
                 .map(article -> {
                     var definitions = article.definitions().stream()
                             .map(definition -> new Definition(definition, definitionLanguage, source))
