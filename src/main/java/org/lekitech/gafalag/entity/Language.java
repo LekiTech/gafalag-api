@@ -1,5 +1,6 @@
 package org.lekitech.gafalag.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -9,40 +10,39 @@ import java.sql.Timestamp;
 import java.util.Set;
 
 @Entity
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @RequiredArgsConstructor
-@EqualsAndHashCode(of = {"id", "name", "iso639_2", "iso639_3"})
-@Table(name = "language", uniqueConstraints = @UniqueConstraint(columnNames = {"name", "iso639_2", "iso639_3"}))
+@Table(name = "language")
 public class Language {
 
     @Id
     @SequenceGenerator(name = "language_seq", sequenceName = "language_seq")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "language_seq")
-    private Long id;
+    public Long id;
 
     @NonNull
     @Column(unique = true)
-    private String name;
+    public String name;
 
     @NonNull
-    @Column(unique = true)
-    private String iso639_2;
+    @Column(unique = true, name = "iso639_2")
+    public String iso2;
 
     @NonNull
-    @Column(unique = true)
-    private String iso639_3;
+    @Column(unique = true, name = "iso639_3")
+    public String iso3;
 
     @CreationTimestamp
-    private Timestamp createdAt;
+    public Timestamp createdAt;
 
     @UpdateTimestamp
-    private Timestamp updatedAt;
+    public Timestamp updatedAt;
 
     @OneToMany(mappedBy = "language", orphanRemoval = true, fetch = FetchType.EAGER)
-    private Set<Dialect> dialects;
+    public Set<Dialect> dialects;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "language", orphanRemoval = true, fetch = FetchType.EAGER)
-    private Set<Expression> expressions;
+    public Set<Expression> expressions;
 }

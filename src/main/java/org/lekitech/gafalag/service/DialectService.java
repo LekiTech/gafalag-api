@@ -18,7 +18,7 @@ public class DialectService {
         return dialectRepository.save(dialect);
     }
 
-    public Dialect findById(Long id) {
+    public Dialect getById(Long id) {
         return dialectRepository.findById(id).orElseThrow();
     }
 }

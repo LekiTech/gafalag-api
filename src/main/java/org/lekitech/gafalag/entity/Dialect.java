@@ -18,19 +18,19 @@ public class Dialect {
     @Id
     @SequenceGenerator(name = "dialect_seq", sequenceName = "dialect_seq")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "dialect_seq")
-    private Long id;
+    public Long id;
 
     @NonNull
-    private String name;
+    public String name;
 
     @NonNull
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "language_id", nullable = false)
-    private Language language;
+    public Language language;
 
     @CreationTimestamp
-    private Timestamp createdAt;
+    public Timestamp createdAt;
 
     @UpdateTimestamp
-    private Timestamp updatedAt;
+    public Timestamp updatedAt;
 }
