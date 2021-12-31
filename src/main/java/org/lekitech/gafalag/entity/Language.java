@@ -17,8 +17,7 @@ import java.util.Set;
 public class Language {
 
     @Id
-    @SequenceGenerator(name = "language_seq", sequenceName = "language_seq")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "language_seq")
+    @GeneratedValue
     public Long id;
 
     @NonNull

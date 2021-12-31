@@ -21,7 +21,7 @@ import java.util.UUID;
 public class Source {
 
     @Id
-    @GeneratedValue()
+    @GeneratedValue
     public UUID id;
 
     @NonNull

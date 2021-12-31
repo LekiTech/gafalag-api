@@ -24,7 +24,7 @@ import java.util.UUID;
 public class Expression implements Serializable {
 
     @Id
-    @GeneratedValue()
+    @GeneratedValue
     public UUID id;
 
     @NonNull

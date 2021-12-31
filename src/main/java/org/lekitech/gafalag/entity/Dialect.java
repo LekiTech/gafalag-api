@@ -17,7 +17,7 @@ public class Dialect {
 
     @Id
     @SequenceGenerator(name = "dialect_seq", sequenceName = "dialect_seq")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "dialect_seq")
+    @GeneratedValue
     public Long id;
 
     @NonNull

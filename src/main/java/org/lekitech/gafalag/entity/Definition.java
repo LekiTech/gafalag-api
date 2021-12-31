@@ -1,14 +1,9 @@
 package org.lekitech.gafalag.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.hibernate.id.UUIDGenerator;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -21,18 +16,19 @@ import java.util.UUID;
 @NoArgsConstructor
 @Table(name = "definition")
 public class Definition implements Serializable {
+
     @Id
-    @GeneratedValue()
+    @GeneratedValue
     public UUID id;
 
     @NonNull
-    @Column(name="definition_text")
+    @Column(name = "definition_text")
     public String text;
 
     @NonNull
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="expression_id")
+    @JoinColumn(name = "expression_id")
     public Expression expression;
 
     @ManyToOne(fetch = FetchType.LAZY)

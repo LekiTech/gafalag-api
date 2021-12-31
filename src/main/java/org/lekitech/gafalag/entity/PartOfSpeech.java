@@ -19,7 +19,7 @@ public class PartOfSpeech {
 
     @Id
     @SequenceGenerator(name = "part_of_speech_seq", sequenceName = "part_of_speech_seq")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "part_of_speech_seq")
+    @GeneratedValue
     public Long id;
 
     @NonNull
