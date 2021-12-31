@@ -3,6 +3,7 @@ package org.lekitech.gafalag.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.lekitech.gafalag.dto.ExpressionBatchRequest;
+import org.lekitech.gafalag.dto.ExpressionDto;
 import org.lekitech.gafalag.dto.PaginatedResult;
 import org.lekitech.gafalag.entity.Definition;
 import org.lekitech.gafalag.entity.Expression;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +21,7 @@ import java.util.UUID;
 
 @Slf4j
 @Service
+@Transactional
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ExpressionService {
 
@@ -32,17 +35,19 @@ public class ExpressionService {
         return repository.findById(id).orElseThrow();
     }
 
-    public PaginatedResult<Expression> getPaginated(int page, int size, Optional<String> languageIso3) {
+    public PaginatedResult<ExpressionDto> getPaginated(int page, int size, Optional<String> languageIso3) {
         return getPaginated(page, size, languageIso3, "spelling", false);
     }
 
-    public PaginatedResult<Expression> getPaginated(int page, int size, Optional<String> languageIso3, String sortBy) {
+    public PaginatedResult<ExpressionDto> getPaginated(int page, int size, Optional<String> languageIso3, String sortBy) {
         return getPaginated(page, size, languageIso3, sortBy, false);
     }
 
-    public PaginatedResult<Expression> getPaginated(int page, int size, Optional<String> languageIso3, String sortBy, boolean descending) {
+    @Transactional(readOnly = true)
+    public PaginatedResult<ExpressionDto> getPaginated(int page, int size, Optional<String> languageIso3, String sortBy, boolean descending) {
         var sort = Sort.by(sortBy);
         var pages = PageRequest.of(page, size, descending ? sort.descending() : sort.ascending());
+        System.out.println("CALLED: getPaginated");
         Page<Expression> pageDb;
         if (languageIso3.isPresent()) {
             var expressionLanguage = languageService.getByIso3(languageIso3.get());
@@ -50,7 +55,8 @@ public class ExpressionService {
         } else {
             pageDb = repository.findAll(pages);
         }
-        return new PaginatedResult<>(pageDb.getTotalElements(), pageDb.getTotalPages(), pageDb.getNumber(), pageDb.getSize(), pageDb.stream().toList());
+        var expressions = pageDb.stream().map(ExpressionDto::new).toList();
+        return new PaginatedResult<>(pageDb.getTotalElements(), pageDb.getTotalPages(), pageDb.getNumber(), pageDb.getSize(), expressions);
     }
 
     public Expression save(Expression expression) {

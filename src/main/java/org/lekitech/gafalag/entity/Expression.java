@@ -10,6 +10,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.*;
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
@@ -20,7 +21,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @Table(name = "expression")
-public class Expression {
+public class Expression implements Serializable {
 
     @Id
     @GeneratedValue(generator = UUIDGenerator.UUID_GEN_STRATEGY)
@@ -42,15 +43,24 @@ public class Expression {
     @NonNull
     @Enumerated(EnumType.STRING)
     public Gender gender;
+    @JsonIgnore
+    @Column(name = "gender_id", insertable = false, updatable = false)
+    public Long genderId;
 
     @NonNull
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     public Language language;
+    @JsonIgnore
+    @Column(name = "language_id", insertable = false, updatable = false)
+    public Long languageId;
 
     @NonNull
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     public Dialect dialect;
+    @JsonIgnore
+    @Column(name = "dialect_id", insertable = false, updatable = false)
+    public Long dialectId;
 
     @CreationTimestamp
     public Timestamp createdAt;
@@ -59,8 +69,9 @@ public class Expression {
     public Timestamp updatedAt;
 
     // Related tables
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "expression")
-    public List<Definition> definitions;
+    @JsonIgnore
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "expression", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+    public List<Definition> definitions = new java.util.ArrayList<>();
 
     public Expression(String spelling, Optional<String> inflection, Language language, List<Definition> definitions) {
         this.spelling = spelling;

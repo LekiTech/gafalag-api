@@ -24,7 +24,7 @@ public class Dialect {
     public String name;
 
     @NonNull
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "language_id", nullable = false)
     public Language language;
 

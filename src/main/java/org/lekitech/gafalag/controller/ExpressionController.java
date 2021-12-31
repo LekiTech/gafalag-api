@@ -26,7 +26,7 @@ public class ExpressionController {
     }
 
     @GetMapping(path = "")
-    public PaginatedResult<Expression> getExpressionsPaginated(
+    public PaginatedResult<ExpressionDto> getExpressionsPaginated(
             @RequestParam int page,
             @RequestParam int size,
             Optional<String> lang,

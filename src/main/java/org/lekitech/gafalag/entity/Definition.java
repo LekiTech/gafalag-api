@@ -11,6 +11,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.id.UUIDGenerator;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.UUID;
 
@@ -19,7 +20,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @Table(name = "definition")
-public class Definition {
+public class Definition implements Serializable {
     @Id
     @GeneratedValue(generator = UUIDGenerator.UUID_GEN_STRATEGY)
     @Type(type = "org.hibernate.type.PostgresUUIDType")
@@ -35,15 +36,15 @@ public class Definition {
     @JoinColumn(name="expression_id")
     public Expression expression;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     public PartOfSpeech partOfSpeech;
 
     @NonNull
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     public Language language;
 
     @NonNull
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     public Source source;
 
     @CreationTimestamp

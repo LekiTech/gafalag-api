@@ -39,10 +39,10 @@ public class Language {
     @UpdateTimestamp
     public Timestamp updatedAt;
 
-    @OneToMany(mappedBy = "language", orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "language", orphanRemoval = true, fetch = FetchType.LAZY)
     public Set<Dialect> dialects;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "language", orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "language", orphanRemoval = true, fetch = FetchType.LAZY)
     public Set<Expression> expressions;
 }
