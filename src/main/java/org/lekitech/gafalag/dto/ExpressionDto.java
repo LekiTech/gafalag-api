@@ -2,9 +2,7 @@ package org.lekitech.gafalag.dto;
 
 import com.fasterxml.jackson.annotation.JsonRootName;
 import lombok.*;
-import org.lekitech.gafalag.entity.Definition;
 import org.lekitech.gafalag.entity.Expression;
-import org.lekitech.gafalag.enumeration.Gender;
 
 import java.util.List;
 import java.util.UUID;
@@ -15,6 +13,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @JsonRootName(value = "expression")
 public class ExpressionDto {
+
     public UUID id;
     private String spelling;
     private Boolean misspelling;
@@ -22,7 +21,7 @@ public class ExpressionDto {
     private Long genderId;
     private Long languageId;
     private Long dialectId;
-//    TODO: create DefinitionDto and use here
+    //    TODO: create DefinitionDto and use here
     private List<String> definitions;
 
     public ExpressionDto(Expression expression) {

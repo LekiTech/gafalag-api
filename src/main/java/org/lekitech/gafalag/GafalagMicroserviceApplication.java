@@ -2,6 +2,7 @@ package org.lekitech.gafalag;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -23,7 +24,6 @@ public class GafalagMicroserviceApplication extends SpringBootServletInitializer
     }
 
     public static void main(String[] args) {
-        log.info("Start Gafalag Microservice");
         SpringApplication.run(GafalagMicroserviceApplication.class, args);
     }
 
@@ -42,7 +42,7 @@ public class GafalagMicroserviceApplication extends SpringBootServletInitializer
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
             @Override
-            public void addCorsMappings(CorsRegistry registry) {
+            public void addCorsMappings(@NonNull CorsRegistry registry) {
                 // TODO Allowed frontend requests (CORS)
                 registry.addMapping("/**").allowedOrigins("*");
             }

@@ -2,19 +2,16 @@ package org.lekitech.gafalag.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
-import org.hibernate.annotations.*;
-import org.hibernate.id.UUIDGenerator;
-import org.lekitech.gafalag.enumeration.Gender;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.Table;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
 
 @Entity
 @Getter
@@ -40,8 +37,9 @@ public class Expression implements Serializable {
     public String inflection;
 
     @NonNull
-    @Enumerated(EnumType.STRING)
+    @ManyToOne(fetch = FetchType.LAZY)
     public Gender gender;
+
     @JsonIgnore
     @Column(name = "gender_id", insertable = false, updatable = false)
     public Long genderId;

@@ -21,27 +21,29 @@ public class Language {
     public Long id;
 
     @NonNull
-    @Column(unique = true)
+    @Column(name = "name")
     public String name;
 
     @NonNull
-    @Column(unique = true, name = "iso639_2")
+    @Column(name = "iso639_2")
     public String iso2;
 
     @NonNull
-    @Column(unique = true, name = "iso639_3")
+    @Column(name = "iso639_3")
     public String iso3;
 
     @CreationTimestamp
+    @Column(name = "created_at")
     public Timestamp createdAt;
 
     @UpdateTimestamp
+    @Column(name = "updated_at")
     public Timestamp updatedAt;
 
-    @OneToMany(mappedBy = "language", orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "language", fetch = FetchType.LAZY)
     public Set<Dialect> dialects;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "language", orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "language", fetch = FetchType.LAZY)
     public Set<Expression> expressions;
 }

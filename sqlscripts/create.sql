@@ -102,13 +102,13 @@ CREATE TABLE source (
 );
 
 CREATE TABLE etymology (
-    id             UUID PRIMARY KEY     DEFAULT uuid_generate_v4(),
+    id             UUID PRIMARY KEY            DEFAULT uuid_generate_v4(),
     expression_id  UUID        NOT NULL,
     language_id    INT         NOT NULL,
     dialect_id     INT,
-    etymology_text VARCHAR     NOT NULL UNIQUE,
-    created_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at     TIMESTAMPTZ NOT NULL DEFAULT now()
+    etymology_text VARCHAR     NOT NULL UNIQUE DEFAULT 'unknown',
+    created_at     TIMESTAMPTZ NOT NULL        DEFAULT now(),
+    updated_at     TIMESTAMPTZ NOT NULL        DEFAULT now()
 );
 -- endregion TABLES
 
@@ -225,3 +225,24 @@ CREATE TRIGGER etymology_updated
     FOR EACH ROW
 EXECUTE PROCEDURE set_current_timestamp();
 -- endregion TRIGGERS
+
+-- region INSERT
+INSERT INTO gender(id, name)
+VALUES (1, 'unknown'),
+       (2, 'женский'),
+       (3, 'мужской'),
+       (4, 'средний');
+
+INSERT INTO language(id, name, iso639_2, iso639_3)
+VALUES (1, 'лезгинский', 'lz', 'lez');
+
+INSERT INTO dialect(language_id, name)
+VALUES (1, 'литературный');
+
+INSERT INTO source (name, url)
+VALUES ('unknown', 'lekitech.org'),
+       ('Lezgi-Urus Gafalag v0.93', 'lezgi-pages.nm.ru');
+-- endregion INSERT
+
+-- CREATE DATABASE gafalag_db WITH OWNER docker;
+-- DROP DATABASE gafalag_db;

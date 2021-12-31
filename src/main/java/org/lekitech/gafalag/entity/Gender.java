@@ -6,31 +6,27 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
-import java.util.Set;
-
 
 @Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @RequiredArgsConstructor
-@Table(name = "dialect")
-public class Dialect {
+@EqualsAndHashCode(of = {
+        "id",
+        "name",
+        "createdAt"
+})
+@Table(name = "gender")
+public class Gender {
 
     @Id
     @GeneratedValue
-    public Long id;
+    private Long id;
 
     @NonNull
-    public String name;
-
-    @NonNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "language_id", nullable = false)
-    public Language language;
-
-    @OneToMany(mappedBy = "dialect", fetch = FetchType.LAZY)
-    private Set<Expression> expressions;
+    @Column(name = "name")
+    private String name;
 
     @CreationTimestamp
     @Column(name = "created_at")
