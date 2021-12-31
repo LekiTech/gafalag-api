@@ -1,5 +1,6 @@
 package org.lekitech.gafalag.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -9,46 +10,40 @@ import java.sql.Timestamp;
 import java.util.Set;
 
 @Entity
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @RequiredArgsConstructor
-@EqualsAndHashCode(of = {
-        "id",
-        "name",
-        "iso639_2",
-        "iso639_3"
-})
 @Table(name = "language")
 public class Language {
 
     @Id
     @GeneratedValue
-    private Long id;
+    public Long id;
 
     @NonNull
     @Column(name = "name")
-    private String name;
+    public String name;
 
     @NonNull
     @Column(name = "iso639_2")
-    private String iso639_2;
+    public String iso2;
 
     @NonNull
     @Column(name = "iso639_3")
-    private String iso639_3;
+    public String iso3;
 
     @CreationTimestamp
     @Column(name = "created_at")
-    private Timestamp createdAt;
+    public Timestamp createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at")
-    private Timestamp updatedAt;
+    public Timestamp updatedAt;
 
-    @OneToMany(mappedBy = "language", cascade = CascadeType.ALL)
-    private Set<Dialect> dialects;
+    @OneToMany(mappedBy = "language", fetch = FetchType.LAZY)
+    public Set<Dialect> dialects;
 
-    @OneToMany(mappedBy = "language")
-    private Set<Expression> expressions;
+    @JsonIgnore
+    @OneToMany(mappedBy = "language", fetch = FetchType.LAZY)
+    public Set<Expression> expressions;
 }

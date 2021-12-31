@@ -16,9 +16,4 @@ public class LanguageDto {
     private String iso639_2;
     private String iso639_3;
 
-    public LanguageDto(@NonNull Language language) {
-        this.name = language.getName();
-        this.iso639_2 = language.getIso639_2();
-        this.iso639_3 = language.getIso639_3();
-    }
 }
