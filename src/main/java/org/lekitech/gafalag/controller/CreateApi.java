@@ -18,17 +18,19 @@ public class CreateApi {
     private final ExpressionService expressionService;
     private final DialectService dialectService;
     private final LanguageService languageService;
+    private final GenderService genderService;
 
     @PostMapping(path = "/expression")
     public Response saveExpression(@RequestBody ExpressionDto dto) {
         val language = languageService.getById(dto.getLanguageId());
         val dialect = dialectService.findById(dto.getDialectId());
+        val gender = genderService.findById(dto.getGenderId());
         val exp = expressionService
                 .save(new Expression(
                         dto.getSpelling(),
                         dto.getMisspelling(),
                         dto.getInflection(),
-                        dto.getGender(),
+                        gender,
                         language,
                         dialect
                 ));
@@ -36,7 +38,7 @@ public class CreateApi {
                 exp.getSpelling(),
                 exp.getMisspelling(),
                 exp.getInflection(),
-                exp.getGender(),
+                gender.getName(),
                 new LanguageDto(language),
                 dialect.getName()
         );

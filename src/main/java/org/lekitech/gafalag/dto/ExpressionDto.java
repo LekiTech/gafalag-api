@@ -17,4 +17,5 @@ public class ExpressionDto {
     private Gender gender;
     private Long dialectId;
     private Long languageId;
+    private Long genderId;
 }

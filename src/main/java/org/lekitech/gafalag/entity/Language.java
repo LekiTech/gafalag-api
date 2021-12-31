@@ -13,36 +13,42 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @RequiredArgsConstructor
-@EqualsAndHashCode(of = {"id", "name", "iso639_2", "iso639_3"})
-@Table(name = "language", uniqueConstraints = @UniqueConstraint(columnNames = {"name", "iso639_2", "iso639_3"}))
+@EqualsAndHashCode(of = {
+        "id",
+        "name",
+        "iso639_2",
+        "iso639_3"
+})
+@Table(name = "language")
 public class Language {
 
     @Id
-    @SequenceGenerator(name = "language_seq", sequenceName = "language_seq")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "language_seq")
+    @GeneratedValue
     private Long id;
 
     @NonNull
-    @Column(unique = true)
+    @Column(name = "name")
     private String name;
 
     @NonNull
-    @Column(unique = true)
+    @Column(name = "iso639_2")
     private String iso639_2;
 
     @NonNull
-    @Column(unique = true)
+    @Column(name = "iso639_3")
     private String iso639_3;
 
     @CreationTimestamp
+    @Column(name = "created_at")
     private Timestamp createdAt;
 
     @UpdateTimestamp
+    @Column(name = "updated_at")
     private Timestamp updatedAt;
 
-    @OneToMany(mappedBy = "language", orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "language", cascade = CascadeType.ALL)
     private Set<Dialect> dialects;
 
-    @OneToMany(mappedBy = "language", orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "language")
     private Set<Expression> expressions;
 }
