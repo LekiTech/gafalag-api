@@ -22,8 +22,7 @@ import java.util.UUID;
 @Table(name = "definition")
 public class Definition implements Serializable {
     @Id
-    @GeneratedValue(generator = UUIDGenerator.UUID_GEN_STRATEGY)
-    @Type(type = "org.hibernate.type.PostgresUUIDType")
+    @GeneratedValue()
     public UUID id;
 
     @NonNull

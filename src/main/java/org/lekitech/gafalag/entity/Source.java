@@ -21,8 +21,7 @@ import java.util.UUID;
 public class Source {
 
     @Id
-    @GeneratedValue(generator = UUIDGenerator.UUID_GEN_STRATEGY)
-    @Type(type = "org.hibernate.type.PostgresUUIDType")
+    @GeneratedValue()
     public UUID id;
 
     @NonNull
