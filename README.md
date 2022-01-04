@@ -26,3 +26,14 @@ docker-compose up -d
 ```
 
 Only one of the 2 options should be chosen, running both will consume more memory and disc space 
+
+## Empty all tables
+```
+DO $$ DECLARE
+  r RECORD;
+BEGIN
+  FOR r IN (SELECT tablename FROM pg_tables WHERE schemaname = current_schema()) LOOP
+    EXECUTE 'TRUNCATE TABLE ' || quote_ident(r.tablename) || ' CASCADE';
+  END LOOP;
+END $$;
+```
