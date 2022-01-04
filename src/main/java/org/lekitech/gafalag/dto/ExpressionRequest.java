@@ -1,37 +1,26 @@
 package org.lekitech.gafalag.dto;
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import org.lekitech.gafalag.entity.*;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.UUID;
 
 public record ExpressionRequest(
         UUID sourceId,
         String expressionLanguageIso3,
         String definitionLanguageIso3,
-        String spelling,
-        Optional<String> inflection,
-        List<String> definitions
+        @JsonUnwrapped
+        Article article
 ) {
 
     public Expression content(Source source,
                               Language expressionLanguage,
                               Language definitionLanguage) {
         return new Expression(
-                spelling,
-                inflection,
+                article.spelling(),
+                article.inflection(),
                 expressionLanguage,
-                definitions(source, definitionLanguage)
+                article.definitions(source, definitionLanguage)
         );
-    }
-
-    public List<Definition> definitions(Source source,
-                                        Language language) {
-        return definitions.stream()
-                .map(definition -> new Definition(
-                        definition,
-                        language,
-                        source
-                )).collect(Collectors.toList());
     }
 }
