@@ -16,4 +16,16 @@ public record ExpressionBatchRequest(
         String expressionLanguageIso3,
         String definitionLanguageIso3,
         List<Article> dictionary
-) {}
+) {
+
+    /**
+     * @param spelling    source expression
+     * @param inflection  possible value
+     * @param definitions an array with formatted texts
+     */
+    public record Article(
+            String spelling,
+            Optional<String> inflection,
+            List<String> definitions
+    ) {}
+}

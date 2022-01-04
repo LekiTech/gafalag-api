@@ -1,16 +1,17 @@
 package org.lekitech.gafalag.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 import org.lekitech.gafalag.dto.*;
-import org.lekitech.gafalag.entity.Expression;
-import org.lekitech.gafalag.service.*;
+import org.lekitech.gafalag.service.ExpressionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
+import java.io.IOException;
 import java.util.Optional;
 
 @Slf4j
@@ -20,21 +21,26 @@ import java.util.Optional;
 public class ExpressionController {
 
     private final ExpressionService expressionService;
-    private final LanguageService languageService;
-    private final SourceService sourceService;
 
     @PostMapping(path = "/batch")
-    public List<Expression> saveExpression(@RequestBody ExpressionBatchRequest request) {
-        return expressionService.saveBatch(request);
+    public HttpStatus saveExpressions(@RequestParam("file") @NonNull MultipartFile file) {
+        if (file.isEmpty()) {
+            return HttpStatus.NOT_FOUND;
+        }
+        try {
+            expressionService.saveBatch(new ObjectMapper().readValue(
+                    file.getBytes(), ExpressionBatchRequest.class
+            ));
+            return HttpStatus.CREATED;
+        } catch (IOException e) {
+            return HttpStatus.BAD_REQUEST;
+        }
     }
 
     @PostMapping
     public HttpStatus saveExpression(@RequestBody ExpressionRequest expression) {
-        val source = sourceService.getById(expression.sourceId());
-        val expressionLang = languageService.getByIso3(expression.expressionLanguageIso3());
-        val definitionLang = languageService.getByIso3(expression.definitionLanguageIso3());
-        expressionService.save(expression.content(source, expressionLang, definitionLang));
-        return HttpStatus.OK;
+        expressionService.save(expression);
+        return HttpStatus.CREATED;
     }
 
     @GetMapping(path = "")

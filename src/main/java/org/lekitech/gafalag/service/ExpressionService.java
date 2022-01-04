@@ -2,22 +2,17 @@ package org.lekitech.gafalag.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.lekitech.gafalag.dto.ExpressionBatchRequest;
-import org.lekitech.gafalag.dto.ExpressionDto;
-import org.lekitech.gafalag.dto.PaginatedResult;
+import lombok.val;
+import org.lekitech.gafalag.dto.*;
 import org.lekitech.gafalag.entity.Definition;
 import org.lekitech.gafalag.entity.Expression;
 import org.lekitech.gafalag.repository.ExpressionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -39,10 +34,6 @@ public class ExpressionService {
         return getPaginated(page, size, languageIso3, "spelling", false);
     }
 
-    public PaginatedResult<ExpressionDto> getPaginated(int page, int size, Optional<String> languageIso3, String sortBy) {
-        return getPaginated(page, size, languageIso3, sortBy, false);
-    }
-
     @Transactional(readOnly = true)
     public PaginatedResult<ExpressionDto> getPaginated(int page, int size, Optional<String> languageIso3, String sortBy, boolean descending) {
         var sort = Sort.by(sortBy);
@@ -59,8 +50,24 @@ public class ExpressionService {
         return new PaginatedResult<>(pageDb.getTotalElements(), pageDb.getTotalPages(), pageDb.getNumber(), pageDb.getSize(), expressions);
     }
 
-    public Expression save(Expression expression) {
-        return repository.save(expression);
+    public PaginatedResult<ExpressionDto> getPaginated(int page, int size, Optional<String> languageIso3, String sortBy) {
+        return getPaginated(page, size, languageIso3, sortBy, false);
+    }
+
+    public Expression save(ExpressionRequest request) {
+        val source = sourceService.getById(request.sourceId());
+        val expressionLanguage = languageService.getByIso3(request.expressionLanguageIso3());
+        val definitionLanguage = languageService.getByIso3(request.definitionLanguageIso3());
+        return repository.save(
+                new Expression(
+                        request.spelling(),
+                        request.inflection(),
+                        expressionLanguage,
+                        request.definitions().stream()
+                                .map(value -> new Definition(value, definitionLanguage, source))
+                                .toList()
+                )
+        );
     }
 
     public List<Expression> saveBatch(ExpressionBatchRequest expressionBatchRequest) {
