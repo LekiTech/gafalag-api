@@ -12,11 +12,12 @@ import java.util.Set;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor = @__(@NonNull))
 @Table(name = "language")
 public class Language {
 
     @Id
+    @NonNull
     @GeneratedValue
     public Long id;
 

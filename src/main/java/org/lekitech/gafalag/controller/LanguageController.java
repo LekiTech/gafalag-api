@@ -29,7 +29,7 @@ public class LanguageController {
 
     @PostMapping(path = "")
     public void saveLanguage(@RequestBody LanguageDto dto) {
-        languageService.save(new Language(dto.getName(), dto.getIso639_2(), dto.getIso639_3()));
+        // languageService.save(new Language(dto.getName(), dto.getIso639_2(), dto.getIso639_3()));
     }
 
     @PostMapping(path = "/dialect")
