@@ -17,7 +17,6 @@ import java.util.Set;
 public class Language {
 
     @Id
-    @NonNull
     @GeneratedValue
     public Long id;
 
