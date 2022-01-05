@@ -1,6 +1,6 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
-CREATE TYPE mediatype AS ENUM ('AUDIO','IMAGE');
+CREATE TYPE MEDIATYPE AS ENUM ('AUDIO','IMAGE');
 
 -- region TABLES
 CREATE TABLE expression (
@@ -49,7 +49,7 @@ CREATE TABLE dialect (
 CREATE TABLE mediafile (
     id            SERIAL PRIMARY KEY,
     expression_id UUID        NOT NULL,
-    mediatype     mediatype   NOT NULL,
+    mediatype     MEDIATYPE   NOT NULL,
     url           VARCHAR     NOT NULL,
     created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at    TIMESTAMPTZ NOT NULL DEFAULT now()
@@ -152,8 +152,8 @@ CREATE OR REPLACE FUNCTION set_current_timestamp()
     RETURNS TRIGGER AS
 $$
 BEGIN
-    NEW.updated_at = now();
-    RETURN NEW;
+    new.updated_at = now();
+    RETURN new;
 END
 $$ LANGUAGE plpgsql;
 -- endregion FUNCTIONS
@@ -225,24 +225,3 @@ CREATE TRIGGER etymology_updated
     FOR EACH ROW
 EXECUTE PROCEDURE set_current_timestamp();
 -- endregion TRIGGERS
-
--- region INSERT
-INSERT INTO gender(id, name)
-VALUES (1, 'unknown'),
-       (2, 'женский'),
-       (3, 'мужской'),
-       (4, 'средний');
-
-INSERT INTO language(id, name, iso639_2, iso639_3)
-VALUES (1, 'лезгинский', 'lz', 'lez');
-
-INSERT INTO dialect(language_id, name)
-VALUES (1, 'литературный');
-
-INSERT INTO source (name, url)
-VALUES ('unknown', 'lekitech.org'),
-       ('Lezgi-Urus Gafalag v0.93', 'lezgi-pages.nm.ru');
--- endregion INSERT
-
--- CREATE DATABASE gafalag_db WITH OWNER docker;
--- DROP DATABASE gafalag_db;

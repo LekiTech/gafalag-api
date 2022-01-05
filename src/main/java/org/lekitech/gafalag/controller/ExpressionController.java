@@ -24,7 +24,6 @@ public class ExpressionController {
     private final ExpressionService expressionService;
 
     @PostMapping(path = "/batch")
-
     public HttpStatus saveExpressions(@RequestParam(value = "file") MultipartFile file) {
         if (file.isEmpty()) {
             return HttpStatus.NOT_FOUND;

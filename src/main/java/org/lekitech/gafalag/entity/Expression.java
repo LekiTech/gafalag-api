@@ -9,7 +9,6 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 @Entity
@@ -76,12 +75,7 @@ public class Expression implements Serializable {
         this.spelling = spelling;
         inflection.ifPresent(value -> this.inflection = value);
         this.language = language;
-        this.definitions = definitions.stream()
-                .peek(def -> def.setExpression(this))
-                .collect(Collectors.toList());
-        // Important for cascade persistence
-        // for (var definition : definitions) {
-        //     definition.expression = this;
-        // }
+        definitions.forEach(def -> def.setExpression(this));
+        this.definitions = definitions;
     }
 }
