@@ -8,9 +8,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Timestamp;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 
 @Entity
@@ -70,14 +68,14 @@ public class Expression implements Serializable {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "expression", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     public List<Definition> definitions = new java.util.ArrayList<>();
 
-    public Expression(String spelling, Optional<String> inflection, Language language, List<Definition> definitions) {
+    public Expression(@NonNull String spelling,
+                      Optional<String> inflection,
+                      @NonNull Language language,
+                      List<Definition> definitions) {
         this.spelling = spelling;
         inflection.ifPresent(value -> this.inflection = value);
         this.language = language;
+        definitions.forEach(def -> def.setExpression(this));
         this.definitions = definitions;
-        // Important for cascade persistence
-        for (var definition : definitions) {
-            definition.expression = this;
-        }
     }
 }

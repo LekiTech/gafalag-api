@@ -1,15 +1,18 @@
 package org.lekitech.gafalag.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.lekitech.gafalag.dto.*;
-import org.lekitech.gafalag.entity.*;
-import org.lekitech.gafalag.service.*;
+import org.lekitech.gafalag.service.ExpressionService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
+import java.io.IOException;
 import java.util.Optional;
 
 @Slf4j
@@ -21,8 +24,26 @@ public class ExpressionController {
     private final ExpressionService expressionService;
 
     @PostMapping(path = "/batch")
-    public List<Expression> saveExpressions(@RequestBody ExpressionBatchRequest request) {
-        return expressionService.saveBatch(request);
+    public HttpStatus saveExpressions(@RequestParam(value = "file") MultipartFile file) {
+        if (file.isEmpty()) {
+            return HttpStatus.NOT_FOUND;
+        }
+        val mapper = new ObjectMapper().registerModule(new Jdk8Module());
+        try {
+            expressionService.saveBatch(mapper.readValue(
+                    file.getBytes(), ExpressionBatchRequest.class
+            ));
+            return HttpStatus.CREATED;
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            return HttpStatus.BAD_REQUEST;
+        }
+    }
+
+    @PostMapping
+    public HttpStatus saveExpression(@RequestBody ExpressionRequest expression) {
+        expressionService.save(expression);
+        return HttpStatus.CREATED;
     }
 
     @GetMapping(path = "")
