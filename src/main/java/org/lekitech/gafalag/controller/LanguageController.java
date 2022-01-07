@@ -2,8 +2,8 @@ package org.lekitech.gafalag.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.lekitech.gafalag.dto.DialectDto;
-import org.lekitech.gafalag.dto.LanguageDto;
+import org.lekitech.gafalag.dto.DialectRequest;
+import org.lekitech.gafalag.dto.LanguageRequest;
 import org.lekitech.gafalag.entity.Dialect;
 import org.lekitech.gafalag.entity.Language;
 import org.lekitech.gafalag.service.DialectService;
@@ -28,13 +28,13 @@ public class LanguageController {
     }
 
     @PostMapping(path = "")
-    public void saveLanguage(@RequestBody LanguageDto dto) {
+    public void saveLanguage(@RequestBody LanguageRequest dto) {
          languageService.save(new Language(dto.name(), dto.iso639_2(), dto.iso639_3()));
     }
 
     @PostMapping(path = "/dialect")
-    public void saveDialect(@RequestBody DialectDto dto) {
-        var language = languageService.getById(dto.getLanguageId());
-        dialectService.save(new Dialect(dto.getName(), language));
+    public void saveDialect(@RequestBody DialectRequest dto) {
+        var language = languageService.getById(dto.languageId());
+        dialectService.save(new Dialect(dto.name(), language));
     }
 }
