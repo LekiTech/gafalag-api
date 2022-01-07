@@ -9,10 +9,11 @@ import org.lekitech.gafalag.dto.*;
 import org.lekitech.gafalag.service.ExpressionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.Optional;
 
 @Slf4j
@@ -23,20 +24,17 @@ public class ExpressionController {
 
     private final ExpressionService expressionService;
 
-    @PostMapping(path = "/batch")
-    public HttpStatus saveExpressions(@RequestParam(value = "file") MultipartFile file) {
-        if (file.isEmpty()) {
-            return HttpStatus.NOT_FOUND;
-        }
-        val mapper = new ObjectMapper().registerModule(new Jdk8Module());
+    @PostMapping(path = "/batch", consumes = "multipart/form-data")
+    public ResponseEntity<String> saveExpressions(@RequestPart("file") MultipartFile file) {
         try {
+            val mapper = new ObjectMapper().registerModule(new Jdk8Module());
             expressionService.saveBatch(mapper.readValue(
                     file.getBytes(), ExpressionBatchRequest.class
             ));
-            return HttpStatus.CREATED;
-        } catch (IOException e) {
+            return ResponseEntity.ok().body(MessageFormat.format("{0} - uploaded success!", file.getOriginalFilename()));
+        } catch (Exception e) {
             log.error(e.getMessage());
-            return HttpStatus.BAD_REQUEST;
+            return ResponseEntity.badRequest().body(e.getLocalizedMessage());
         }
     }
 
