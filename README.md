@@ -1,7 +1,7 @@
 # gafalag-api
 
 ## How to run
-Gafalag API depends on database connection so make sure PostgreSQL database with correct scheme is running on port `5432`
+Gafalag API depends on database connection so make sure PostgreSQL database with correct scheme is running on port `5433`
 
 Easiest way to start with development is to run database with Docker. Follow the steps below to do so:
 
@@ -13,7 +13,7 @@ docker build -t gafalag-api-db -f ./docker/db/Dockerfile .
 ```
 After that enter command below to run Docker container of gafalag-api database
 ```shell
-docker run -d -p 5432:5432 --name gafalag-api-db gafalag-api-db:latest
+docker run -d -p 5433:5432 --name gafalag-api-db gafalag-api-db:latest
 ```
 Once steps above are done simply run this java project from your IDE
 
