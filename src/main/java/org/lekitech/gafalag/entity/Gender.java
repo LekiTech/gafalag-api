@@ -21,7 +21,7 @@ import java.sql.Timestamp;
 public class Gender {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(generator = "gender_id_seq")
     private Long id;
 
     @NonNull

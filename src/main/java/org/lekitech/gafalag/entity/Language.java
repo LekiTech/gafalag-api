@@ -17,7 +17,7 @@ import java.util.Set;
 public class Language {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(generator = "language_id_seq")
     public Long id;
 
     @NonNull

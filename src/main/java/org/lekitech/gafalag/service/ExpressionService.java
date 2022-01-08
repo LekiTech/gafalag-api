@@ -12,7 +12,8 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -30,15 +31,18 @@ public class ExpressionService {
         return repository.findById(id).orElseThrow();
     }
 
-    public PaginatedResult<ExpressionDto> getPaginated(int page, int size, Optional<String> languageIso3) {
+    public PaginatedResult<ExpressionResponse> getPaginated(int page, int size, Optional<String> languageIso3) {
         return getPaginated(page, size, languageIso3, "spelling", false);
     }
 
     @Transactional(readOnly = true)
-    public PaginatedResult<ExpressionDto> getPaginated(int page, int size, Optional<String> languageIso3, String sortBy, boolean descending) {
+    public PaginatedResult<ExpressionResponse> getPaginated(int page,
+                                                            int size,
+                                                            Optional<String> languageIso3,
+                                                            String sortBy,
+                                                            boolean descending) {
         var sort = Sort.by(sortBy);
         var pages = PageRequest.of(page, size, descending ? sort.descending() : sort.ascending());
-        System.out.println("CALLED: getPaginated");
         Page<Expression> pageDb;
         if (languageIso3.isPresent()) {
             var expressionLanguage = languageService.getByIso3(languageIso3.get());
@@ -46,11 +50,32 @@ public class ExpressionService {
         } else {
             pageDb = repository.findAll(pages);
         }
-        var expressions = pageDb.stream().map(ExpressionDto::new).toList();
-        return new PaginatedResult<>(pageDb.getTotalElements(), pageDb.getTotalPages(), pageDb.getNumber(), pageDb.getSize(), expressions);
+        var expressions = pageDb.stream()
+                .map(expression -> new ExpressionResponse(
+                        expression.id,
+                        expression.spelling,
+                        expression.misspelling,
+                        expression.inflection,
+                        expression.genderId,
+                        expression.languageId,
+                        expression.dialectId,
+                        expression.definitions.stream()
+                                .map(definition -> new DefinitionResponse(
+                                        definition.text,
+                                        definition.language.name,
+                                        definition.source.name
+                                )).toList()
+                )).toList();
+        return new PaginatedResult<>(
+                pageDb.getTotalElements(),
+                pageDb.getTotalPages(),
+                pageDb.getNumber(),
+                pageDb.getSize(),
+                expressions
+        );
     }
 
-    public PaginatedResult<ExpressionDto> getPaginated(int page, int size, Optional<String> languageIso3, String sortBy) {
+    public PaginatedResult<ExpressionResponse> getPaginated(int page, int size, Optional<String> languageIso3, String sortBy) {
         return getPaginated(page, size, languageIso3, sortBy, false);
     }
 
@@ -70,21 +95,17 @@ public class ExpressionService {
         );
     }
 
-    public List<Expression> saveBatch(ExpressionBatchRequest expressionBatchRequest) {
+    public void saveBatch(ExpressionBatchRequest expressionBatchRequest) {
         var expressionLanguage = languageService.getByIso3(expressionBatchRequest.expressionLanguageIso3());
         var definitionLanguage = languageService.getByIso3(expressionBatchRequest.definitionLanguageIso3());
-
         var source = sourceService.getOrCreate(expressionBatchRequest.name(), expressionBatchRequest.url());
-
         var expressions = expressionBatchRequest.dictionary().stream()
                 .map(article -> {
                     var definitions = article.definitions().stream()
                             .map(definition -> new Definition(definition, definitionLanguage, source))
                             .toList();
                     return new Expression(article.spelling(), article.inflection(), expressionLanguage, definitions);
-                })
-                .toList();
-
-        return repository.saveAll(expressions);
+                }).toList();
+        repository.saveAll(expressions);
     }
 }

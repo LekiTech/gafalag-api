@@ -28,7 +28,7 @@ docker-compose up -d
 Only one of the 2 options should be chosen, running both will consume more memory and disc space 
 
 ## Empty all tables
-```
+```postgresql
 DO $$ DECLARE
   r RECORD;
 BEGIN
