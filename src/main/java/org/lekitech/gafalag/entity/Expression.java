@@ -38,24 +38,14 @@ public class Expression implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     private Gender gender;
 
-    @JsonIgnore
-    @Column(name = "gender_id", insertable = false, updatable = false)
-    private Long genderId;
-
     @NonNull
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     private Language language;
-    @JsonIgnore
-    @Column(name = "language_id", insertable = false, updatable = false)
-    private Long languageId;
 
     @NonNull
     @ManyToOne(fetch = FetchType.LAZY)
     private Dialect dialect;
-    @JsonIgnore
-    @Column(name = "dialect_id", insertable = false, updatable = false)
-    private Long dialectId;
 
     @CreationTimestamp
     private Timestamp createdAt;
@@ -68,9 +58,9 @@ public class Expression implements Serializable {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "expression", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     public List<Definition> definitions = new java.util.ArrayList<>();
 
-    public Expression(@NonNull String spelling,
+    public Expression(String spelling,
                       Optional<String> inflection,
-                      @NonNull Language language,
+                      Language language,
                       List<Definition> definitions) {
         this.spelling = spelling;
         inflection.ifPresent(value -> this.inflection = value);
