@@ -4,6 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.lekitech.gafalag.dto.*;
+import org.lekitech.gafalag.dto.definition.DefinitionResponse;
+import org.lekitech.gafalag.dto.expression.ExpressionBatchRequest;
+import org.lekitech.gafalag.dto.expression.ExpressionMapper;
+import org.lekitech.gafalag.dto.expression.ExpressionRequest;
+import org.lekitech.gafalag.dto.expression.ExpressionResponse;
 import org.lekitech.gafalag.entity.Definition;
 import org.lekitech.gafalag.entity.Expression;
 import org.lekitech.gafalag.repository.ExpressionRepository;
@@ -46,26 +51,12 @@ public class ExpressionService {
         Page<Expression> pageDb;
         if (languageIso3.isPresent()) {
             var expressionLanguage = languageService.getByIso3(languageIso3.get());
-            pageDb = repository.findAllByLanguageId(expressionLanguage.id, pages);
+            pageDb = repository.findAllByLanguageId(expressionLanguage.getId(), pages);
         } else {
             pageDb = repository.findAll(pages);
         }
         var expressions = pageDb.stream()
-                .map(expression -> new ExpressionResponse(
-                        expression.id,
-                        expression.spelling,
-                        expression.misspelling,
-                        expression.inflection,
-                        expression.genderId,
-                        expression.languageId,
-                        expression.dialectId,
-                        expression.definitions.stream()
-                                .map(definition -> new DefinitionResponse(
-                                        definition.text,
-                                        definition.language.name,
-                                        definition.source.name
-                                )).toList()
-                )).toList();
+                .map(ExpressionMapper.INSTANCE::expressionToResponseDto).toList();
         return new PaginatedResult<>(
                 pageDb.getTotalElements(),
                 pageDb.getTotalPages(),

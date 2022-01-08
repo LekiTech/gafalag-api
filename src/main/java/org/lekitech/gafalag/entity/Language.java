@@ -10,6 +10,8 @@ import java.sql.Timestamp;
 import java.util.Set;
 
 @Entity
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @RequiredArgsConstructor
@@ -18,32 +20,32 @@ public class Language {
 
     @Id
     @GeneratedValue(generator = "language_id_seq")
-    public Long id;
+    private Long id;
 
     @NonNull
     @Column(name = "name")
-    public String name;
+    private String name;
 
     @NonNull
     @Column(name = "iso639_2")
-    public String iso2;
+    private String iso2;
 
     @NonNull
     @Column(name = "iso639_3")
-    public String iso3;
+    private String iso3;
 
     @CreationTimestamp
     @Column(name = "created_at")
-    public Timestamp createdAt;
+    private Timestamp createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at")
-    public Timestamp updatedAt;
+    private Timestamp updatedAt;
 
     @OneToMany(mappedBy = "language", fetch = FetchType.LAZY)
-    public Set<Dialect> dialects;
+    private Set<Dialect> dialects;
 
     @JsonIgnore
     @OneToMany(mappedBy = "language", fetch = FetchType.LAZY)
-    public Set<Expression> expressions;
+    private Set<Expression> expressions;
 }

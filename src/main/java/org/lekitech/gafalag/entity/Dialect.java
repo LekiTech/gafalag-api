@@ -10,7 +10,8 @@ import java.util.Set;
 
 
 @Entity
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @RequiredArgsConstructor
@@ -19,15 +20,15 @@ public class Dialect {
 
     @Id
     @GeneratedValue(generator = "dialect_id_seq")
-    public Long id;
+    private Long id;
 
     @NonNull
-    public String name;
+    private String name;
 
     @NonNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "language_id", nullable = false)
-    public Language language;
+    private Language language;
 
     @OneToMany(mappedBy = "dialect", fetch = FetchType.LAZY)
     private Set<Expression> expressions;

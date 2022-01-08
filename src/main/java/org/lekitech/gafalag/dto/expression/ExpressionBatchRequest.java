@@ -1,4 +1,4 @@
-package org.lekitech.gafalag.dto;
+package org.lekitech.gafalag.dto.expression;
 
 import java.util.List;
 import java.util.Optional;

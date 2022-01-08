@@ -1,7 +1,7 @@
-package org.lekitech.gafalag.dto;
+package org.lekitech.gafalag.dto.definition;
 
 public record DefinitionResponse(
-        String definition,
+        String text,
         String language,
         String source
 ) {}
