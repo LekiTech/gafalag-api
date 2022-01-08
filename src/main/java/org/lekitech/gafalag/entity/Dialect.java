@@ -18,7 +18,7 @@ import java.util.Set;
 public class Dialect {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(generator = "dialect_id_seq")
     public Long id;
 
     @NonNull

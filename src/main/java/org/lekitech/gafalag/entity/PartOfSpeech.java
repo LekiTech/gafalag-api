@@ -18,8 +18,7 @@ import java.sql.Timestamp;
 public class PartOfSpeech {
 
     @Id
-    @SequenceGenerator(name = "part_of_speech_seq", sequenceName = "part_of_speech_seq")
-    @GeneratedValue
+    @GeneratedValue(generator = "part_of_speech_id_seq")
     public Long id;
 
     @NonNull
