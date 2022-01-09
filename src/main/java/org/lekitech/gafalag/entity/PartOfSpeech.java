@@ -19,15 +19,15 @@ public class PartOfSpeech {
 
     @Id
     @GeneratedValue(generator = "part_of_speech_id_seq")
-    public Long id;
+    private Long id;
 
     @NonNull
     @Column(unique = true)
-    public String name;
+    private String name;
 
     @CreationTimestamp
-    public Timestamp createdAt;
+    private Timestamp createdAt;
 
     @UpdateTimestamp
-    public Timestamp updatedAt;
+    private Timestamp updatedAt;
 }

@@ -20,57 +20,47 @@ public class Expression implements Serializable {
 
     @Id
     @GeneratedValue
-    public UUID id;
+    private UUID id;
 
     @NonNull
     @Column
-    public String spelling;
+    private String spelling;
 
     @NonNull
     @Column
-    public Boolean misspelling;
+    private Boolean misspelling;
 
     @NonNull
     @Column
-    public String inflection;
+    private String inflection;
 
     @NonNull
     @ManyToOne(fetch = FetchType.LAZY)
-    public Gender gender;
-
-    @JsonIgnore
-    @Column(name = "gender_id", insertable = false, updatable = false)
-    public Long genderId;
+    private Gender gender;
 
     @NonNull
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    public Language language;
-    @JsonIgnore
-    @Column(name = "language_id", insertable = false, updatable = false)
-    public Long languageId;
+    private Language language;
 
     @NonNull
     @ManyToOne(fetch = FetchType.LAZY)
-    public Dialect dialect;
-    @JsonIgnore
-    @Column(name = "dialect_id", insertable = false, updatable = false)
-    public Long dialectId;
+    private Dialect dialect;
 
     @CreationTimestamp
-    public Timestamp createdAt;
+    private Timestamp createdAt;
 
     @UpdateTimestamp
-    public Timestamp updatedAt;
+    private Timestamp updatedAt;
 
     // Related tables
     @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "expression", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     public List<Definition> definitions = new java.util.ArrayList<>();
 
-    public Expression(@NonNull String spelling,
+    public Expression(String spelling,
                       Optional<String> inflection,
-                      @NonNull Language language,
+                      Language language,
                       List<Definition> definitions) {
         this.spelling = spelling;
         inflection.ifPresent(value -> this.inflection = value);

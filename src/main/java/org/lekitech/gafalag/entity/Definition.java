@@ -19,34 +19,34 @@ public class Definition implements Serializable {
 
     @Id
     @GeneratedValue
-    public UUID id;
+    private UUID id;
 
     @NonNull
     @Column(name = "definition_text")
-    public String text;
+    private String text;
 
     @NonNull
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "expression_id")
-    public Expression expression;
+    private Expression expression;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    public PartOfSpeech partOfSpeech;
-
-    @NonNull
-    @ManyToOne(fetch = FetchType.LAZY)
-    public Language language;
+    private PartOfSpeech partOfSpeech;
 
     @NonNull
     @ManyToOne(fetch = FetchType.LAZY)
-    public Source source;
+    private Language language;
+
+    @NonNull
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Source source;
 
     @CreationTimestamp
-    public Timestamp createdAt;
+    private Timestamp createdAt;
 
     @UpdateTimestamp
-    public Timestamp updatedAt;
+    private Timestamp updatedAt;
 
     public Definition(String text, Language language, Source source) {
         this.text = text;
