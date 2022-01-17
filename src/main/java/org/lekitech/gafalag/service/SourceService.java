@@ -32,7 +32,8 @@ public class SourceService {
         try {
             return sourceRepository.findByName(name).orElseThrow();
         } catch(Exception ex) {
-            var source = new Source(name, url);
+            var source = new Source(name);
+            url.ifPresent(source::setUrl);
             return sourceRepository.save(source);
         }
     }

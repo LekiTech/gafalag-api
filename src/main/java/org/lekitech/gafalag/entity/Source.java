@@ -24,7 +24,6 @@ public class Source {
     @Column(name = "name")
     private String name;
 
-    @NonNull
     @Column(name = "url")
     private String url;
 
