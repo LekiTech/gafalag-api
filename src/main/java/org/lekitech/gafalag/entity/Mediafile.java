@@ -22,9 +22,11 @@ public class Mediafile {
 
     @NonNull
     @Enumerated(EnumType.STRING)
+    @Column(name = "mediatype")
     private Mediatype mediatype;
 
     @NonNull
+    @Column(name = "url")
     private String url;
 
     @CreationTimestamp

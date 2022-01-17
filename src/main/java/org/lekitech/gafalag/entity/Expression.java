@@ -1,12 +1,10 @@
 package org.lekitech.gafalag.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.*;
 
@@ -14,53 +12,51 @@ import java.util.*;
 @Entity
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor
+@EqualsAndHashCode(of = {"id", "spelling"})
 @Table(name = "expression")
-public class Expression implements Serializable {
+public class Expression {
 
     @Id
     @GeneratedValue
     private UUID id;
 
-    @NonNull
-    @Column
+    @Column(name = "spelling")
     private String spelling;
 
-    @NonNull
-    @Column
+    @Column(name = "misspelling")
     private Boolean misspelling;
 
-    @NonNull
-    @Column
+    @Column(name = "inflection")
     private String inflection;
 
-    @NonNull
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "gender_id")
     private Gender gender;
 
-    @NonNull
-    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "language_id")
     private Language language;
 
-    @NonNull
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "dialect_id")
     private Dialect dialect;
 
     @CreationTimestamp
+    @Column(name = "created_at")
     private Timestamp createdAt;
 
     @UpdateTimestamp
+    @Column(name = "updated_at")
     private Timestamp updatedAt;
 
-    // Related tables
-    @JsonIgnore
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "expression", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
-    public List<Definition> definitions = new java.util.ArrayList<>();
+    @OneToMany(mappedBy = "expression", cascade = CascadeType.PERSIST)
+    private List<Definition> definitions = new ArrayList<>();
 
-    public Expression(String spelling,
+    public Expression(@NonNull String spelling,
                       Optional<String> inflection,
-                      Language language,
+                      @NonNull Language language,
                       List<Definition> definitions) {
         this.spelling = spelling;
         inflection.ifPresent(value -> this.inflection = value);

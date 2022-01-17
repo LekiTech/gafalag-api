@@ -6,18 +6,14 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
 @RequiredArgsConstructor
-@EqualsAndHashCode(of = {
-        "id",
-        "name",
-        "createdAt"
-})
 @Table(name = "gender")
 public class Gender {
 
@@ -36,4 +32,7 @@ public class Gender {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private Timestamp updatedAt;
+
+    @OneToMany(mappedBy = "gender", cascade = CascadeType.PERSIST)
+    private List<Expression> expressions = new ArrayList<>();
 }

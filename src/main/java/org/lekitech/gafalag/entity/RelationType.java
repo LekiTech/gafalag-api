@@ -20,6 +20,7 @@ public class RelationType {
     private Integer id;
 
     @NonNull
+    @Column(name = "name")
     private String name;
 
     @CreationTimestamp

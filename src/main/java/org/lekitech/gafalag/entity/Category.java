@@ -22,6 +22,7 @@ public class Category {
     private UUID id;
 
     @NonNull
+    @Column(name = "name")
     private String name;
 
     @CreationTimestamp

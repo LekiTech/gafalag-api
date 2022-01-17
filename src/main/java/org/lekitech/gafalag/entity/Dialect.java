@@ -6,15 +6,15 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.HashSet;
 import java.util.Set;
-
 
 @Entity
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
 @RequiredArgsConstructor
+@EqualsAndHashCode(of = {"id", "name"})
 @Table(name = "dialect")
 public class Dialect {
 
@@ -23,15 +23,13 @@ public class Dialect {
     private Long id;
 
     @NonNull
+    @Column(name = "name")
     private String name;
 
     @NonNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "language_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "language_id")
     private Language language;
-
-    @OneToMany(mappedBy = "dialect", fetch = FetchType.LAZY)
-    private Set<Expression> expressions;
 
     @CreationTimestamp
     @Column(name = "created_at")
@@ -40,4 +38,7 @@ public class Dialect {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private Timestamp updatedAt;
+
+    @OneToMany(mappedBy = "dialect", cascade = CascadeType.PERSIST)
+    private Set<Expression> expressions = new HashSet<>();
 }

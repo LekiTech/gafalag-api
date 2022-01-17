@@ -2,19 +2,16 @@ package org.lekitech.gafalag.entity;
 
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.hibernate.id.UUIDGenerator;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Getter
 @Setter
-@AllArgsConstructor
+@RequiredArgsConstructor
 @NoArgsConstructor
 @Table(name = "source")
 public class Source {
@@ -24,20 +21,21 @@ public class Source {
     private UUID id;
 
     @NonNull
-    @Column(unique = true)
+    @Column(name = "name")
     private String name;
 
-    @Column()
+    @NonNull
+    @Column(name = "url")
     private String url;
 
     @CreationTimestamp
+    @Column(name = "created_at")
     private Timestamp createdAt;
 
     @UpdateTimestamp
+    @Column(name = "updated_at")
     private Timestamp updatedAt;
 
-    public Source(String name, Optional<String> url) {
-        this.name = name;
-        url.ifPresent(value -> this.url = value);
-    }
+    @OneToMany(mappedBy = "source", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    private Set<Definition> definitions = new HashSet<>();
 }

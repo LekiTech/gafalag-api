@@ -1,9 +1,6 @@
 package org.lekitech.gafalag.entity;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -14,6 +11,7 @@ import java.sql.Timestamp;
 @Getter
 @Setter
 @NoArgsConstructor
+@RequiredArgsConstructor
 @Table(name = "part_of_speech")
 public class PartOfSpeech {
 
@@ -22,12 +20,14 @@ public class PartOfSpeech {
     private Long id;
 
     @NonNull
-    @Column(unique = true)
+    @Column(name = "name")
     private String name;
 
     @CreationTimestamp
+    @Column(name = "created_at")
     private Timestamp createdAt;
 
     @UpdateTimestamp
+    @Column(name = "updated_at")
     private Timestamp updatedAt;
 }

@@ -1,20 +1,20 @@
 package org.lekitech.gafalag.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
 @RequiredArgsConstructor
+@EqualsAndHashCode(of = {"id", "name", "iso2", "iso3"})
 @Table(name = "language")
 public class Language {
 
@@ -27,11 +27,11 @@ public class Language {
     private String name;
 
     @NonNull
-    @Column(name = "iso639_2")
+    @Column(name = "iso639_2", length = 2)
     private String iso2;
 
     @NonNull
-    @Column(name = "iso639_3")
+    @Column(name = "iso639_3", length = 3)
     private String iso3;
 
     @CreationTimestamp
@@ -42,10 +42,9 @@ public class Language {
     @Column(name = "updated_at")
     private Timestamp updatedAt;
 
-    @OneToMany(mappedBy = "language", fetch = FetchType.LAZY)
-    private Set<Dialect> dialects;
+    @OneToMany(mappedBy = "language", cascade = CascadeType.PERSIST)
+    private Set<Dialect> dialects = new HashSet<>();
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "language", fetch = FetchType.LAZY)
-    private Set<Expression> expressions;
+    @OneToMany(mappedBy = "language", cascade = CascadeType.PERSIST)
+    private Set<Expression> expressions = new HashSet<>();
 }

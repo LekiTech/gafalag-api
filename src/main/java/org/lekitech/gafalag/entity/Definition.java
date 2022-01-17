@@ -1,12 +1,10 @@
 package org.lekitech.gafalag.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.UUID;
 
@@ -14,8 +12,10 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
+@RequiredArgsConstructor
+@EqualsAndHashCode(of = {"id", "text"})
 @Table(name = "definition")
-public class Definition implements Serializable {
+public class Definition {
 
     @Id
     @GeneratedValue
@@ -25,39 +25,29 @@ public class Definition implements Serializable {
     @Column(name = "definition_text")
     private String text;
 
-    @NonNull
-    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "expression_id")
     private Expression expression;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "part_of_speech_id")
     private PartOfSpeech partOfSpeech;
 
     @NonNull
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "language_id")
     private Language language;
 
     @NonNull
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "source_id")
     private Source source;
 
     @CreationTimestamp
+    @Column(name = "created_at")
     private Timestamp createdAt;
 
     @UpdateTimestamp
+    @Column(name = "updated_at")
     private Timestamp updatedAt;
-
-    public Definition(String text, Language language, Source source) {
-        this.text = text;
-        this.language = language;
-        this.source = source;
-    }
-
-    public Definition(String text, Language language, Source source, Expression expression) {
-        this.text = text;
-        this.language = language;
-        this.source = source;
-        this.expression = expression;
-    }
 }
