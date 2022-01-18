@@ -25,6 +25,7 @@ public class Definition {
     @Column(name = "definition_text")
     private String text;
 
+    @NonNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "expression_id")
     private Expression expression;

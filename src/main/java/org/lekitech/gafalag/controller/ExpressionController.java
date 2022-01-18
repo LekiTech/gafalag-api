@@ -5,13 +5,11 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.lekitech.gafalag.dto.*;
-import org.lekitech.gafalag.dto.expression.ExpressionBatchRequest;
-import org.lekitech.gafalag.dto.expression.ExpressionRequest;
-import org.lekitech.gafalag.dto.expression.ExpressionResponse;
-import org.lekitech.gafalag.service.ExpressionService;
+import org.lekitech.gafalag.dto.PaginatedResult;
+import org.lekitech.gafalag.dto.expression.*;
+import org.lekitech.gafalag.mapper.ExpressionMapper;
+import org.lekitech.gafalag.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,6 +24,7 @@ import java.util.Optional;
 public class ExpressionController {
 
     private final ExpressionService expressionService;
+    private final ExpressionMapper expressionMapper;
 
     @PostMapping(path = "/batch", consumes = "multipart/form-data")
     public ResponseEntity<String> saveExpressions(@RequestPart("file") MultipartFile file) {
@@ -42,9 +41,8 @@ public class ExpressionController {
     }
 
     @PostMapping
-    public HttpStatus saveExpression(@RequestBody ExpressionRequest expression) {
-        expressionService.save(expression);
-        return HttpStatus.CREATED;
+    public ExpressionResponse saveExpression(@RequestBody ExpressionRequest request) {
+        return expressionMapper.toDto(expressionService.save(request));
     }
 
     @GetMapping(path = "")

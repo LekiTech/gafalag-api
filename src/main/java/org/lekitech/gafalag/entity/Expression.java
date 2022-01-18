@@ -14,6 +14,7 @@ import java.util.*;
 @Setter
 @ToString
 @NoArgsConstructor
+@RequiredArgsConstructor
 @EqualsAndHashCode(of = {"id", "spelling"})
 @Table(name = "expression")
 public class Expression {
@@ -22,6 +23,7 @@ public class Expression {
     @GeneratedValue
     private UUID id;
 
+    @NonNull
     @Column(name = "spelling")
     private String spelling;
 
@@ -35,6 +37,7 @@ public class Expression {
     @JoinColumn(name = "gender_id")
     private Gender gender;
 
+    @NonNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "language_id")
     private Language language;
@@ -53,15 +56,4 @@ public class Expression {
 
     @OneToMany(mappedBy = "expression", cascade = CascadeType.PERSIST)
     private List<Definition> definitions = new ArrayList<>();
-
-    public Expression(@NonNull String spelling,
-                      Optional<String> inflection,
-                      @NonNull Language language,
-                      List<Definition> definitions) {
-        this.spelling = spelling;
-        inflection.ifPresent(value -> this.inflection = value);
-        this.language = language;
-        definitions.forEach(def -> def.setExpression(this));
-        this.definitions = definitions;
-    }
 }
