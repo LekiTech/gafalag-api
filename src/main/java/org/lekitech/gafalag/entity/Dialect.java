@@ -11,7 +11,6 @@ import java.sql.Timestamp;
 @Getter
 @Setter
 @NoArgsConstructor
-@RequiredArgsConstructor
 @EqualsAndHashCode(of = {"id", "name"})
 @Table(name = "dialect")
 public class Dialect {
@@ -20,11 +19,9 @@ public class Dialect {
     @GeneratedValue(generator = "dialect_id_seq")
     private Long id;
 
-    @NonNull
     @Column(name = "name")
     private String name;
 
-    @NonNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "language_id")
     private Language language;
@@ -36,4 +33,10 @@ public class Dialect {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private Timestamp updatedAt;
+
+    public Dialect(String name,
+                   Language language) {
+        this.name = name;
+        this.language = language;
+    }
 }

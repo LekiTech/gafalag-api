@@ -14,20 +14,16 @@ import java.util.UUID;
 @Setter
 @Immutable
 @NoArgsConstructor
-@RequiredArgsConstructor
 @Table(name = "expression_relation")
 public class ExpressionRelation implements Serializable {
 
-    @NonNull
     @EmbeddedId
     private ExpressionRelationId expressionRelationId;
 
-    @NonNull
     @ManyToOne
     @JoinColumn(name = "expression_1_id", insertable = false, updatable = false)
     private Expression expression1;
 
-    @NonNull
     @ManyToOne
     @JoinColumn(name = "expression_2_id", insertable = false, updatable = false)
     private Expression expression2;

@@ -83,20 +83,16 @@ public class ExpressionService {
                                         List<String> definitions) {
         val expressionLanguage = languageService.getByIso3(expressionIso3);
         val definitionLanguage = languageService.getByIso3(definitionIso3);
-        val expression = new Expression(spelling, expressionLanguage);
-        inflection.ifPresent(expression::setInflection);
-        expression.setDefinitions(definitions.stream()
-                .map(text -> new Definition(
-                        text, expression, definitionLanguage, source
-                )).toList()
-        );
-        return expression;
+        val defs = definitions.stream().map(text -> new Definition(
+                text, definitionLanguage, source
+        )).toList();
+        return new Expression(spelling, inflection.orElse(null), expressionLanguage, defs);
     }
 
     public void saveBatch(ExpressionBatchRequest request) {
         val expLang = request.expressionLanguageIso3();
         val defLang = request.definitionLanguageIso3();
-        val source = sourceService.getOrCreate(request.name(), request.url());
+        val source = sourceService.getOrCreate(request.name(), request.url().orElse(null));
         repository.saveAll(request.dictionary()
                 .stream().map(article -> createExpression(
                         expLang, defLang, source,

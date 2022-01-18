@@ -12,7 +12,6 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
-@RequiredArgsConstructor
 @EqualsAndHashCode(of = {"id", "name"})
 @Table(name = "category")
 public class Category {
@@ -21,7 +20,6 @@ public class Category {
     @GeneratedValue
     private UUID id;
 
-    @NonNull
     @Column(name = "name")
     private String name;
 
@@ -32,4 +30,8 @@ public class Category {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private Timestamp updatedAt;
+
+    public Category(String name) {
+        this.name = name;
+    }
 }

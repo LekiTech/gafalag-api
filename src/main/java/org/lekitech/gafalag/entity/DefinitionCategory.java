@@ -14,20 +14,16 @@ import java.util.UUID;
 @Setter
 @Immutable
 @NoArgsConstructor
-@RequiredArgsConstructor
 @Table(name = "definition_category")
 public class DefinitionCategory {
 
-    @NonNull
     @EmbeddedId
     private DefinitionCategoryId definitionCategoryId;
 
-    @NonNull
     @ManyToOne
     @JoinColumn(name = "definition_id", insertable = false, updatable = false)
     private Definition definition;
 
-    @NonNull
     @ManyToOne
     @JoinColumn(name = "category_id", insertable = false, updatable = false)
     private Category category;

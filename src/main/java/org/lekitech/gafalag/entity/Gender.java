@@ -11,7 +11,7 @@ import java.sql.Timestamp;
 @Getter
 @Setter
 @NoArgsConstructor
-@RequiredArgsConstructor
+@EqualsAndHashCode(of = {"id", "name"})
 @Table(name = "gender")
 public class Gender {
 
@@ -19,7 +19,6 @@ public class Gender {
     @GeneratedValue(generator = "gender_id_seq")
     private Long id;
 
-    @NonNull
     @Column(name = "name")
     private String name;
 
@@ -30,4 +29,8 @@ public class Gender {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private Timestamp updatedAt;
+
+    public Gender(String name) {
+        this.name = name;
+    }
 }

@@ -13,8 +13,7 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
-@RequiredArgsConstructor
-@EqualsAndHashCode(of = {"id", "name", "iso2", "iso3"})
+@EqualsAndHashCode(of = {"id", "name"})
 @Table(name = "language")
 public class Language {
 
@@ -22,15 +21,12 @@ public class Language {
     @GeneratedValue(generator = "language_id_seq")
     private Long id;
 
-    @NonNull
     @Column(name = "name")
     private String name;
 
-    @NonNull
     @Column(name = "iso639_2", length = 2)
     private String iso2;
 
-    @NonNull
     @Column(name = "iso639_3", length = 3)
     private String iso3;
 
@@ -44,4 +40,12 @@ public class Language {
 
     @OneToMany(mappedBy = "language", cascade = CascadeType.PERSIST)
     private Set<Dialect> dialects = new HashSet<>();
+
+    public Language(String name,
+                    String iso2,
+                    String iso3) {
+        this.name = name;
+        this.iso2 = iso2;
+        this.iso3 = iso3;
+    }
 }

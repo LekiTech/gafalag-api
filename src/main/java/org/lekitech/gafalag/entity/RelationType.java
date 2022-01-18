@@ -11,15 +11,14 @@ import java.sql.Timestamp;
 @Getter
 @Setter
 @NoArgsConstructor
-@RequiredArgsConstructor
+@EqualsAndHashCode(of = {"id", "name"})
 @Table(name = "relation_type")
 public class RelationType {
 
     @Id
     @GeneratedValue(generator = "relation_type_id_seq")
-    private Integer id;
+    private Long id;
 
-    @NonNull
     @Column(name = "name")
     private String name;
 
@@ -30,4 +29,8 @@ public class RelationType {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private Timestamp updatedAt;
+
+    public RelationType(String name) {
+        this.name = name;
+    }
 }

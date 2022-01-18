@@ -12,7 +12,6 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
-@RequiredArgsConstructor
 @EqualsAndHashCode(of = {"id", "etymologyText"})
 @Table(name = "etymology")
 public class Etymology {
@@ -21,7 +20,6 @@ public class Etymology {
     @GeneratedValue
     private UUID id;
 
-    @NonNull
     @Column(name = "etymology_text")
     private String etymologyText;
 
@@ -44,4 +42,8 @@ public class Etymology {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private Timestamp updatedAt;
+
+    public Etymology(String etymologyText) {
+        this.etymologyText = etymologyText;
+    }
 }

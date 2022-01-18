@@ -11,8 +11,8 @@ import java.util.UUID;
 @Entity
 @Getter
 @Setter
-@RequiredArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode(of = {"id", "name"})
 @Table(name = "source")
 public class Source {
 
@@ -20,7 +20,6 @@ public class Source {
     @GeneratedValue
     private UUID id;
 
-    @NonNull
     @Column(name = "name")
     private String name;
 
@@ -34,4 +33,10 @@ public class Source {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private Timestamp updatedAt;
+
+    public Source(String name,
+                  String url) {
+        this.name = name;
+        this.url = url;
+    }
 }

@@ -12,7 +12,7 @@ import java.sql.Timestamp;
 @Getter
 @Setter
 @NoArgsConstructor
-@RequiredArgsConstructor
+@EqualsAndHashCode(of = {"id", "url"})
 @Table(name = "mediafile")
 public class Mediafile {
 
@@ -20,12 +20,10 @@ public class Mediafile {
     @GeneratedValue(generator = "mediafile_id_seq")
     private Long id;
 
-    @NonNull
     @Enumerated(EnumType.STRING)
     @Column(name = "mediatype")
     private Mediatype mediatype;
 
-    @NonNull
     @Column(name = "url")
     private String url;
 
@@ -36,4 +34,10 @@ public class Mediafile {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private Timestamp updatedAt;
+
+    public Mediafile(Mediatype mediatype,
+                     String url) {
+        this.mediatype = mediatype;
+        this.url = url;
+    }
 }

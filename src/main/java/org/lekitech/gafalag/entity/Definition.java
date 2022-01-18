@@ -12,7 +12,6 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
-@RequiredArgsConstructor
 @EqualsAndHashCode(of = {"id", "text"})
 @Table(name = "definition")
 public class Definition {
@@ -21,11 +20,9 @@ public class Definition {
     @GeneratedValue
     private UUID id;
 
-    @NonNull
     @Column(name = "definition_text")
     private String text;
 
-    @NonNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "expression_id")
     private Expression expression;
@@ -34,12 +31,10 @@ public class Definition {
     @JoinColumn(name = "part_of_speech_id")
     private PartOfSpeech partOfSpeech;
 
-    @NonNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "language_id")
     private Language language;
 
-    @NonNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "source_id")
     private Source source;
@@ -51,4 +46,12 @@ public class Definition {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private Timestamp updatedAt;
+
+    public Definition(String text,
+                      Language language,
+                      Source source) {
+        this.text = text;
+        this.language = language;
+        this.source = source;
+    }
 }
