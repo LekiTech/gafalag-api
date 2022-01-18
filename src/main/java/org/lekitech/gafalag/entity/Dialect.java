@@ -6,8 +6,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
 @Getter
@@ -38,7 +36,4 @@ public class Dialect {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private Timestamp updatedAt;
-
-    @OneToMany(mappedBy = "dialect", cascade = CascadeType.PERSIST)
-    private Set<Expression> expressions = new HashSet<>();
 }

@@ -6,7 +6,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -34,7 +34,4 @@ public class Source {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private Timestamp updatedAt;
-
-    @OneToMany(mappedBy = "source", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-    private Set<Definition> definitions = new HashSet<>();
 }
