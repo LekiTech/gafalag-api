@@ -2,9 +2,8 @@ package org.lekitech.gafalag.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.lekitech.gafalag.dto.dialect.*;
 import org.lekitech.gafalag.dto.language.*;
-import org.lekitech.gafalag.mapper.DialectMapper;
-import org.lekitech.gafalag.mapper.LanguageMapper;
 import org.lekitech.gafalag.service.DialectService;
 import org.lekitech.gafalag.service.LanguageService;
 import org.springframework.beans.factory.annotation.Autowired;

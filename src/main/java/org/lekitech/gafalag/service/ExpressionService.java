@@ -6,7 +6,6 @@ import lombok.val;
 import org.lekitech.gafalag.dto.PaginatedResult;
 import org.lekitech.gafalag.dto.expression.*;
 import org.lekitech.gafalag.entity.*;
-import org.lekitech.gafalag.mapper.ExpressionMapper;
 import org.lekitech.gafalag.repository.ExpressionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
@@ -47,6 +46,9 @@ public class ExpressionService {
         if (languageIso3.isPresent()) {
             var expressionLanguage = languageService.getByIso3(languageIso3.get());
             pageDb = repository.findAllByLanguageId(expressionLanguage.getId(), pages);
+
+            //TODO: 19.01.2022 ExpressionRepository#findAllByLanguage_Iso3 кажется работает также быстро
+            // pageDb = repository.findAllByLanguage_Iso3(languageIso3.get(), pages);
         } else {
             pageDb = repository.findAll(pages);
         }

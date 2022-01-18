@@ -1,4 +1,4 @@
-package org.lekitech.gafalag.dto.language;
+package org.lekitech.gafalag.dto.dialect;
 
 public record DialectResponse(
         Long id,
