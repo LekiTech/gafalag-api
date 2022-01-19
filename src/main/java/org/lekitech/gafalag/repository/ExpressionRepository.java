@@ -1,5 +1,6 @@
 package org.lekitech.gafalag.repository;
 
+import lombok.NonNull;
 import org.lekitech.gafalag.entity.Expression;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,9 +12,9 @@ import java.util.UUID;
 @Repository
 public interface ExpressionRepository extends JpaRepository<Expression, UUID> {
 
-    Page<Expression> findAll(Pageable pageable);
+    @NonNull Page<Expression> findAll(@NonNull Pageable pageable);
 
     Page<Expression> findAllByLanguageId(Long languageId, Pageable pageable);
 
-    // Page<Expression> findAllByLanguage_Iso3(String language_iso3, Pageable pageable);
+    Page<Expression> findAllByLanguage_Iso3(String language_iso3, Pageable pageable);
 }

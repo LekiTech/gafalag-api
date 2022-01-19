@@ -42,23 +42,9 @@ public class ExpressionService {
                                                             boolean descending) {
         var sort = Sort.by(sortBy);
         var pages = PageRequest.of(page, size, descending ? sort.descending() : sort.ascending());
-        Page<Expression> pageDb;
-        if (languageIso3.isPresent()) {
-            var expressionLanguage = languageService.getByIso3(languageIso3.get());
-            pageDb = repository.findAllByLanguageId(expressionLanguage.getId(), pages);
-
-            //TODO: 19.01.2022 ExpressionRepository#findAllByLanguage_Iso3 кажется работает также быстро
-            // pageDb = repository.findAllByLanguage_Iso3(languageIso3.get(), pages);
-        } else {
-            pageDb = repository.findAll(pages);
-        }
-        var expressions = pageDb.stream().map(expressionMapper::toDto).toList();
-        return new PaginatedResult<>(
-                pageDb.getTotalElements(),
-                pageDb.getTotalPages(),
-                pageDb.getNumber(),
-                pageDb.getSize(),
-                expressions
+        return expressionMapper.toDto(languageIso3.isPresent()
+                ? repository.findAllByLanguage_Iso3(languageIso3.get(), pages)
+                : repository.findAll(pages)
         );
     }
 
