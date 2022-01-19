@@ -13,8 +13,8 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @EqualsAndHashCode(of = {"id", "name"})
-@Table(name = "source")
-public class Source {
+@Table(name = "category")
+public class Category {
 
     @Id
     @GeneratedValue
@@ -22,9 +22,6 @@ public class Source {
 
     @Column(name = "name")
     private String name;
-
-    @Column(name = "url")
-    private String url;
 
     @CreationTimestamp
     @Column(name = "created_at")
@@ -34,9 +31,7 @@ public class Source {
     @Column(name = "updated_at")
     private Timestamp updatedAt;
 
-    public Source(String name,
-                  String url) {
+    public Category(String name) {
         this.name = name;
-        this.url = url;
     }
 }

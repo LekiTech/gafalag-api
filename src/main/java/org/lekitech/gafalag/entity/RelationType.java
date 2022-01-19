@@ -6,25 +6,21 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
-import java.util.UUID;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @EqualsAndHashCode(of = {"id", "name"})
-@Table(name = "source")
-public class Source {
+@Table(name = "relation_type")
+public class RelationType {
 
     @Id
-    @GeneratedValue
-    private UUID id;
+    @GeneratedValue(generator = "relation_type_id_seq")
+    private Long id;
 
     @Column(name = "name")
     private String name;
-
-    @Column(name = "url")
-    private String url;
 
     @CreationTimestamp
     @Column(name = "created_at")
@@ -34,9 +30,7 @@ public class Source {
     @Column(name = "updated_at")
     private Timestamp updatedAt;
 
-    public Source(String name,
-                  String url) {
+    public RelationType(String name) {
         this.name = name;
-        this.url = url;
     }
 }

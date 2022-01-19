@@ -3,25 +3,26 @@ package org.lekitech.gafalag.entity;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.lekitech.gafalag.entity.type.Mediatype;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
-import java.util.UUID;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
-@EqualsAndHashCode(of = {"id", "name"})
-@Table(name = "source")
-public class Source {
+@EqualsAndHashCode(of = {"id", "url"})
+@Table(name = "mediafile")
+public class Mediafile {
 
     @Id
-    @GeneratedValue
-    private UUID id;
+    @GeneratedValue(generator = "mediafile_id_seq")
+    private Long id;
 
-    @Column(name = "name")
-    private String name;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "mediatype")
+    private Mediatype mediatype;
 
     @Column(name = "url")
     private String url;
@@ -34,9 +35,9 @@ public class Source {
     @Column(name = "updated_at")
     private Timestamp updatedAt;
 
-    public Source(String name,
-                  String url) {
-        this.name = name;
+    public Mediafile(Mediatype mediatype,
+                     String url) {
+        this.mediatype = mediatype;
         this.url = url;
     }
 }

@@ -1,20 +1,19 @@
 package org.lekitech.gafalag.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
-@RequiredArgsConstructor
+@EqualsAndHashCode(of = {"id", "name"})
 @Table(name = "language")
 public class Language {
 
@@ -22,16 +21,13 @@ public class Language {
     @GeneratedValue(generator = "language_id_seq")
     private Long id;
 
-    @NonNull
     @Column(name = "name")
     private String name;
 
-    @NonNull
-    @Column(name = "iso639_2")
+    @Column(name = "iso639_2", length = 2)
     private String iso2;
 
-    @NonNull
-    @Column(name = "iso639_3")
+    @Column(name = "iso639_3", length = 3)
     private String iso3;
 
     @CreationTimestamp
@@ -42,10 +38,14 @@ public class Language {
     @Column(name = "updated_at")
     private Timestamp updatedAt;
 
-    @OneToMany(mappedBy = "language", fetch = FetchType.LAZY)
-    private Set<Dialect> dialects;
+    @OneToMany(mappedBy = "language", cascade = CascadeType.PERSIST)
+    private Set<Dialect> dialects = new HashSet<>();
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "language", fetch = FetchType.LAZY)
-    private Set<Expression> expressions;
+    public Language(String name,
+                    String iso2,
+                    String iso3) {
+        this.name = name;
+        this.iso2 = iso2;
+        this.iso3 = iso3;
+    }
 }

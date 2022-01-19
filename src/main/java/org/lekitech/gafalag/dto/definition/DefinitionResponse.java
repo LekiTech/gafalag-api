@@ -1,9 +1,9 @@
 package org.lekitech.gafalag.dto.definition;
 
+import java.util.UUID;
+
 public record DefinitionResponse(
         String text,
-        // TODO: change name to languageIso3
-        String language,
-        // TODO: change to object or to sourceId
-        String source
+        String languageIso3,
+        UUID sourceId
 ) {}

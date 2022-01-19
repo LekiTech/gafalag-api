@@ -6,6 +6,6 @@ public record PaginatedResult <T> (
         long totalItems,
         long totalPages,
         int currentPage,
-        int pageSIze,
+        int pageSize,
         List<T> items
 ) { }
