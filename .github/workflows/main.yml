@@ -59,7 +59,7 @@ jobs:
           # REPLACE "cr-bp-web-backend" with your own container registry
           script: |
             doctl registry login --expiry-seconds 180
-            docker pull registry.digitalocean.com/gafalag/gafalag-api:latest
+            docker pull registry.digitalocean.com/gafalag/gafalag-api
             echo "calling shutdown endpoint..."
             curl --silent http://localhost/shutdown || true
             echo "giving healthcheck time to fail..."
@@ -75,4 +75,4 @@ jobs:
               --restart always \
               -p 0.0.0.0:80:8080 \
               --name gafalag-api \
-              registry.digitalocean.com/gafalag/gafalag-api:latest
+              registry.digitalocean.com/gafalag/gafalag-api
