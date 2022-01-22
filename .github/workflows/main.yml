@@ -19,7 +19,7 @@ jobs:
     - name: Install doctl for DigitalOcean
       uses: digitalocean/action-doctl@v2.1.0
       with:
-        token: ${{secrets.DIGITALOCEAN_ACCESS_TOKEN}}
+        token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
         
     - name: Set up Docker Builder
       uses: docker/setup-buildx-action@v1
@@ -36,7 +36,7 @@ jobs:
         # REPLACE name "bp-web-backend" with a suitable name for your app image
         tags: |
           registry.digitalocean.com/gafalag/gafalag-api:latest
-          registry.digitalocean.com/gafalag/gafalag-api:sha-${{github.sha}}
+          registry.digitalocean.com/gafalag/gafalag-api:sha-${{ github.sha }}
       
   deploy:
     needs: build
@@ -51,9 +51,9 @@ jobs:
       - name: Deploy gafalag-api to DigitalOcean Droplet
         uses: appleboy/ssh-action@v0.1.4
         with:
-          host: ${{secrets.DIGITALOCEAN_DROPLET_HOST}}
+          host: ${{ secrets.DIGITALOCEAN_DROPLET_HOST }}
           username: root
-          key: ${{secrets.DIGITALOCEAN_API_KEY}}
+          key: ${{ secrets.DIGITALOCEAN_API_KEY }}
           port: 22
           # REPLACE "bp-web-backend" with image name used in build job
           # REPLACE "cr-bp-web-backend" with your own container registry
@@ -74,5 +74,5 @@ jobs:
             docker run -d \
               --restart always \
               -p 0.0.0.0:80:8080 \
-              --name bp-web-backend \
+              --name gafalag-api \
               registry.digitalocean.com/gafalag/gafalag-api:latest
