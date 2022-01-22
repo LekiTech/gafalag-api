@@ -35,8 +35,8 @@ jobs:
         # REPLACE "cr-bp-web-backend" with your own container registry 
         # REPLACE name "bp-web-backend" with a suitable name for your app image
         tags: |
-          registry.digitalocean.com/gafalag/bp-web-backend:latest
-          registry.digitalocean.com/gafalag/bp-web-backend:sha-${{ github.sha }}
+          registry.digitalocean.com/gafalag/gafalag-api:latest
+          registry.digitalocean.com/gafalag/gafalag-api:sha-${{ github.sha }}
       
   deploy:
     needs: build
