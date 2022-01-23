@@ -17,10 +17,9 @@ jobs:
       uses: actions/checkout@v2
       
     - name: Install doctl for DigitalOcean
-      uses: digitalocean/action-doctl@v2
+      uses: digitalocean/action-doctl@v1.69.0
       with:
-        token: third-party-remote-access
-        args: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+        token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
           
         
     - name: Set up Docker Builder
