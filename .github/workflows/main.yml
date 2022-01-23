@@ -20,7 +20,7 @@ jobs:
       uses: digitalocean/action-doctl@v1
       with:
         entryPoint: registry.digitalocean.com/gafalag
-        arg: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+        args: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
         
     - name: Set up Docker Builder
       uses: docker/setup-buildx-action@v1
