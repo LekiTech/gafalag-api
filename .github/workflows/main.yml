@@ -17,9 +17,9 @@ jobs:
       uses: actions/checkout@v2
       
     - name: Install doctl for DigitalOcean
-      uses: digitalocean/action-doctl@v1
+      uses: digitalocean/action-doctl@v2
       with:
-        repo: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+        secret: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
           
         
     - name: Set up Docker Builder
