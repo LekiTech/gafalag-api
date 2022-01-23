@@ -19,8 +19,7 @@ jobs:
     - name: Install doctl for DigitalOcean
       uses: digitalocean/action-doctl@v1
       with:
-#         entryPoint: registry.digitalocean.com/gafalag
-        DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+        GITHUB_TOKENS: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
           
         
     - name: Set up Docker Builder
