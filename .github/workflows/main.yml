@@ -50,7 +50,7 @@ jobs:
       # Droplets already have docker, doctl + auth, and curl installed
       # REPLACE "bp-web-backend" with image name used in build job
       - name: Deploy bp-web-backend to DigitalOcean Droplet
-        uses: appleboy/ssh-action@v2
+        uses: appleboy/ssh-action@v3
         with:
           host: ${{ secrets.DIGITALOCEAN_DROPLET_HOST }}
           username: root
