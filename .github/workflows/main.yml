@@ -19,7 +19,7 @@ jobs:
     - name: Install doctl for DigitalOcean
       uses: digitalocean/action-doctl@v2
       with:
-        token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+        third-party-remote-access: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
           
         
     - name: Set up Docker Builder
