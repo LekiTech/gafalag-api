@@ -49,7 +49,7 @@ jobs:
 
       # Droplets already have docker, doctl + auth, and curl installed
       # REPLACE "bp-web-backend" with image name used in build job
-      - name: Deploy gafalag-api to DigitalOcean Droplet
+      - name: Deploy gafalag-api:latest to DigitalOcean Droplet
         uses: appleboy/ssh-action@v0.1.4
         with:
           host: ${{ secrets.DIGITALOCEAN_DROPLET_HOST }}
