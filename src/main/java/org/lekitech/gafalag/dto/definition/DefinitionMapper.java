@@ -9,7 +9,7 @@ import java.lang.annotation.*;
 public interface DefinitionMapper {
 
     @Mappings({
-            @Mapping(source = "language.iso3", target = "languageIso3"),
+            @Mapping(source = "language.id", target = "languageId"),
             @Mapping(source = "source.id", target = "sourceId")
     })
     @MapByEntity

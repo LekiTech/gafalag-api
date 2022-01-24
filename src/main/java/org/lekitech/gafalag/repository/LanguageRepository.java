@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface LanguageRepository extends JpaRepository<Language, Long> {
-    Optional<Language> findByIso2(String iso639_2);
-    Optional<Language> findByIso3(String iso639_3);
+public interface LanguageRepository extends JpaRepository<Language, String> {
+
+    Optional<Language> findByIso2(String iso2);
 }

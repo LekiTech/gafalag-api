@@ -18,17 +18,14 @@ import java.util.Set;
 public class Language {
 
     @Id
-    @GeneratedValue(generator = "language_id_seq")
-    private Long id;
+    @Column(length = 3)
+    private String id;
 
     @Column(name = "name")
     private String name;
 
-    @Column(name = "iso639_2", length = 2)
+    @Column(name = "iso_2", length = 2)
     private String iso2;
-
-    @Column(name = "iso639_3", length = 3)
-    private String iso3;
 
     @CreationTimestamp
     @Column(name = "created_at")
@@ -41,11 +38,11 @@ public class Language {
     @OneToMany(mappedBy = "language", cascade = CascadeType.PERSIST)
     private Set<Dialect> dialects = new HashSet<>();
 
-    public Language(String name,
-                    String iso2,
-                    String iso3) {
+    public Language(String id,
+                    String name,
+                    String iso2) {
+        this.id = id;
         this.name = name;
         this.iso2 = iso2;
-        this.iso3 = iso3;
     }
 }

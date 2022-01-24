@@ -1,6 +1,5 @@
 package org.lekitech.gafalag.dto.mapper;
 
-import org.lekitech.gafalag.dto.language.LanguageMapper;
 import org.mapstruct.ObjectFactory;
 import org.mapstruct.TargetType;
 import org.springframework.lang.NonNull;
@@ -17,13 +16,17 @@ public class ReferenceMapper {
     private EntityManager entityManager;
 
     @ObjectFactory
-    @LanguageMapper.MapByLong
     public <T> T map(@NonNull final Long id, @TargetType Class<T> type) {
         return entityManager.getReference(type, id);
     }
 
     @ObjectFactory
     public <T> T map(@NonNull final UUID id, @TargetType Class<T> type) {
+        return entityManager.getReference(type, id);
+    }
+
+    @ObjectFactory
+    public <T> T map(@NonNull final String id, @TargetType Class<T> type) {
         return entityManager.getReference(type, id);
     }
 }

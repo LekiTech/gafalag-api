@@ -7,6 +7,7 @@ import org.lekitech.gafalag.repository.LanguageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
 @Slf4j
@@ -20,7 +21,7 @@ public class LanguageService {
         return repository.save(language);
     }
 
-    public Language getById(Long id) {
+    public Language getById(String id) {
         return repository.findById(id).orElseThrow();
     }
 
@@ -28,17 +29,8 @@ public class LanguageService {
         return repository.findAll();
     }
 
-    public Language getByIso2(String iso639_2) {
-        if (iso639_2.length() != 2) {
-            throw new StringIndexOutOfBoundsException("Language format 'ISO639_2' must be 2 chars long");
-        }
-        return repository.findByIso2(iso639_2).orElseThrow();
-    }
-
-    public Language getByIso3(String iso639_3) {
-        if (iso639_3.length() != 3) {
-            throw new StringIndexOutOfBoundsException("Language format 'ISO639_3' must be 3 chars long");
-        }
-        return repository.findByIso3(iso639_3).orElseThrow();
+    public Language getByIso2(String iso2) {
+        return repository.findByIso2(iso2)
+                .orElseThrow(() -> new EntityNotFoundException("iso639_alpha_2=" + iso2));
     }
 }
