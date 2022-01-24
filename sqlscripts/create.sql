@@ -1,4 +1,8 @@
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+-- region EXTENSIONS
+CREATE EXTENSION IF NOT EXISTS pg_trgm; -- for fuzzy search
+
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp"; -- for id
+-- endregion
 
 CREATE TYPE MEDIATYPE AS ENUM ('AUDIO','IMAGE');
 
@@ -224,3 +228,7 @@ CREATE TRIGGER etymology_updated
     FOR EACH ROW
 EXECUTE PROCEDURE set_current_timestamp();
 -- endregion TRIGGERS
+
+-- region INDEXES
+CREATE INDEX exp_gin_idx ON expression USING gin (spelling gin_trgm_ops);
+-- endregion

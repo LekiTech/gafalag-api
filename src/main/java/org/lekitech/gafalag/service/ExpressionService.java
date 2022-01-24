@@ -91,4 +91,8 @@ public class ExpressionService {
                 )).toList()
         );
     }
+
+    public List<Expression> fuzzySearch(String exp) {
+        return repository.fuzzySearch(exp);
+    }
 }

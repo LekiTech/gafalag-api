@@ -22,7 +22,8 @@ public class LanguageService {
     }
 
     public Language getById(String id) {
-        return repository.findById(id).orElseThrow();
+        return repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Language is not found, id=" + id));
     }
 
     public List<Language> getAll() {
@@ -31,6 +32,6 @@ public class LanguageService {
 
     public Language getByIso2(String iso2) {
         return repository.findByIso2(iso2)
-                .orElseThrow(() -> new EntityNotFoundException("iso639_alpha_2=" + iso2));
+                .orElseThrow(() -> new EntityNotFoundException("Language is not found, iso2=" + iso2));
     }
 }
