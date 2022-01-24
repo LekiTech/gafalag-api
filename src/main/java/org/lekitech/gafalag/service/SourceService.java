@@ -7,6 +7,7 @@ import org.lekitech.gafalag.repository.SourceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.UUID;
 
 @Slf4j
@@ -21,11 +22,13 @@ public class SourceService {
     }
 
     public Source getById(UUID id) {
-        return sourceRepository.findById(id).orElseThrow();
+        return sourceRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Source is not found, id=" + id));
     }
 
     public Source getByName(String name) {
-        return sourceRepository.findByName(name).orElseThrow();
+        return sourceRepository.findByName(name)
+                .orElseThrow(() -> new EntityNotFoundException("Source is not found, name=" + name));
     }
 
     public Source getOrCreate(String name, String url) {

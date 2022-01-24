@@ -9,12 +9,12 @@ import org.lekitech.gafalag.dto.PaginatedResult;
 import org.lekitech.gafalag.dto.expression.*;
 import org.lekitech.gafalag.service.ExpressionService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.text.MessageFormat;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,22 +28,21 @@ public class ExpressionController {
     private final ExpressionMapper expressionMapper;
 
     @PostMapping(path = "/batch", consumes = "multipart/form-data")
-    public ResponseEntity<String> saveExpressions(@RequestPart("file") MultipartFile file) {
+    public void saveExpressions(@RequestPart("file") MultipartFile file) {
         try {
             val mapper = new ObjectMapper().registerModule(new Jdk8Module());
             expressionService.saveBatch(mapper.readValue(
                     file.getBytes(), ExpressionBatchRequest.class
             ));
-            return ResponseEntity.ok().body(MessageFormat.format("{0} - uploaded success!", file.getOriginalFilename()));
         } catch (Exception e) {
             log.error(e.getMessage());
-            return ResponseEntity.badRequest().body(e.getLocalizedMessage());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
     }
 
     @PostMapping
-    public ExpressionResponse saveExpression(@RequestBody ExpressionRequest request) {
-        return expressionMapper.toDto(expressionService.save(request));
+    public void saveExpression(@RequestBody ExpressionRequest request) {
+        expressionService.save(request);
     }
 
     @Transactional
