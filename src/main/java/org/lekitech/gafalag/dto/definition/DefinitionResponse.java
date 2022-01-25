@@ -4,6 +4,6 @@ import java.util.UUID;
 
 public record DefinitionResponse(
         String text,
-        String languageIso3,
+        String languageId,
         UUID sourceId
 ) {}

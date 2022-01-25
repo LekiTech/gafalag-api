@@ -16,8 +16,8 @@ public interface LanguageMapper {
     @MapByEntity
     LanguageResponse toDto(Language entity);
 
-    @MapByLong
-    Language map(Long id);
+    @MapByString
+    Language map(String id);
 
     @Qualifier
     @Target(ElementType.METHOD)
@@ -32,5 +32,5 @@ public interface LanguageMapper {
     @Qualifier
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.CLASS)
-    @interface MapByLong {}
+    @interface MapByString {}
 }

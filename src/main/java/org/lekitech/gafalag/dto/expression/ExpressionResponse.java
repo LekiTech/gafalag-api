@@ -11,7 +11,7 @@ public record ExpressionResponse(
         Boolean misspelling,
         String inflection,
         Long genderId,
-        Long languageId,
+        String languageId,
         Long dialectId,
         List<DefinitionResponse> definitions
 ) {}

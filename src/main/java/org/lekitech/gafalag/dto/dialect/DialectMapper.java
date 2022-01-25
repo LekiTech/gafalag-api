@@ -8,7 +8,7 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring", uses = {LanguageMapper.class})
 public interface DialectMapper {
 
-    @Mapping(source = "languageId", target = "language", qualifiedBy = LanguageMapper.MapByLong.class)
+    @Mapping(source = "languageId", target = "language", qualifiedBy = LanguageMapper.MapByString.class)
     Dialect toEntity(DialectRequest dto);
 
     @Mapping(source = "language.id", target = "languageId")

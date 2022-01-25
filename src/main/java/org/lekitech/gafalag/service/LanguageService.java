@@ -21,7 +21,7 @@ public class LanguageService {
         return repository.save(language);
     }
 
-    public Language getById(Long id) {
+    public Language getById(String id) {
         return repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Language is not found, id=" + id));
     }
@@ -30,19 +30,8 @@ public class LanguageService {
         return repository.findAll();
     }
 
-    public Language getByIso2(String iso639_2) {
-        if (iso639_2.length() != 2) {
-            throw new StringIndexOutOfBoundsException("Language format 'ISO639_2' must be 2 chars long");
-        }
-        return repository.findByIso2(iso639_2)
-                .orElseThrow(() -> new EntityNotFoundException("Language is not found, iso2=" + iso639_2));
-    }
-
-    public Language getByIso3(String iso639_3) {
-        if (iso639_3.length() != 3) {
-            throw new StringIndexOutOfBoundsException("Language format 'ISO639_3' must be 3 chars long");
-        }
-        return repository.findByIso3(iso639_3)
-                .orElseThrow(() -> new EntityNotFoundException("Language is not found, iso3=" + iso639_3));
+    public Language getByIso2(String iso2) {
+        return repository.findByIso2(iso2)
+                .orElseThrow(() -> new EntityNotFoundException("Language is not found, iso2=" + iso2));
     }
 }

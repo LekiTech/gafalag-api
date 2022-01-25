@@ -4,8 +4,8 @@ import java.util.*;
 
 public record ExpressionRequest(
         UUID sourceId,
-        String expressionLanguageIso3,
-        String definitionLanguageIso3,
+        String expressionLanguageId,
+        String definitionLanguageId,
         String spelling,
         Optional<String> inflection,
         List<String> definitions

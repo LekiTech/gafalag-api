@@ -17,9 +17,7 @@ public interface ExpressionRepository extends JpaRepository<Expression, UUID> {
 
     @NonNull Page<Expression> findAll(@NonNull Pageable pageable);
 
-    Page<Expression> findAllByLanguageId(Long languageId, Pageable pageable);
-
-    Page<Expression> findAllByLanguage_Iso3(String language_iso3, Pageable pageable);
+    Page<Expression> findAllByLanguageId(String languageId, Pageable pageable);
 
     @Query(nativeQuery = true,
             value = "SELECT * FROM expression " +
