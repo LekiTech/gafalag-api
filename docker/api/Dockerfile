@@ -14,3 +14,4 @@ FROM openjdk:17-slim
 COPY --from=build /home/app/target/gafalag-api-1.0-SNAPSHOT.jar ./gafalag-api.jar
 EXPOSE 8080
 ENTRYPOINT ["java","-jar","./gafalag-api.jar"]
+#, "--gafalag.db.url=jdbc:postgresql://localhost:5433/gafalag_db", "--gafalag.db.username=docker", "--gafalag.db.password=docker"]
