@@ -74,4 +74,7 @@ jobs:
               --restart always \
               -p 0.0.0.0:80:8080 \
               --name gafalag-api \
-              registry.digitalocean.com/gafalag/gafalag-api:latest
+              registry.digitalocean.com/gafalag/gafalag-api:latest \
+              --gafalag.db.url=${{ secrets.DIGITALOCEAN_DB_URL }} \
+              --gafalag.db.username=${{ secrets.DIGITALOCEAN_DB_USERNAME }} \
+              --gafalag.db.password=${{ secrets.DIGITALOCEAN_DB_PASSWORD }}
