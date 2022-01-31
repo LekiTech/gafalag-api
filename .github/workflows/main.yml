@@ -1,0 +1,77 @@
+name: Deploy to Staging
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  # Allows to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout files
+        uses: actions/checkout@v2
+
+      - name: Install doctl for DigitalOcean
+        uses: digitalocean/action-doctl@v2
+        with:
+          # Token you have generated to access the DigitalOcean API
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      - name: Set up Docker Builder
+        uses: docker/setup-buildx-action@v1
+
+      - name: Authenticate with DigitalOcean Container Registry
+        run: doctl registry login --expiry-seconds 180
+
+      - name: Build and Push to DigitalOcean Container Registry
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          # "registry.digitalocean.com/gafalag" - registry endpoint, "gafalag" - your own container registry name
+          # "gafalag-api" - suitable name for your app image
+          tags: |
+            registry.digitalocean.com/gafalag/gafalag-api:latest
+            registry.digitalocean.com/gafalag/gafalag-api:sha-${{ github.sha }}
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout files
+        uses: actions/checkout@v2
+      # Droplets already have docker, doctl + auth, and curl installed
+      # "gafalag-api" - image name used in build job
+      - name: Deploy gafalag-api to DigitalOcean Droplet
+        uses: appleboy/ssh-action@v0.1.4
+        with:
+          host: ${{ secrets.DIGITALOCEAN_DROPLET_HOST }}
+          username: root
+          key: ${{ secrets.DIGITALOCEAN_API_KEY }}
+          port: 22
+          # "gafalag-api" - image name used in build job
+          # "gafalag" - your own container registry name
+          script: |
+            doctl registry login --expiry-seconds 180
+            docker pull registry.digitalocean.com/gafalag/gafalag-api:latest
+            echo "calling shutdown endpoint..."
+            curl --silent http://localhost/shutdown || true
+            echo "giving healthcheck time to fail..."
+            sleep 30 # ((unhealthy + 1) * interval)
+
+            echo "removing unused images..."
+            docker image prune -a
+            echo "stopping and removing running container..."
+            docker stop gafalag-api || true
+            docker rm gafalag-api || true
+            echo "starting server instance..."
+            docker run -d \
+              --restart always \
+              -p 0.0.0.0:80:8080 \
+              --name gafalag-api \
+              registry.digitalocean.com/gafalag/gafalag-api:latest
