@@ -78,3 +78,4 @@ jobs:
               --gafalag.db.url=${{ secrets.DIGITALOCEAN_DB_URL }} \
               --gafalag.db.username=${{ secrets.DIGITALOCEAN_DB_USERNAME }} \
               --gafalag.db.password=${{ secrets.DIGITALOCEAN_DB_PASSWORD }}
+
