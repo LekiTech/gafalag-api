@@ -18,5 +18,9 @@ services:
       dockerfile: ./docker/api/Dockerfile
     ports:
       - "8080:8080"
+    command:
+      - "--gafalag.db.url=jdbc:postgresql://host.docker.internal:5433/gafalag_db"
+      - "--gafalag.db.username=docker"
+      - "--gafalag.db.password=docker"
     volumes:
       - .:/code
