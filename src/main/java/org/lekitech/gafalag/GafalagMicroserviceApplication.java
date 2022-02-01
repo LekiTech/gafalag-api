@@ -17,6 +17,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.sql.DataSource;
 
+import static org.springframework.http.HttpMethod.*;
+import static org.springframework.http.HttpMethod.OPTIONS;
+
 @Slf4j
 @SpringBootApplication
 @EnableJpaRepositories
@@ -27,6 +30,8 @@ public class GafalagMicroserviceApplication extends SpringBootServletInitializer
     private String dbUsername;
     @Value("${gafalag.db.password}")
     private String dbPassword;
+
+    private static final long MAXAGESECS = 3600;
 
     /**
      * Loading db connection programmatically for secure connection string passing in production
@@ -68,7 +73,12 @@ public class GafalagMicroserviceApplication extends SpringBootServletInitializer
             @Override
             public void addCorsMappings(@NonNull CorsRegistry registry) {
                 // TODO Allowed frontend requests (CORS)
-                registry.addMapping("/**").allowedOrigins("*");
+                registry.addMapping("/**")
+                        .allowedOriginPatterns("*")
+                        .allowedMethods(GET.name(), POST.name(), PUT.name(), PATCH.name(), DELETE.name(), OPTIONS.name())
+                        .allowedHeaders("*")
+                        .allowCredentials(true)
+                        .maxAge(MAXAGESECS);
             }
         };
     }
