@@ -1,0 +1,26 @@
+version: "3.9"  # optional since v1.27.0
+services:
+  db:
+    container_name: gafalag-db
+    # will build ./docker/db/Dockerfile
+    build:
+      context: ./
+      dockerfile: ./docker/db/Dockerfile
+    ports:
+      - "5433:5432"
+  api:
+    container_name: gafalag-api
+    depends_on:
+      - db
+    # will build ./docker/api/Dockerfile
+    build:
+      context: ./
+      dockerfile: ./docker/api/Dockerfile
+    ports:
+      - "8080:8080"
+    command:
+      - "--gafalag.db.url=jdbc:postgresql://host.docker.internal:5433/gafalag_db"
+      - "--gafalag.db.username=docker"
+      - "--gafalag.db.password=docker"
+    volumes:
+      - .:/code

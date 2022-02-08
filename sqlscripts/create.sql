@@ -1,6 +1,10 @@
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+-- region EXTENSIONS
+CREATE EXTENSION IF NOT EXISTS pg_trgm; -- for fuzzy search
 
-CREATE TYPE mediatype AS ENUM ('AUDIO','IMAGE');
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp"; -- for id
+-- endregion
+
+CREATE TYPE MEDIATYPE AS ENUM ('AUDIO','IMAGE');
 
 -- region TABLES
 CREATE TABLE expression (
@@ -9,7 +13,7 @@ CREATE TABLE expression (
     misspelling BOOLEAN              DEFAULT FALSE,
     inflection  VARCHAR,
     gender_id   INT,
-    language_id INT         NOT NULL,
+    language_id VARCHAR     NOT NULL,
     dialect_id  INT,
     created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
@@ -30,17 +34,16 @@ CREATE TABLE part_of_speech (
 );
 
 CREATE TABLE language (
-    id         SERIAL PRIMARY KEY,
+    id         VARCHAR(3) PRIMARY KEY, -- iso639 alpha 3
     name       VARCHAR     NOT NULL UNIQUE,
-    iso639_2   VARCHAR(2) UNIQUE,
-    iso639_3   VARCHAR(3) UNIQUE,
+    iso_2      VARCHAR(2) UNIQUE,      -- iso639 alpha 2
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE TABLE dialect (
     id          SERIAL PRIMARY KEY,
-    language_id INT         NOT NULL,
+    language_id VARCHAR     NOT NULL,
     name        VARCHAR     NOT NULL UNIQUE,
     created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
@@ -49,7 +52,7 @@ CREATE TABLE dialect (
 CREATE TABLE mediafile (
     id            SERIAL PRIMARY KEY,
     expression_id UUID        NOT NULL,
-    mediatype     mediatype   NOT NULL,
+    mediatype     MEDIATYPE   NOT NULL,
     url           VARCHAR     NOT NULL,
     created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at    TIMESTAMPTZ NOT NULL DEFAULT now()
@@ -86,7 +89,7 @@ CREATE TABLE definition (
     id                UUID PRIMARY KEY     DEFAULT uuid_generate_v4(),
     expression_id     UUID        NOT NULL,
     part_of_speech_id INT,
-    language_id       INT         NOT NULL,
+    language_id       VARCHAR     NOT NULL,
     source_id         UUID        NOT NULL,
     definition_text   VARCHAR     NOT NULL,
     created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -102,13 +105,13 @@ CREATE TABLE source (
 );
 
 CREATE TABLE etymology (
-    id             UUID PRIMARY KEY     DEFAULT uuid_generate_v4(),
+    id             UUID PRIMARY KEY            DEFAULT uuid_generate_v4(),
     expression_id  UUID        NOT NULL,
-    language_id    INT         NOT NULL,
+    language_id    VARCHAR     NOT NULL,
     dialect_id     INT,
-    etymology_text VARCHAR     NOT NULL UNIQUE,
-    created_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at     TIMESTAMPTZ NOT NULL DEFAULT now()
+    etymology_text VARCHAR     NOT NULL UNIQUE DEFAULT 'unknown',
+    created_at     TIMESTAMPTZ NOT NULL        DEFAULT now(),
+    updated_at     TIMESTAMPTZ NOT NULL        DEFAULT now()
 );
 -- endregion TABLES
 
@@ -152,8 +155,8 @@ CREATE OR REPLACE FUNCTION set_current_timestamp()
     RETURNS TRIGGER AS
 $$
 BEGIN
-    NEW.updated_at = now();
-    RETURN NEW;
+    new.updated_at = now();
+    RETURN new;
 END
 $$ LANGUAGE plpgsql;
 -- endregion FUNCTIONS
@@ -225,3 +228,7 @@ CREATE TRIGGER etymology_updated
     FOR EACH ROW
 EXECUTE PROCEDURE set_current_timestamp();
 -- endregion TRIGGERS
+
+-- region INDEXES
+CREATE INDEX exp_gin_idx ON expression USING gin (spelling gin_trgm_ops);
+-- endregion
