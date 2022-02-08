@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -19,6 +20,10 @@ public class SourceService {
 
     public Source save(Source source) {
         return sourceRepository.save(source);
+    }
+
+    public List<Source> getAll() {
+        return sourceRepository.findAll();
     }
 
     public Source getById(UUID id) {
