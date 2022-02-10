@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.lekitech.gafalag.dto.PaginatedResult;
 import org.lekitech.gafalag.dto.expression.*;
+import org.lekitech.gafalag.entity.Expression;
 import org.lekitech.gafalag.service.ExpressionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -49,6 +50,12 @@ public class ExpressionController {
     @GetMapping(path = "/search")
     public List<ExpressionResponse> search(@RequestParam String exp) {
         return expressionService.fuzzySearch(exp).stream().map(expressionMapper::toDto).toList();
+    }
+
+    @Transactional
+    @GetMapping(path = "/search/suggestions")
+    public List<String> searchSuggestions(@RequestParam String exp) {
+        return expressionService.fuzzySearch(exp).stream().map(Expression::getSpelling).toList();
     }
 
     @GetMapping(path = "")
