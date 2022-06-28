@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface ExpressionRepository extends JpaRepository<Expression, UUID>, JpaSpecificationExecutor<Expression> {
+public interface ExpressionRepository extends JpaRepository<Expression, UUID> {
 
     @NonNull Page<Expression> findAll(@NonNull Pageable pageable);
 
