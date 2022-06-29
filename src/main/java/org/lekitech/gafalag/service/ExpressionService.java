@@ -95,4 +95,8 @@ public class ExpressionService {
     public List<Expression> fuzzySearch(String exp) {
         return repository.fuzzySearch(exp);
     }
+
+    public List<Expression> fullTextSearch(String text) {
+        return repository.fullTextSearch(text);
+    }
 }
