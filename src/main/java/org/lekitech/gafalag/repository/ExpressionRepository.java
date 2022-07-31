@@ -18,10 +18,12 @@ public interface ExpressionRepository extends JpaRepository<Expression, UUID> {
 
     Page<Expression> findAllByLanguageId(String languageId, Pageable pageable);
 
-    // TODO: find way to filter on "toLang" from database
-//                    "JOIN definition d ON e.id = d.expression_id " +
-    // AND d.language_id = :toLang " +
-
+    // TODO: find way to filter on "toLang" from database query to replace current implementation in ExpressionService
+    //       We need tis filter for the cases when we have multiple translations form single language e.g.:
+    //          - Russian -> Lezgi
+    //          - Russian -> Tabasaran
+    //       In this case user should only get translations from Russian to the selected language and
+    //       not all available languages
     @Query(nativeQuery = true,
             value = "SELECT * FROM expression e " +
                     "WHERE e.language_id = :fromLang " +
@@ -29,7 +31,6 @@ public interface ExpressionRepository extends JpaRepository<Expression, UUID> {
                     "LIMIT 10")
     List<Expression> fuzzySearch(@Param("exp") String exp,
                                  @Param("fromLang") String fromLang);
-//                                 @Param("toLang") String toLang);
 
     @Query(nativeQuery = true,
             value = "SELECT * FROM expression e " +
