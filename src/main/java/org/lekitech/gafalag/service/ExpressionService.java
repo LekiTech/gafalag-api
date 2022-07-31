@@ -10,6 +10,7 @@ import org.lekitech.gafalag.repository.ExpressionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -92,11 +93,18 @@ public class ExpressionService {
         );
     }
 
-    public List<Expression> fuzzySearch(String exp) {
-        return repository.fuzzySearch(exp);
+    public List<Expression> fuzzySearch(String exp, String fromLang, String toLang) {
+        var result = repository.fuzzySearch(exp, fromLang);
+        for(var expression : result) {
+            var filteredDefinitions = expression.getDefinitions().stream()
+                    .filter(def -> def.getLanguage().getId().equals(toLang))
+                    .toList();
+            expression.setDefinitions(filteredDefinitions);
+        }
+        return result;
     }
 
-    public List<Expression> fullTextSearch(String text) {
-        return repository.fullTextSearch(text);
+    public List<Expression> fullTextSearch(String text, String fromLang, String toLang) {
+        return repository.fullTextSearch(text, fromLang, toLang);
     }
 }
