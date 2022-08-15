@@ -48,8 +48,26 @@ public class ExpressionController {
 
     @Transactional
     @GetMapping(path = "/search")
-    public List<ExpressionResponse> search(@RequestParam String exp) {
-        return expressionService.fuzzySearch(exp).stream().map(expressionMapper::toDto).toList();
+    public List<ExpressionResponse> search(@RequestParam String exp,
+                                           @RequestParam String fromLang,
+                                           @RequestParam String toLang) {
+        return expressionService.fuzzySearch(exp, fromLang, toLang).stream().map(expressionMapper::toDto).toList();
+    }
+
+    @Transactional
+    @GetMapping(path = "/search/suggestions")
+    public List<String> searchSuggestions(@RequestParam String exp,
+                                          @RequestParam String fromLang,
+                                          @RequestParam String toLang) {
+        return expressionService.fuzzySearch(exp, fromLang, toLang).stream().map(Expression::getSpelling).toList();
+    }
+
+    @Transactional
+    @GetMapping(path = "/search/definition")
+    public List<ExpressionResponse> searchByDefinition(@RequestParam String text,
+                                                       @RequestParam String fromLang,
+                                                       @RequestParam String toLang) {
+        return expressionService.fullTextSearch(text, fromLang, toLang).stream().map(expressionMapper::toDto).toList();
     }
 
     @Transactional
