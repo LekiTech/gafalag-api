@@ -4,8 +4,8 @@
 FROM maven:3.8.4-openjdk-17-slim AS build
 COPY src /home/app/src
 COPY pom.xml /home/app
-# build with dokcer profile, could also be used with -Pprod for prod profile and -Pdev for dev profile
-RUN mvn -f /home/app/pom.xml clean package -Pprod
+# build with docker profile, could also be used with -Pprod for prod profile and -Pdev for dev profile
+RUN mvn -f /home/app/pom.xml clean package -Pdocker
 
 #
 # Package stage
