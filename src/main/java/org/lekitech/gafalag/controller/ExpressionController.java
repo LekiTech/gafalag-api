@@ -70,12 +70,6 @@ public class ExpressionController {
         return expressionService.fullTextSearch(text, fromLang, toLang).stream().map(expressionMapper::toDto).toList();
     }
 
-    @Transactional
-    @GetMapping(path = "/search/suggestions")
-    public List<String> searchSuggestions(@RequestParam String exp) {
-        return expressionService.fuzzySearch(exp).stream().map(Expression::getSpelling).toList();
-    }
-
     @GetMapping(path = "")
     public PaginatedResult<ExpressionResponse> getExpressionsPaginated(
             @RequestParam int page,
