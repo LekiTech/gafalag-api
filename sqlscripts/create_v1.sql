@@ -4,89 +4,33 @@ CREATE EXTENSION IF NOT EXISTS pg_trgm; -- for fuzzy search
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp"; -- for id
 -- endregion
 
-CREATE TYPE MEDIATYPE AS ENUM ('AUDIO','IMAGE', 'VIDEO');
-
-CREATE TYPE TAGTYPE AS ENUM ('CATEGORY','GRAMMAR', 'ETYMOLOGY', 'UNKNOWN');
+CREATE TYPE MEDIATYPE AS ENUM ('AUDIO','IMAGE');
 
 -- region TABLES
 CREATE TABLE expression (
     id          UUID PRIMARY KEY     DEFAULT uuid_generate_v4(),
     spelling    VARCHAR     NOT NULL,
-    -- inflection  VARCHAR,
-    details_id  UUID        NOT NULL,
+    misspelling BOOLEAN              DEFAULT FALSE,
+    inflection  VARCHAR,
+    gender_id   INT,
     language_id VARCHAR     NOT NULL,
-    -- dialect_id  INT,
+    dialect_id  INT,
     created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE expression_details (
-    id             UUID PRIMARY KEY     DEFAULT uuid_generate_v4(),
-    gr             VARCHAR     NOT NULL,
-    inflection     VARCHAR,
-    expression_id  UUID     NOT NULL,
-    source_id      UUID     NOT NULL,
-    -- dialect_id  INT,
-    created_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at     TIMESTAMPTZ NOT NULL DEFAULT now()
+CREATE TABLE gender (
+    id         SERIAL PRIMARY KEY,
+    name       VARCHAR     NOT NULL UNIQUE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE definition_details (
-    id                UUID PRIMARY KEY     DEFAULT uuid_generate_v4(),
-    expression_details_id     UUID        NOT NULL,
-    language_id       VARCHAR     NOT NULL,
-    dialect_id        INT        NOT NULL,
-    created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at        TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-
-CREATE TABLE definition (
-    id                UUID PRIMARY KEY     DEFAULT uuid_generate_v4(),
-    value   VARCHAR     NOT NULL,
---    tags   VARCHAR     NOT NULL,
-    definition_details_id     UUID        NOT NULL,
-    created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at        TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-
-CREATE TABLE tag (
---    id            UUID PRIMARY KEY     DEFAULT uuid_generate_v4(),
-    -- e.g. 'см.тж.', 'сущ.', 'диал.'
-    abbreviation  VARCHAR(10)     PRIMARY KEY,
-    -- e.g. 'смотри также', 'имя  существительное', 'диалектизм'
-    description   VARCHAR,
-    tagtype       TAGTYPE     NOT NULL,
-    created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at    TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-
-CREATE TABLE definition_tag (
-    tag_abbr          VARCHAR(10)        NOT NULL,
-    definition_id     UUID        NOT NULL,
-    created_at        TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-
-CREATE TABLE example (
-    id                UUID PRIMARY KEY     DEFAULT uuid_generate_v4(),
-    source            VARCHAR,
-    translation       VARCHAR,
-    src_lang_id       VARCHAR     NOT NULL,
-    trl_lang_id       VARCHAR,
-    raw               VARCHAR     NOT NULL,
-    created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at        TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-
-CREATE TABLE expression_example (
-    expression_details_id     UUID        NOT NULL,
-    example_id                UUID        NOT NULL,
-    created_at                TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-
-CREATE TABLE definition_example (
-    example_id                UUID        NOT NULL,
-    definition_details_id     UUID        NOT NULL,
-    created_at                TIMESTAMPTZ NOT NULL DEFAULT now()
+CREATE TABLE part_of_speech (
+    id         SERIAL PRIMARY KEY,
+    name       VARCHAR     NOT NULL UNIQUE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE TABLE language (
@@ -128,6 +72,30 @@ CREATE TABLE relation_type (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+CREATE TABLE definition_category (
+    definition_id UUID        NOT NULL,
+    category_id   UUID        NOT NULL,
+    created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE category (
+    id         UUID PRIMARY KEY     DEFAULT uuid_generate_v4(),
+    name       VARCHAR     NOT NULL UNIQUE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE definition (
+    id                UUID PRIMARY KEY     DEFAULT uuid_generate_v4(),
+    expression_id     UUID        NOT NULL,
+    part_of_speech_id INT,
+    language_id       VARCHAR     NOT NULL,
+    source_id         UUID        NOT NULL,
+    definition_text   VARCHAR     NOT NULL,
+    created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at        TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
 CREATE TABLE source (
     id         UUID PRIMARY KEY     DEFAULT uuid_generate_v4(),
     name       VARCHAR     NOT NULL UNIQUE,
@@ -149,36 +117,9 @@ CREATE TABLE etymology (
 
 -- region ALTER TABLES
 ALTER TABLE expression
-    ADD FOREIGN KEY (details_id) REFERENCES expression_details (id),
-    ADD FOREIGN KEY (language_id) REFERENCES language (id);
-
-ALTER TABLE expression_details
-    ADD FOREIGN KEY (expression_id) REFERENCES expression (id),
-    ADD FOREIGN KEY (source_id) REFERENCES source (id);
-
-ALTER TABLE definition_details
-    ADD FOREIGN KEY (expression_details_id) REFERENCES expression_details (id),
+    ADD FOREIGN KEY (gender_id) REFERENCES gender (id),
     ADD FOREIGN KEY (language_id) REFERENCES language (id),
     ADD FOREIGN KEY (dialect_id) REFERENCES dialect (id);
-
-ALTER TABLE definition
-    ADD FOREIGN KEY (definition_details_id) REFERENCES definition_details (id);
-
-ALTER TABLE definition_tag
-    ADD FOREIGN KEY (definition_id) REFERENCES definition (id),
-    ADD FOREIGN KEY (tag_abbr) REFERENCES tag (abbreviation);
-
-ALTER TABLE example
-    ADD FOREIGN KEY (src_lang_id) REFERENCES language (id),
-    ADD FOREIGN KEY (trl_lang_id) REFERENCES language (id);
-
-ALTER TABLE expression_example
-    ADD FOREIGN KEY (expression_details_id) REFERENCES expression_details (id),
-    ADD FOREIGN KEY (example_id) REFERENCES example (id);
-
-ALTER TABLE definition_example
-    ADD FOREIGN KEY (example_id) REFERENCES example (id),
-    ADD FOREIGN KEY (definition_details_id) REFERENCES definition_details (id);
 
 ALTER TABLE dialect
     ADD FOREIGN KEY (language_id) REFERENCES language (id);
@@ -191,6 +132,17 @@ ALTER TABLE expression_relation
     ADD FOREIGN KEY (expression_1_id) REFERENCES expression (id),
     ADD FOREIGN KEY (expression_2_id) REFERENCES expression (id),
     ADD FOREIGN KEY (relation_type_id) REFERENCES relation_type (id);
+
+ALTER TABLE definition_category
+    ADD PRIMARY KEY (definition_id, category_id),
+    ADD FOREIGN KEY (definition_id) REFERENCES definition (id),
+    ADD FOREIGN KEY (category_id) REFERENCES category (id);
+
+ALTER TABLE definition
+    ADD FOREIGN KEY (expression_id) REFERENCES expression (id),
+    ADD FOREIGN KEY (part_of_speech_id) REFERENCES part_of_speech (id),
+    ADD FOREIGN KEY (language_id) REFERENCES language (id),
+    ADD FOREIGN KEY (source_id) REFERENCES source (id);
 
 ALTER TABLE etymology
     ADD FOREIGN KEY (expression_id) REFERENCES expression (id),
@@ -216,27 +168,15 @@ CREATE TRIGGER expression_updated
     FOR EACH ROW
 EXECUTE PROCEDURE set_current_timestamp();
 
-CREATE TRIGGER example_updated
+CREATE TRIGGER gender_updated
     BEFORE UPDATE
-    ON example
+    ON gender
     FOR EACH ROW
 EXECUTE PROCEDURE set_current_timestamp();
 
-CREATE TRIGGER expression_example_updated
+CREATE TRIGGER part_of_speech_updated
     BEFORE UPDATE
-    ON expression_example
-    FOR EACH ROW
-EXECUTE PROCEDURE set_current_timestamp();
-
-CREATE TRIGGER definition_example_updated
-    BEFORE UPDATE
-    ON definition_example
-    FOR EACH ROW
-EXECUTE PROCEDURE set_current_timestamp();
-
-CREATE TRIGGER expression_details_updated
-    BEFORE UPDATE
-    ON expression_details
+    ON part_of_speech
     FOR EACH ROW
 EXECUTE PROCEDURE set_current_timestamp();
 
@@ -264,27 +204,15 @@ CREATE TRIGGER relation_type_updated
     FOR EACH ROW
 EXECUTE PROCEDURE set_current_timestamp();
 
+CREATE TRIGGER category_updated
+    BEFORE UPDATE
+    ON category
+    FOR EACH ROW
+EXECUTE PROCEDURE set_current_timestamp();
+
 CREATE TRIGGER definition_updated
     BEFORE UPDATE
     ON definition
-    FOR EACH ROW
-EXECUTE PROCEDURE set_current_timestamp();
-
-CREATE TRIGGER definition_details_updated
-    BEFORE UPDATE
-    ON definition_details
-    FOR EACH ROW
-EXECUTE PROCEDURE set_current_timestamp();
-
-CREATE TRIGGER definition_tag_updated
-    BEFORE UPDATE
-    ON definition_tag
-    FOR EACH ROW
-EXECUTE PROCEDURE set_current_timestamp();
-
-CREATE TRIGGER tag_updated
-    BEFORE UPDATE
-    ON tag
     FOR EACH ROW
 EXECUTE PROCEDURE set_current_timestamp();
 
