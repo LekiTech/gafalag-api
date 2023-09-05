@@ -68,8 +68,7 @@ CREATE TYPE GENDER AS ENUM (
     );
 
 -- region TABLES
-CREATE TABLE expression
-(
+CREATE TABLE expression (
     id          UUID PRIMARY KEY     DEFAULT uuid_generate_v4(),
     spelling    VARCHAR     NOT NULL,
     details_id  UUID        NOT NULL,
@@ -78,8 +77,7 @@ CREATE TABLE expression
     updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE expression_details
-(
+CREATE TABLE expression_details (
     id         UUID PRIMARY KEY     DEFAULT uuid_generate_v4(),
     gr         VARCHAR     NOT NULL,
     inflection VARCHAR,
@@ -88,8 +86,7 @@ CREATE TABLE expression_details
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE definition_details
-(
+CREATE TABLE definition_details (
     id                    UUID PRIMARY KEY     DEFAULT uuid_generate_v4(),
     expression_details_id UUID        NOT NULL,
     language_id           VARCHAR     NOT NULL,
@@ -98,15 +95,13 @@ CREATE TABLE definition_details
     updated_at            TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE definition_details_tag
-(
+CREATE TABLE definition_details_tag (
     tag_abbr              UUID        NOT NULL,
     definition_details_id UUID        NOT NULL,
     created_at            TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE definition
-(
+CREATE TABLE definition (
     id                    UUID PRIMARY KEY     DEFAULT uuid_generate_v4(),
     "value"               VARCHAR     NOT NULL,
     definition_details_id UUID        NOT NULL,
@@ -114,15 +109,13 @@ CREATE TABLE definition
     updated_at            TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE definition_tag
-(
+CREATE TABLE definition_tag (
     tag_abbr      VARCHAR(10) NOT NULL,
     definition_id UUID        NOT NULL,
     created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE tag
-(
+CREATE TABLE tag (
     abbreviation VARCHAR(10) PRIMARY KEY,
     description  VARCHAR,
     "type"       TAG_TYPE    NOT NULL,
@@ -130,22 +123,19 @@ CREATE TABLE tag
     updated_at   TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE expression_example
-(
+CREATE TABLE expression_example (
     expression_details_id UUID        NOT NULL,
     example_id            UUID        NOT NULL,
     created_at            TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE definition_example
-(
+CREATE TABLE definition_example (
     example_id            UUID        NOT NULL,
     definition_details_id UUID        NOT NULL,
     created_at            TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE example
-(
+CREATE TABLE example (
     id          UUID PRIMARY KEY     DEFAULT uuid_generate_v4(),
     source      VARCHAR,
     translation VARCHAR,
@@ -159,8 +149,7 @@ CREATE TABLE example
     updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE language
-(
+CREATE TABLE language (
     id         VARCHAR(3) PRIMARY KEY, -- iso639 alpha 3
     "name"     VARCHAR     NOT NULL UNIQUE,
     iso_2      VARCHAR(2) UNIQUE,      -- iso639 alpha 2
@@ -168,8 +157,7 @@ CREATE TABLE language
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE dialect
-(
+CREATE TABLE dialect (
     id          SERIAL PRIMARY KEY,
     language_id VARCHAR     NOT NULL,
     "name"      VARCHAR     NOT NULL UNIQUE,
@@ -177,8 +165,7 @@ CREATE TABLE dialect
     updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE mediafile
-(
+CREATE TABLE mediafile (
     id            UUID PRIMARY KEY,
     expression_id UUID        NOT NULL,
     mediatype     MEDIA_TYPE  NOT NULL,
@@ -187,32 +174,28 @@ CREATE TABLE mediafile
     updated_at    TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE expression_relation
-(
+CREATE TABLE expression_relation (
     expression_1_id  UUID        NOT NULL,
     expression_2_id  UUID        NOT NULL,
     relation_type_id INT         NOT NULL,
     created_at       TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE relation_type
-(
+CREATE TABLE relation_type (
     id         SERIAL PRIMARY KEY,
     "name"     VARCHAR     NOT NULL UNIQUE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE source
-(
+CREATE TABLE source (
     id         UUID PRIMARY KEY     DEFAULT uuid_generate_v4(),
     "type"     SOURCE_TYPE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE written_source
-(
+CREATE TABLE written_source (
     id               UUID PRIMARY KEY,
     source_id        UUID,
     "name"           VARCHAR,
@@ -229,8 +212,7 @@ CREATE TABLE written_source
     updated_at       TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE etymology
-(
+CREATE TABLE etymology (
     id            UUID PRIMARY KEY     DEFAULT uuid_generate_v4(),
     expression_id UUID        NOT NULL,
     language_id   VARCHAR(3)  NOT NULL,
@@ -240,8 +222,7 @@ CREATE TABLE etymology
     updated_at    TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE "case"
-(
+CREATE TABLE "case" (
     id          UUID PRIMARY KEY,
     -- e.g. Nominative, Accusative etc.
     "name"      VARCHAR,
@@ -251,8 +232,7 @@ CREATE TABLE "case"
     language_id VARCHAR
 );
 
-CREATE TABLE declension
-(
+CREATE TABLE declension (
     id                    UUID PRIMARY KEY,
     -- expression to decline according to the given case | слово для склонения согласно указанному падежу
     expression_details_id UUID,
