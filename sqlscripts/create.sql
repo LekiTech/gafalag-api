@@ -403,20 +403,20 @@ CREATE TRIGGER etymology_updated
 EXECUTE PROCEDURE set_current_timestamp();
 
 CREATE TRIGGER case_updated
-BEFORE UPDATE
-ON "case"
-FOR EACH ROW
+    BEFORE UPDATE
+    ON "case"
+    FOR EACH ROW
 EXECUTE PROCEDURE set_current_timestamp();
 
 CREATE TRIGGER declension_updated
-BEFORE UPDATE
-ON declension
-FOR EACH ROW
+    BEFORE UPDATE
+    ON declension
+    FOR EACH ROW
 EXECUTE PROCEDURE set_current_timestamp();
 -- endregion TRIGGERS
 
 -- region INDEXES
-create INDEX "created_at_index" ON "expression" ("created_at");
+CREATE INDEX "created_at_index" ON "expression" ("created_at");
 CREATE INDEX "updated_at_index" ON "expression" ("updated_at");
 
 CREATE INDEX "created_at_index" ON "expression_details" ("created_at");
