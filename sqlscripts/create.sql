@@ -229,7 +229,9 @@ CREATE TABLE "case" (
     -- question to be answered by given case e.g. Who/What?, Whom/What? etc.
     question    VARCHAR,
     -- refers to a language where given the case belongs to.
-    language_id VARCHAR
+    language_id VARCHAR,
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE TABLE declension (
@@ -241,7 +243,9 @@ CREATE TABLE declension (
     -- grammatical number e.g. single_1 for "доске" and plural_many for "досках"
     "num"                 GRAMM_NUMBER,
     person                GRAMM_PERSON,
-    gender                GENDER
+    gender                GENDER,
+    created_at            TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at            TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 -- endregion TABLES
 
@@ -332,18 +336,6 @@ CREATE TRIGGER example_updated
     FOR EACH ROW
 EXECUTE PROCEDURE set_current_timestamp();
 
-CREATE TRIGGER expression_example_updated
-    BEFORE UPDATE
-    ON expression_example
-    FOR EACH ROW
-EXECUTE PROCEDURE set_current_timestamp();
-
-CREATE TRIGGER definition_example_updated
-    BEFORE UPDATE
-    ON definition_example
-    FOR EACH ROW
-EXECUTE PROCEDURE set_current_timestamp();
-
 CREATE TRIGGER expression_details_updated
     BEFORE UPDATE
     ON expression_details
@@ -386,9 +378,9 @@ CREATE TRIGGER definition_details_updated
     FOR EACH ROW
 EXECUTE PROCEDURE set_current_timestamp();
 
-CREATE TRIGGER definition_tag_updated
+CREATE TRIGGER written_source_updated
     BEFORE UPDATE
-    ON definition_tag
+    ON written_source
     FOR EACH ROW
 EXECUTE PROCEDURE set_current_timestamp();
 
@@ -409,70 +401,74 @@ CREATE TRIGGER etymology_updated
     ON etymology
     FOR EACH ROW
 EXECUTE PROCEDURE set_current_timestamp();
+
+CREATE TRIGGER case_updated
+BEFORE UPDATE
+ON "case"
+FOR EACH ROW
+EXECUTE PROCEDURE set_current_timestamp();
+
+CREATE TRIGGER declension_updated
+BEFORE UPDATE
+ON declension
+FOR EACH ROW
+EXECUTE PROCEDURE set_current_timestamp();
 -- endregion TRIGGERS
 
 -- region INDEXES
-CREATE INDEX "created_at_index" ON "expression" ("created_at");
-
+create INDEX "created_at_index" ON "expression" ("created_at");
 CREATE INDEX "updated_at_index" ON "expression" ("updated_at");
 
 CREATE INDEX "created_at_index" ON "expression_details" ("created_at");
-
 CREATE INDEX "updated_at_index" ON "expression_details" ("updated_at");
 
 CREATE INDEX "created_at_index" ON "definition_details" ("created_at");
-
 CREATE INDEX "updated_at_index" ON "definition_details" ("updated_at");
 
 CREATE INDEX "created_at_index" ON "definition_details_tag" ("created_at");
 
 CREATE INDEX "created_at_index" ON "definition" ("created_at");
-
 CREATE INDEX "updated_at_index" ON "definition" ("updated_at");
 
 CREATE INDEX "created_at_index" ON "definition_tag" ("created_at");
 
 CREATE INDEX "created_at_index" ON "tag" ("created_at");
-
 CREATE INDEX "updated_at_index" ON "tag" ("updated_at");
 
 CREATE INDEX "created_at_index" ON "expression_example" ("created_at");
-
 CREATE INDEX "created_at_index" ON "definition_example" ("created_at");
 
 CREATE INDEX "created_at_index" ON "example" ("created_at");
-
 CREATE INDEX "updated_at_index" ON "example" ("updated_at");
 
 CREATE INDEX "created_at_index" ON "language" ("created_at");
-
 CREATE INDEX "updated_at_index" ON "language" ("updated_at");
 
 CREATE INDEX "created_at_index" ON "dialect" ("created_at");
-
 CREATE INDEX "updated_at_index" ON "dialect" ("updated_at");
 
 CREATE INDEX "created_at_index" ON "mediafile" ("created_at");
-
 CREATE INDEX "updated_at_index" ON "mediafile" ("updated_at");
 
 CREATE INDEX "created_at_index" ON "expression_relation" ("created_at");
 
 CREATE INDEX "created_at_index" ON "relation_type" ("created_at");
-
 CREATE INDEX "updated_at_index" ON "relation_type" ("updated_at");
 
 CREATE INDEX "created_at_index" ON "source" ("created_at");
-
 CREATE INDEX "updated_at_index" ON "source" ("updated_at");
 
 CREATE INDEX "created_at_index" ON "written_source" ("created_at");
-
 CREATE INDEX "updated_at_index" ON "written_source" ("updated_at");
 
 CREATE INDEX "created_at_index" ON "etymology" ("created_at");
-
 CREATE INDEX "updated_at_index" ON "etymology" ("updated_at");
+
+CREATE INDEX "created_at_index" ON "case" ("created_at");
+CREATE INDEX "updated_at_index" ON "case" ("updated_at");
+
+CREATE INDEX "created_at_index" ON "declension" ("created_at");
+CREATE INDEX "updated_at_index" ON "declension" ("updated_at");
 
 CREATE INDEX exp_gin_idx ON expression USING gin (spelling gin_trgm_ops);
 -- endregion
