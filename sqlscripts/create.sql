@@ -1,58 +1,174 @@
 -- region EXTENSIONS
 CREATE EXTENSION IF NOT EXISTS pg_trgm; -- for fuzzy search
 
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp"; -- for id
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+-- for id
 -- endregion
 
-CREATE TYPE MEDIATYPE AS ENUM ('AUDIO','IMAGE');
+CREATE TYPE MEDIA_TYPE AS ENUM (
+    'AUDIO',
+    'IMAGE',
+    'VIDEO'
+    );
+
+CREATE TYPE TAG_TYPE AS ENUM (
+    'CATEGORY',
+    'GRAMMAR',
+    'ETYMOLOGY',
+    'UNKNOWN'
+    );
+
+CREATE TYPE SOURCE_TYPE AS ENUM (
+    'WRITTEN',
+    'USER'
+    );
+
+-- Grammatical number
+-- Грамматическое число
+-- based on https://en.wikipedia.org/wiki/Grammatical_number
+CREATE TYPE GRAMM_NUMBER AS ENUM (
+    'NONE',
+    -- 3 AND more
+    'PLURAL_MANY',
+    -- exact 1
+    'SINGLE_1',
+    -- few
+    'PAUCAL_FEW',
+    -- exact 2
+    'DUAL_2',
+    -- exact 3
+    'TRIAL_3',
+    -- exact 4
+    'QUADRAL_4',
+    'DISTR_PLURAL',
+    'SUPERPLURAL'
+    );
+
+-- Grammatical person
+-- Лицо (лингвистика)
+-- based on https://en.wikipedia.org/wiki/Grammatical_person
+CREATE TYPE GRAMM_PERSON AS ENUM (
+    -- I, we [depends on gramm. number]
+    'FIRST',
+    -- you, (ты, вы) [depends on gramm. number]
+    'SECOND',
+    -- he, she, it, they [depends on gramm. number and gender]
+    'THIRD'
+    );
+
+CREATE TYPE GENDER AS ENUM (
+    -- e.g. he
+    'MALE',
+    -- e.g. she
+    'FEMALE',
+    -- e.g. it
+    'NONE',
+    -- e.g. they
+    'BOTH'
+    );
 
 -- region TABLES
 CREATE TABLE expression (
     id          UUID PRIMARY KEY     DEFAULT uuid_generate_v4(),
     spelling    VARCHAR     NOT NULL,
-    misspelling BOOLEAN              DEFAULT FALSE,
-    inflection  VARCHAR,
-    gender_id   INT,
-    language_id VARCHAR     NOT NULL,
-    dialect_id  INT,
+    details_id  UUID        NOT NULL,
+    language_id VARCHAR(3)  NOT NULL,
     created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE gender (
-    id         SERIAL PRIMARY KEY,
-    name       VARCHAR     NOT NULL UNIQUE,
+CREATE TABLE expression_details (
+    id         UUID PRIMARY KEY     DEFAULT uuid_generate_v4(),
+    gr         VARCHAR     NOT NULL,
+    inflection VARCHAR,
+    source_id  UUID        NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE part_of_speech (
-    id         SERIAL PRIMARY KEY,
-    name       VARCHAR     NOT NULL UNIQUE,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+CREATE TABLE definition_details (
+    id                    UUID PRIMARY KEY     DEFAULT uuid_generate_v4(),
+    expression_details_id UUID        NOT NULL,
+    language_id           VARCHAR(3)  NOT NULL,
+    dialect_id            UUID        NOT NULL,
+    created_at            TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at            TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE definition_details_tag (
+    tag_abbr              VARCHAR(10) NOT NULL,
+    definition_details_id UUID        NOT NULL,
+    created_at            TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE definition (
+    id                    UUID PRIMARY KEY     DEFAULT uuid_generate_v4(),
+    "value"               VARCHAR     NOT NULL,
+    definition_details_id UUID        NOT NULL,
+    created_at            TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at            TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE definition_tag (
+    tag_abbr      VARCHAR(10) NOT NULL,
+    definition_id UUID        NOT NULL,
+    created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE tag (
+    abbreviation VARCHAR(10) PRIMARY KEY,
+    description  VARCHAR,
+    "type"       TAG_TYPE    NOT NULL,
+    created_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at   TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE expression_example (
+    expression_details_id UUID        NOT NULL,
+    example_id            UUID        NOT NULL,
+    created_at            TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE definition_example (
+    example_id            UUID        NOT NULL,
+    definition_details_id UUID        NOT NULL,
+    created_at            TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE example (
+    id          UUID PRIMARY KEY     DEFAULT uuid_generate_v4(),
+    source      VARCHAR,
+    translation VARCHAR,
+    -- source language id
+    src_lang_id VARCHAR(3)  NOT NULL,
+    -- translation language id
+    trl_lang_id VARCHAR(3),
+    -- string combination of source and translation
+    raw         VARCHAR     NOT NULL,
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE TABLE language (
     id         VARCHAR(3) PRIMARY KEY, -- iso639 alpha 3
-    name       VARCHAR     NOT NULL UNIQUE,
+    "name"     VARCHAR     NOT NULL UNIQUE,
     iso_2      VARCHAR(2) UNIQUE,      -- iso639 alpha 2
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE TABLE dialect (
-    id          SERIAL PRIMARY KEY,
-    language_id VARCHAR     NOT NULL,
-    name        VARCHAR     NOT NULL UNIQUE,
+    id          UUID PRIMARY KEY,
+    language_id VARCHAR(3)  NOT NULL,
+    "name"      VARCHAR     NOT NULL UNIQUE,
     created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE mediafile (
-    id            SERIAL PRIMARY KEY,
+CREATE TABLE media_file (
+    id            UUID PRIMARY KEY,
     expression_id UUID        NOT NULL,
-    mediatype     MEDIATYPE   NOT NULL,
+    mediatype     MEDIA_TYPE  NOT NULL,
     url           VARCHAR     NOT NULL,
     created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at    TIMESTAMPTZ NOT NULL DEFAULT now()
@@ -61,93 +177,139 @@ CREATE TABLE mediafile (
 CREATE TABLE expression_relation (
     expression_1_id  UUID        NOT NULL,
     expression_2_id  UUID        NOT NULL,
-    relation_type_id INT         NOT NULL,
+    relation_type_id UUID        NOT NULL,
     created_at       TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE TABLE relation_type (
-    id         SERIAL PRIMARY KEY,
-    name       VARCHAR     NOT NULL UNIQUE,
+    id         UUID PRIMARY KEY,
+    "name"     VARCHAR     NOT NULL UNIQUE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-
-CREATE TABLE definition_category (
-    definition_id UUID        NOT NULL,
-    category_id   UUID        NOT NULL,
-    created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-
-CREATE TABLE category (
-    id         UUID PRIMARY KEY     DEFAULT uuid_generate_v4(),
-    name       VARCHAR     NOT NULL UNIQUE,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-
-CREATE TABLE definition (
-    id                UUID PRIMARY KEY     DEFAULT uuid_generate_v4(),
-    expression_id     UUID        NOT NULL,
-    part_of_speech_id INT,
-    language_id       VARCHAR     NOT NULL,
-    source_id         UUID        NOT NULL,
-    definition_text   VARCHAR     NOT NULL,
-    created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at        TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE TABLE source (
     id         UUID PRIMARY KEY     DEFAULT uuid_generate_v4(),
-    name       VARCHAR     NOT NULL UNIQUE,
-    url        VARCHAR,
+    "type"     SOURCE_TYPE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+CREATE TABLE written_source (
+    id               UUID PRIMARY KEY,
+    source_id        UUID,
+    "name"           VARCHAR,
+    authors          VARCHAR,
+    publication_year VARCHAR,
+    provided_by      VARCHAR,
+    provided_by_url  VARCHAR,
+    processed_by     VARCHAR,
+    copyright        VARCHAR,
+    see_source_url   VARCHAR,
+    -- Tells about how the source obtained its information when necessary
+    description      VARCHAR,
+    created_at       TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at       TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
 CREATE TABLE etymology (
-    id             UUID PRIMARY KEY            DEFAULT uuid_generate_v4(),
-    expression_id  UUID        NOT NULL,
-    language_id    VARCHAR     NOT NULL,
-    dialect_id     INT,
-    etymology_text VARCHAR     NOT NULL UNIQUE DEFAULT 'unknown',
-    created_at     TIMESTAMPTZ NOT NULL        DEFAULT now(),
-    updated_at     TIMESTAMPTZ NOT NULL        DEFAULT now()
+    id            UUID PRIMARY KEY     DEFAULT uuid_generate_v4(),
+    expression_id UUID        NOT NULL,
+    language_id   VARCHAR(3)  NOT NULL,
+    dialect_id    UUID,
+    description   VARCHAR     NOT NULL,
+    created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE "case" (
+    id          UUID PRIMARY KEY,
+    -- e.g. Nominative, Accusative etc.
+    "name"      VARCHAR,
+    -- question to be answered by given case e.g. Who/What?, Whom/What? etc.
+    question    VARCHAR,
+    -- refers to a language where given the case belongs to.
+    language_id VARCHAR(3),
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE declension (
+    id                    UUID PRIMARY KEY,
+    -- expression to decline according to the given case | слово для склонения согласно указанному падежу
+    expression_details_id UUID,
+    case_id               UUID,
+    "value"               VARCHAR,
+    -- grammatical number e.g. single_1 for "доске" and plural_many for "досках"
+    "num"                 GRAMM_NUMBER,
+    person                GRAMM_PERSON,
+    gender                GENDER,
+    created_at            TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at            TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 -- endregion TABLES
 
 -- region ALTER TABLES
 ALTER TABLE expression
-    ADD FOREIGN KEY (gender_id) REFERENCES gender (id),
+    ADD FOREIGN KEY (details_id) REFERENCES expression_details (id),
+    ADD FOREIGN KEY (language_id) REFERENCES language (id);
+
+ALTER TABLE expression_details
+    ADD FOREIGN KEY (source_id) REFERENCES source (id);
+
+ALTER TABLE definition_details
+    ADD FOREIGN KEY (expression_details_id) REFERENCES expression_details (id),
     ADD FOREIGN KEY (language_id) REFERENCES language (id),
     ADD FOREIGN KEY (dialect_id) REFERENCES dialect (id);
+
+ALTER TABLE definition_details_tag
+    ADD FOREIGN KEY (tag_abbr) REFERENCES tag (abbreviation),
+    ADD FOREIGN KEY (definition_details_id) REFERENCES definition_details (id);
+
+ALTER TABLE definition
+    ADD FOREIGN KEY (definition_details_id) REFERENCES definition_details (id);
+
+ALTER TABLE definition_tag
+    ADD FOREIGN KEY (tag_abbr) REFERENCES tag (abbreviation),
+    ADD FOREIGN KEY (definition_id) REFERENCES definition (id);
+
+ALTER TABLE expression_example
+    ADD FOREIGN KEY (expression_details_id) REFERENCES expression_details (id),
+    ADD FOREIGN KEY (example_id) REFERENCES example (id);
+
+ALTER TABLE definition_example
+    ADD FOREIGN KEY (example_id) REFERENCES example (id),
+    ADD FOREIGN KEY (definition_details_id) REFERENCES definition_details (id);
+
+ALTER TABLE example
+    ADD FOREIGN KEY (src_lang_id) REFERENCES language (id),
+    ADD FOREIGN KEY (trl_lang_id) REFERENCES language (id);
 
 ALTER TABLE dialect
     ADD FOREIGN KEY (language_id) REFERENCES language (id);
 
-ALTER TABLE mediafile
+ALTER TABLE media_file
     ADD FOREIGN KEY (expression_id) REFERENCES expression (id);
 
 ALTER TABLE expression_relation
-    ADD PRIMARY KEY (expression_1_id, expression_2_id),
     ADD FOREIGN KEY (expression_1_id) REFERENCES expression (id),
     ADD FOREIGN KEY (expression_2_id) REFERENCES expression (id),
     ADD FOREIGN KEY (relation_type_id) REFERENCES relation_type (id);
 
-ALTER TABLE definition_category
-    ADD PRIMARY KEY (definition_id, category_id),
-    ADD FOREIGN KEY (definition_id) REFERENCES definition (id),
-    ADD FOREIGN KEY (category_id) REFERENCES category (id);
-
-ALTER TABLE definition
-    ADD FOREIGN KEY (expression_id) REFERENCES expression (id),
-    ADD FOREIGN KEY (part_of_speech_id) REFERENCES part_of_speech (id),
-    ADD FOREIGN KEY (language_id) REFERENCES language (id),
+ALTER TABLE written_source
     ADD FOREIGN KEY (source_id) REFERENCES source (id);
 
 ALTER TABLE etymology
     ADD FOREIGN KEY (expression_id) REFERENCES expression (id),
     ADD FOREIGN KEY (language_id) REFERENCES language (id),
     ADD FOREIGN KEY (dialect_id) REFERENCES dialect (id);
+
+ALTER TABLE "case"
+    ADD FOREIGN KEY (language_id) REFERENCES language (id);
+
+ALTER TABLE declension
+    ADD FOREIGN KEY (expression_details_id) REFERENCES expression_details (id),
+    ADD FOREIGN KEY (case_id) REFERENCES "case" (id);
 -- endregion ALTER TABLES
 
 -- region FUNCTIONS
@@ -168,15 +330,15 @@ CREATE TRIGGER expression_updated
     FOR EACH ROW
 EXECUTE PROCEDURE set_current_timestamp();
 
-CREATE TRIGGER gender_updated
+CREATE TRIGGER example_updated
     BEFORE UPDATE
-    ON gender
+    ON example
     FOR EACH ROW
 EXECUTE PROCEDURE set_current_timestamp();
 
-CREATE TRIGGER part_of_speech_updated
+CREATE TRIGGER expression_details_updated
     BEFORE UPDATE
-    ON part_of_speech
+    ON expression_details
     FOR EACH ROW
 EXECUTE PROCEDURE set_current_timestamp();
 
@@ -192,9 +354,9 @@ CREATE TRIGGER dialect_updated
     FOR EACH ROW
 EXECUTE PROCEDURE set_current_timestamp();
 
-CREATE TRIGGER mediafile_updated
+CREATE TRIGGER media_file_updated
     BEFORE UPDATE
-    ON mediafile
+    ON media_file
     FOR EACH ROW
 EXECUTE PROCEDURE set_current_timestamp();
 
@@ -204,15 +366,27 @@ CREATE TRIGGER relation_type_updated
     FOR EACH ROW
 EXECUTE PROCEDURE set_current_timestamp();
 
-CREATE TRIGGER category_updated
-    BEFORE UPDATE
-    ON category
-    FOR EACH ROW
-EXECUTE PROCEDURE set_current_timestamp();
-
 CREATE TRIGGER definition_updated
     BEFORE UPDATE
     ON definition
+    FOR EACH ROW
+EXECUTE PROCEDURE set_current_timestamp();
+
+CREATE TRIGGER definition_details_updated
+    BEFORE UPDATE
+    ON definition_details
+    FOR EACH ROW
+EXECUTE PROCEDURE set_current_timestamp();
+
+CREATE TRIGGER written_source_updated
+    BEFORE UPDATE
+    ON written_source
+    FOR EACH ROW
+EXECUTE PROCEDURE set_current_timestamp();
+
+CREATE TRIGGER tag_updated
+    BEFORE UPDATE
+    ON tag
     FOR EACH ROW
 EXECUTE PROCEDURE set_current_timestamp();
 
@@ -227,8 +401,48 @@ CREATE TRIGGER etymology_updated
     ON etymology
     FOR EACH ROW
 EXECUTE PROCEDURE set_current_timestamp();
+
+CREATE TRIGGER case_updated
+    BEFORE UPDATE
+    ON "case"
+    FOR EACH ROW
+EXECUTE PROCEDURE set_current_timestamp();
+
+CREATE TRIGGER declension_updated
+    BEFORE UPDATE
+    ON declension
+    FOR EACH ROW
+EXECUTE PROCEDURE set_current_timestamp();
 -- endregion TRIGGERS
 
 -- region INDEXES
 CREATE INDEX exp_gin_idx ON expression USING gin (spelling gin_trgm_ops);
+-- endregion
+
+-- region Comments
+COMMENT ON COLUMN example.src_lang_id IS 'Source language ID';
+
+COMMENT ON COLUMN example.trl_lang_id IS 'Translation language ID';
+
+COMMENT ON COLUMN example.raw IS 'String combination of source and translation';
+
+COMMENT ON COLUMN language.id IS 'iso639_3';
+
+COMMENT ON COLUMN language.iso_2 IS 'iso639_2';
+
+COMMENT ON COLUMN written_source.description IS 'Tells about how the source obtained its information when necessary';
+
+COMMENT ON TABLE "case" IS 'Падеж';
+
+COMMENT ON COLUMN "case".name IS 'e.g. Nominative, Accusative etc.';
+
+COMMENT ON COLUMN "case".question IS 'question to be answered by given case e.g. Who/What?, Whom/What? etc.';
+
+COMMENT ON COLUMN "case".language_id IS 'refers to a language where the given case belongs to';
+
+COMMENT ON TABLE declension IS 'Склонение';
+
+COMMENT ON COLUMN declension.expression_details_id IS 'expression to decline according to the given case | слово для склонения согласно указанному падежу';
+
+COMMENT ON COLUMN declension.num IS 'grammatical number e.g. single_1 for "доске" and plural_many for "досках"';
 -- endregion
