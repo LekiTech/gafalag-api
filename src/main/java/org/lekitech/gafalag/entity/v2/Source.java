@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.lekitech.gafalag.entity.Language;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -18,23 +17,16 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "case")
+@Table(name = "source")
 @EqualsAndHashCode(of = {"id"})
-public class Case {
+public class Source {
 
     @Id
     @GeneratedValue
     private UUID id;
 
-    @Column(name = "name")
-    private String name;
-
-    @Column(name = "question")
-    private String question;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "language_id")
-    private Language language;
+    @Column(name = "type")
+    private String type;
 
     @CreationTimestamp
     @Column(name = "created_at")
@@ -46,7 +38,7 @@ public class Case {
 
     //  - relations
 
-    @OneToMany(mappedBy = "case", cascade = CascadeType.PERSIST)
-    private Set<Declension> declensions = new HashSet<>();
+    @OneToMany(mappedBy = "source", cascade = CascadeType.PERSIST)
+    private Set<ExpressionDetails> expressionDetails = new HashSet<>();
 
 }

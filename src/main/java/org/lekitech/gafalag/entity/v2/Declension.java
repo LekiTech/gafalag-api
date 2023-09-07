@@ -6,35 +6,42 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.lekitech.gafalag.entity.Language;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "case")
+@Table(name = "declension")
 @EqualsAndHashCode(of = {"id"})
-public class Case {
+public class Declension {
 
     @Id
     @GeneratedValue
     private UUID id;
 
-    @Column(name = "name")
-    private String name;
-
-    @Column(name = "question")
-    private String question;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "expression_details_id")
+    private ExpressionDetails expressionDetails;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "language_id")
-    private Language language;
+    @JoinColumn(name = "case_id")
+    private Case aCase;
+
+    @Column(name = "value")
+    private String value;
+
+    @Column(name = "num")
+    private String num;
+
+    @Column(name = "person")
+    private String person;
+
+    @Column(name = "gender")
+    private String gender;
 
     @CreationTimestamp
     @Column(name = "created_at")
@@ -43,10 +50,5 @@ public class Case {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private Timestamp updatedAt;
-
-    //  - relations
-
-    @OneToMany(mappedBy = "case", cascade = CascadeType.PERSIST)
-    private Set<Declension> declensions = new HashSet<>();
 
 }
