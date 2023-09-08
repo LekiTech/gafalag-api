@@ -22,29 +22,29 @@ import java.util.HashMap;
 @Configuration
 @PropertySource({ "classpath:application-dev.properties" })
 @EnableJpaRepositories(
-        basePackages = "org.lekitech.gafalag.repository.v1",
-        entityManagerFactoryRef = "entityManagerFactoryV1",
-        transactionManagerRef = "transactionManagerV1"
+        basePackages = "org.lekitech.gafalag.repository.v2",
+        entityManagerFactoryRef = "entityManagerFactoryV2",
+        transactionManagerRef = "transactionManagerV2"
 )
-public class DataV1Configuration {
+public class DataV2Configuration {
     @Autowired
     private Environment env;
-    @Value("${gafalag.db.v1.url}")
-    private String dbUrlV1;
-    @Value("${gafalag.db.v1.username}")
-    private String dbUsernameV1;
-    @Value("${gafalag.db.v1.password}")
-    private String dbPasswordV1;
+    @Value("${gafalag.db.v2.url}")
+    private String dbUrlV2;
+    @Value("${gafalag.db.v2.username}")
+    private String dbUsernameV2;
+    @Value("${gafalag.db.v2.password}")
+    private String dbPasswordV2;
 
 
     @Primary
-    @Bean(name = "entityManagerFactoryV1")
-    public LocalContainerEntityManagerFactoryBean entityManagerFactoryV1() {
+    @Bean(name = "entityManagerFactoryV2")
+    public LocalContainerEntityManagerFactoryBean entityManagerFactoryV2() {
         LocalContainerEntityManagerFactoryBean em
                 = new LocalContainerEntityManagerFactoryBean();
-        em.setDataSource(getDataSourceV1());
+        em.setDataSource(getDataSourceV2());
         em.setPackagesToScan(
-                new String[]{"org.lekitech.gafalag.entity.v1"});
+                new String[]{"org.lekitech.gafalag.entity.v2"});
 
         HibernateJpaVendorAdapter vendorAdapter
                 = new HibernateJpaVendorAdapter();
@@ -64,24 +64,24 @@ public class DataV1Configuration {
      * @return
      */
     @Primary
-    @Bean(name="v1")
-    public DataSource getDataSourceV1() {
-        log.info("\n===== PASSED V1 DB PARAMS =====\n'" + dbUrlV1 + "'\n'" + dbUsernameV1 + "'\n'" + dbPasswordV1 + "'");
+    @Bean(name="v2")
+    public DataSource getDataSourceV2() {
+        log.info("\n===== PASSED V2 DB PARAMS =====\n'" + dbUrlV2 + "'\n'" + dbUsernameV2 + "'\n'" + dbPasswordV2 + "'");
         DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
-        dataSourceBuilder.url(dbUrlV1);
-        dataSourceBuilder.username(dbUsernameV1);
-        dataSourceBuilder.password(dbPasswordV1);
+        dataSourceBuilder.url(dbUrlV2);
+        dataSourceBuilder.username(dbUsernameV2);
+        dataSourceBuilder.password(dbPasswordV2);
         return dataSourceBuilder.build();
     }
 
     @Primary
-    @Bean(name = "transactionManagerV1")
+    @Bean(name = "transactionManagerV2")
     public PlatformTransactionManager userTransactionManager() {
 
         JpaTransactionManager transactionManager
                 = new JpaTransactionManager();
         transactionManager.setEntityManagerFactory(
-                entityManagerFactoryV1().getObject());
+                entityManagerFactoryV2().getObject());
         return transactionManager;
     }
 }
