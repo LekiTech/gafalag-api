@@ -19,14 +19,17 @@ public class ExpressionRelation {
     @EmbeddedId
     private ExpressionRelationId expressionRelationId;
 
+    @MapsId("expression1Id")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "expression_1_id")
     private Expression expression1;
 
+    @MapsId("expression2Id")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "expression_2_id")
     private Expression expression2;
 
+    @MapsId("relationTypeId")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "relation_type_id")
     private RelationType relationType;

@@ -45,7 +45,7 @@ public class GrammaticalCase {
 
     //  - relations
 
-    @OneToMany(mappedBy = "grammatical_case", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "grammaticalCase", cascade = CascadeType.PERSIST)
     private Set<Declension> declensions = new HashSet<>();
 
 }

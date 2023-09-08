@@ -7,7 +7,6 @@ import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
@@ -37,14 +36,13 @@ public class DataV1Configuration {
     private String dbPasswordV1;
 
 
-    @Primary
+//    @Primary
     @Bean(name = "entityManagerFactoryV1")
     public LocalContainerEntityManagerFactoryBean entityManagerFactoryV1() {
         LocalContainerEntityManagerFactoryBean em
                 = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(getDataSourceV1());
-        em.setPackagesToScan(
-                new String[]{"org.lekitech.gafalag.entity.v1"});
+        em.setPackagesToScan("org.lekitech.gafalag.entity.v1");
 
         HibernateJpaVendorAdapter vendorAdapter
                 = new HibernateJpaVendorAdapter();

@@ -19,12 +19,14 @@ public class DefinitionDetailsTag {
     @EmbeddedId
     private DefinitionDetailsTagId definitionDetailsTagId;
 
+    @MapsId("tagAbbr")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "tag_abbr")
+    @JoinColumn(name = "tag_abbr", referencedColumnName = "abbreviation")
     private Tag tag;
 
+    @MapsId("definitionDetailsId")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "definition_details_id")
+    @JoinColumn(name = "definition_details_id", referencedColumnName = "id")
     private DefinitionDetails definitionDetails;
 
     @CreationTimestamp

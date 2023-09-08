@@ -19,10 +19,12 @@ public class ExpressionExample {
     @EmbeddedId
     private ExpressionExampleId expressionExampleId;
 
+    @MapsId("expressionDetailsId")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "expression_details_id")
     private ExpressionDetails expressionDetails;
 
+    @MapsId("exampleId")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "example_id")
     private Example example;
@@ -32,8 +34,8 @@ public class ExpressionExample {
     private Timestamp createdAt;
 
     public ExpressionExample(ExpressionDetails expressionDetails, Example example) {
-        this.expressionDetails = expressionDetails;
-        this.example = example;
+//        this.expressionDetails = expressionDetails;
+//        this.example = example;
         this.expressionExampleId = new ExpressionExampleId(
                 expressionDetails.getId(), example.getId()
         );

@@ -38,7 +38,7 @@ public class RelationType {
 
     // - relations
 
-    @OneToMany(mappedBy = "relation_type", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "relationType", cascade = CascadeType.PERSIST)
     private Set<ExpressionRelation> expressionRelations = new HashSet<>();
 
 }

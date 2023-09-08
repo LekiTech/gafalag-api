@@ -45,13 +45,13 @@ public class ExpressionDetails {
 
     //  - relations
 
-    @OneToMany(mappedBy = "expression_details", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "expressionDetails", cascade = CascadeType.PERSIST)
     private Set<DefinitionDetails> definitionDetails = new HashSet<>();
 
-    @OneToMany(mappedBy = "expression_details", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "expressionDetails", cascade = CascadeType.PERSIST)
     private Set<Expression> expressions = new HashSet<>();
 
-    @OneToMany(mappedBy = "expression_details", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "expressionDetails", cascade = CascadeType.PERSIST)
     private Set<ExpressionExample> expressionExamples = new HashSet<>();
 
 }

@@ -47,13 +47,13 @@ public class DefinitionDetails {
 
     //  - relations
 
-    @OneToMany(mappedBy = "definition_details", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "definitionDetails", cascade = CascadeType.PERSIST)
     private Set<Definition> definitions = new HashSet<>();
 
-    @OneToMany(mappedBy = "definition_details", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "definitionDetails", cascade = CascadeType.PERSIST)
     private Set<DefinitionDetailsTag> definitionDetailsTags = new HashSet<>();
 
-    @OneToMany(mappedBy = "definition_details", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "definitionDetails", cascade = CascadeType.PERSIST)
     private Set<DefinitionExample> definitionExamples = new HashSet<>();
 
 }

@@ -7,7 +7,6 @@ import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
@@ -19,13 +18,12 @@ import javax.sql.DataSource;
 import java.util.HashMap;
 
 @Slf4j
-//@Configuration
-//@PropertySource({ "classpath:application-dev.properties" })
-//@EnableJpaRepositories(
-//        basePackages = "org.lekitech.gafalag.repository.v2",
-//        entityManagerFactoryRef = "entityManagerFactoryV2",
-//        transactionManagerRef = "transactionManagerV2"
-//)
+@Configuration
+@EnableJpaRepositories(
+        basePackages = "org.lekitech.gafalag.repository.v2",
+        entityManagerFactoryRef = "entityManagerFactoryV2",
+        transactionManagerRef = "transactionManagerV2"
+)
 public class DataV2Configuration {
     @Autowired
     private Environment env;
@@ -43,8 +41,7 @@ public class DataV2Configuration {
         LocalContainerEntityManagerFactoryBean em
                 = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(getDataSourceV2());
-        em.setPackagesToScan(
-                new String[]{"org.lekitech.gafalag.entity.v2"});
+        em.setPackagesToScan("org.lekitech.gafalag.entity.v2");
 
         HibernateJpaVendorAdapter vendorAdapter
                 = new HibernateJpaVendorAdapter();

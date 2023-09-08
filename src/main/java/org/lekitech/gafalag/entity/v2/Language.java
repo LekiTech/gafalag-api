@@ -46,8 +46,11 @@ public class Language {
     @OneToMany(mappedBy = "language", cascade = CascadeType.PERSIST)
     private Set<Dialect> dialects = new HashSet<>();
 
-    @OneToMany(mappedBy = "language", cascade = CascadeType.PERSIST)
-    private Set<Example> examples = new HashSet<>();
+    @OneToMany(mappedBy = "srcLanguage", cascade = CascadeType.PERSIST)
+    private Set<Example> examplesSrc = new HashSet<>();
+
+    @OneToMany(mappedBy = "trlLanguage", cascade = CascadeType.PERSIST)
+    private Set<Example> examplesTrl = new HashSet<>();
 
     @OneToMany(mappedBy = "language", cascade = CascadeType.PERSIST)
     private Set<Expression> expressions = new HashSet<>();

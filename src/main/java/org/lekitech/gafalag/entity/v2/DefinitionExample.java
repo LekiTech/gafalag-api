@@ -19,10 +19,12 @@ public class DefinitionExample {
     @EmbeddedId
     private DefinitionExampleId definitionExampleId;
 
+    @MapsId("exampleId")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "example_id")
     private Example example;
 
+    @MapsId("definitionDetailsId")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "definition_details_id")
     private DefinitionDetails definitionDetails;

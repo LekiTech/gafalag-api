@@ -47,9 +47,6 @@ public class Expression {
     // - relations
 
     @OneToMany(mappedBy = "expression", cascade = CascadeType.PERSIST)
-    private Set<ExpressionRelation> expressionRelations = new HashSet<>();
-
-    @OneToMany(mappedBy = "expression", cascade = CascadeType.PERSIST)
     private Set<MediaFile> mediaFiles = new HashSet<>();
 
 }
