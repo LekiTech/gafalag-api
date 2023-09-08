@@ -222,7 +222,7 @@ CREATE TABLE etymology (
     updated_at    TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE "case" (
+CREATE TABLE grammatical_case (
     id          UUID PRIMARY KEY,
     -- e.g. Nominative, Accusative etc.
     "name"      VARCHAR,
@@ -238,7 +238,7 @@ CREATE TABLE declension (
     id                    UUID PRIMARY KEY,
     -- expression to decline according to the given case | слово для склонения согласно указанному падежу
     expression_details_id UUID,
-    case_id               UUID,
+    grammatical_case_id   UUID,
     "value"               VARCHAR,
     -- grammatical number e.g. single_1 for "доске" and plural_many for "досках"
     "num"                 GRAMM_NUMBER,
@@ -304,12 +304,12 @@ ALTER TABLE etymology
     ADD FOREIGN KEY (language_id) REFERENCES language (id),
     ADD FOREIGN KEY (dialect_id) REFERENCES dialect (id);
 
-ALTER TABLE "case"
+ALTER TABLE grammatical_case
     ADD FOREIGN KEY (language_id) REFERENCES language (id);
 
 ALTER TABLE declension
     ADD FOREIGN KEY (expression_details_id) REFERENCES expression_details (id),
-    ADD FOREIGN KEY (case_id) REFERENCES "case" (id);
+    ADD FOREIGN KEY (grammatical_case_id) REFERENCES grammatical_case (id);
 -- endregion ALTER TABLES
 
 -- region FUNCTIONS
@@ -402,9 +402,9 @@ CREATE TRIGGER etymology_updated
     FOR EACH ROW
 EXECUTE PROCEDURE set_current_timestamp();
 
-CREATE TRIGGER case_updated
+CREATE TRIGGER grammatical_case_updated
     BEFORE UPDATE
-    ON "case"
+    ON grammatical_case
     FOR EACH ROW
 EXECUTE PROCEDURE set_current_timestamp();
 
@@ -432,13 +432,13 @@ COMMENT ON COLUMN language.iso_2 IS 'iso639_2';
 
 COMMENT ON COLUMN written_source.description IS 'Tells about how the source obtained its information when necessary';
 
-COMMENT ON TABLE "case" IS 'Падеж';
+COMMENT ON TABLE grammatical_case IS 'Падеж';
 
-COMMENT ON COLUMN "case".name IS 'e.g. Nominative, Accusative etc.';
+COMMENT ON COLUMN grammatical_case.name IS 'e.g. Nominative, Accusative etc.';
 
-COMMENT ON COLUMN "case".question IS 'question to be answered by given case e.g. Who/What?, Whom/What? etc.';
+COMMENT ON COLUMN grammatical_case.question IS 'question to be answered by given case e.g. Who/What?, Whom/What? etc.';
 
-COMMENT ON COLUMN "case".language_id IS 'refers to a language where the given case belongs to';
+COMMENT ON COLUMN grammatical_case.language_id IS 'refers to a language where the given case belongs to';
 
 COMMENT ON TABLE declension IS 'Склонение';
 
