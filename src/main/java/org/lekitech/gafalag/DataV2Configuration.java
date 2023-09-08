@@ -19,13 +19,13 @@ import javax.sql.DataSource;
 import java.util.HashMap;
 
 @Slf4j
-@Configuration
-@PropertySource({ "classpath:application-dev.properties" })
-@EnableJpaRepositories(
-        basePackages = "org.lekitech.gafalag.repository.v2",
-        entityManagerFactoryRef = "entityManagerFactoryV2",
-        transactionManagerRef = "transactionManagerV2"
-)
+//@Configuration
+//@PropertySource({ "classpath:application-dev.properties" })
+//@EnableJpaRepositories(
+//        basePackages = "org.lekitech.gafalag.repository.v2",
+//        entityManagerFactoryRef = "entityManagerFactoryV2",
+//        transactionManagerRef = "transactionManagerV2"
+//)
 public class DataV2Configuration {
     @Autowired
     private Environment env;

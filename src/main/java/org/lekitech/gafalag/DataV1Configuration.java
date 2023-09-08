@@ -20,7 +20,7 @@ import java.util.HashMap;
 
 @Slf4j
 @Configuration
-@PropertySource({ "classpath:application-dev.properties" })
+//@PropertySource({ "classpath:application-dev.properties" })
 @EnableJpaRepositories(
         basePackages = "org.lekitech.gafalag.repository.v1",
         entityManagerFactoryRef = "entityManagerFactoryV1",
