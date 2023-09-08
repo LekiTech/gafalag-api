@@ -9,38 +9,30 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "example")
+@Table(name = "expression")
 @EqualsAndHashCode(of = {"id"})
-public class Example {
+public class Expression {
 
     @Id
     @GeneratedValue
     private UUID id;
 
-    @Column(name = "source")
-    private String source;
-
-    @Column(name = "translation")
-    private String translation;
+    @Column(name = "spelling")
+    private String spelling;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "src_lang_id")
-    private Language srcLanguage;
+    @JoinColumn(name = "details_id")
+    private ExpressionDetails expressionDetails;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "trl_lang_id")
-    private Language trlLanguage;
-
-    @Column(name = "raw")
-    private String raw;
+    @JoinColumn(name = "language_id")
+    private Language language;
 
     @CreationTimestamp
     @Column(name = "created_at")
@@ -49,13 +41,5 @@ public class Example {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private Timestamp updatedAt;
-
-    //  - relations
-
-    @OneToMany(mappedBy = "example", cascade = CascadeType.PERSIST)
-    private Set<DefinitionExample> definitionExamples = new HashSet<>();
-
-    @OneToMany(mappedBy = "example", cascade = CascadeType.PERSIST)
-    private Set<ExpressionExample> expressionExamples = new HashSet<>();
 
 }
