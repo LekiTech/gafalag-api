@@ -51,4 +51,7 @@ public class DefinitionDetails {
     @OneToMany(mappedBy = "definition_details", cascade = CascadeType.PERSIST)
     private Set<Definition> definitions = new HashSet<>();
 
+    @OneToMany(mappedBy = "definition_details", cascade = CascadeType.PERSIST)
+    private Set<DefinitionDetailsTag> definitionDetailsTags = new HashSet<>();
+
 }
