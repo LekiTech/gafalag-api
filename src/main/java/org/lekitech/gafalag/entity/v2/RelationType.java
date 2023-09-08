@@ -17,16 +17,16 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "source")
+@Table(name = "relation_type")
 @EqualsAndHashCode(of = {"id"})
-public class Source {
+public class RelationType {
 
     @Id
     @GeneratedValue
     private UUID id;
 
-    @Column(name = "type")
-    private String type;
+    @Column(name = "name")
+    private String name;
 
     @CreationTimestamp
     @Column(name = "created_at")
@@ -36,12 +36,9 @@ public class Source {
     @Column(name = "updated_at")
     private Timestamp updatedAt;
 
-    //  - relations
+    // - relations
 
-    @OneToMany(mappedBy = "source", cascade = CascadeType.PERSIST)
-    private Set<ExpressionDetails> expressionDetails = new HashSet<>();
-
-    @OneToMany(mappedBy = "source", cascade = CascadeType.PERSIST)
-    private Set<WrittenSource> writtenSources = new HashSet<>();
+    @OneToMany(mappedBy = "relation_type", cascade = CascadeType.PERSIST)
+    private Set<ExpressionRelation> expressionRelations = new HashSet<>();
 
 }

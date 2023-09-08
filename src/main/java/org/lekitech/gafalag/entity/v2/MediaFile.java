@@ -9,24 +9,29 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "source")
+@Table(name = "media_file")
 @EqualsAndHashCode(of = {"id"})
-public class Source {
+public class MediaFile {
 
     @Id
     @GeneratedValue
     private UUID id;
 
-    @Column(name = "type")
-    private String type;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "expression_id")
+    private Expression expression;
+
+    @Column(name = "media_type")
+    private String mediaType;
+
+    @Column(name = "url")
+    private String url;
 
     @CreationTimestamp
     @Column(name = "created_at")
@@ -35,13 +40,5 @@ public class Source {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private Timestamp updatedAt;
-
-    //  - relations
-
-    @OneToMany(mappedBy = "source", cascade = CascadeType.PERSIST)
-    private Set<ExpressionDetails> expressionDetails = new HashSet<>();
-
-    @OneToMany(mappedBy = "source", cascade = CascadeType.PERSIST)
-    private Set<WrittenSource> writtenSources = new HashSet<>();
 
 }

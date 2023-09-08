@@ -9,6 +9,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -41,5 +43,13 @@ public class Expression {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private Timestamp updatedAt;
+
+    // - relations
+
+    @OneToMany(mappedBy = "expression", cascade = CascadeType.PERSIST)
+    private Set<ExpressionRelation> expressionRelations = new HashSet<>();
+
+    @OneToMany(mappedBy = "expression", cascade = CascadeType.PERSIST)
+    private Set<MediaFile> mediaFiles = new HashSet<>();
 
 }

@@ -168,7 +168,7 @@ CREATE TABLE dialect (
 CREATE TABLE media_file (
     id            UUID PRIMARY KEY,
     expression_id UUID        NOT NULL,
-    mediatype     MEDIA_TYPE  NOT NULL,
+    media_type    MEDIA_TYPE  NOT NULL,
     url           VARCHAR     NOT NULL,
     created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at    TIMESTAMPTZ NOT NULL DEFAULT now()
