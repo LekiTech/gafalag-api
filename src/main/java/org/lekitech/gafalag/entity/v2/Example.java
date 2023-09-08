@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.lekitech.gafalag.entity.Language;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -18,25 +17,30 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "definition_details")
+@Table(name = "example")
 @EqualsAndHashCode(of = {"id"})
-public class DefinitionDetails {
+public class Example {
 
     @Id
     @GeneratedValue
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "expression_details_id")
-    private ExpressionDetails expressionDetails;
+    @Column(name = "source")
+    private String source;
+
+    @Column(name = "translation")
+    private String translation;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "language_id")
-    private Language language;
+    @JoinColumn(name = "src_lang_id")
+    private Language srcLanguage;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "dialect_id")
-    private Dialect dialect;
+    @JoinColumn(name = "trl_lang_id")
+    private Language trlLanguage;
+
+    @Column(name = "raw")
+    private String raw;
 
     @CreationTimestamp
     @Column(name = "created_at")
@@ -48,13 +52,7 @@ public class DefinitionDetails {
 
     //  - relations
 
-    @OneToMany(mappedBy = "definition_details", cascade = CascadeType.PERSIST)
-    private Set<Definition> definitions = new HashSet<>();
-
-    @OneToMany(mappedBy = "definition_details", cascade = CascadeType.PERSIST)
-    private Set<DefinitionDetailsTag> definitionDetailsTags = new HashSet<>();
-
-    @OneToMany(mappedBy = "definition_details", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "example", cascade = CascadeType.PERSIST)
     private Set<DefinitionExample> definitionExamples = new HashSet<>();
 
 }
