@@ -1,9 +1,8 @@
-package org.lekitech.gafalag.entity;
+package org.lekitech.gafalag.entity.v1;
 
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.lekitech.gafalag.entity.v2.DefinitionDetails;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -41,7 +40,12 @@ public class Language {
     @OneToMany(mappedBy = "language", cascade = CascadeType.PERSIST)
     private Set<Dialect> dialects = new HashSet<>();
 
-    @OneToMany(mappedBy = "language", cascade = CascadeType.PERSIST)
-    private Set<DefinitionDetails> definitionDetails = new HashSet<>();
+    public Language(String id,
+                    String name,
+                    String iso2) {
+        this.id = id;
+        this.name = name;
+        this.iso2 = iso2;
+    }
 
 }

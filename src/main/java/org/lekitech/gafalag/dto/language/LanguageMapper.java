@@ -1,7 +1,7 @@
 package org.lekitech.gafalag.dto.language;
 
 import org.lekitech.gafalag.dto.mapper.ReferenceMapper;
-import org.lekitech.gafalag.entity.Language;
+import org.lekitech.gafalag.entity.v1.Language;
 import org.mapstruct.Mapper;
 import org.mapstruct.Qualifier;
 

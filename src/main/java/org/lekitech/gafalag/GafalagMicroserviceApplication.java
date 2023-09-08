@@ -8,28 +8,24 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import javax.sql.DataSource;
-
 import static org.springframework.http.HttpMethod.*;
-import static org.springframework.http.HttpMethod.OPTIONS;
 
 @Slf4j
 @SpringBootApplication
-@EnableJpaRepositories
+//@EnableJpaRepositories
 public class GafalagMicroserviceApplication extends SpringBootServletInitializer {
-    @Value("${gafalag.db.url}")
-    private String dbUrl;
-    @Value("${gafalag.db.username}")
-    private String dbUsername;
-    @Value("${gafalag.db.password}")
-    private String dbPassword;
+
+    @Value("${gafalag.db.v2.url}")
+    private String dbUrlV2;
+    @Value("${gafalag.db.v2.username}")
+    private String dbUsernameV2;
+    @Value("${gafalag.db.v2.password}")
+    private String dbPasswordV2;
 
     private static final long MAXAGESECS = 3600;
 
@@ -37,15 +33,55 @@ public class GafalagMicroserviceApplication extends SpringBootServletInitializer
      * Loading db connection programmatically for secure connection string passing in production
      * @return
      */
-    @Bean
-    public DataSource getDataSource() {
-        log.info("\n===== PASSED DB PARAMS =====\n'" + dbUrl + "'\n'" + dbUsername + "'\n'" + dbPassword + "'");
-        DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
-        dataSourceBuilder.url(dbUrl);
-        dataSourceBuilder.username(dbUsername);
-        dataSourceBuilder.password(dbPassword);
-        return dataSourceBuilder.build();
-    }
+//    @Primary
+//    @Bean(name="v1")
+//    public DataSource getDataSourceV1() {
+//        log.info("\n===== PASSED V1 DB PARAMS =====\n'" + dbUrlV1 + "'\n'" + dbUsernameV1 + "'\n'" + dbPasswordV1 + "'");
+//        DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
+//        dataSourceBuilder.url(dbUrlV1);
+//        dataSourceBuilder.username(dbUsernameV1);
+//        dataSourceBuilder.password(dbPasswordV1);
+//        return dataSourceBuilder.build();
+//    }
+//    @Primary
+//    @Bean(name = "entityManagerFactoryV1")
+//    public LocalContainerEntityManagerFactoryBean entityManagerFactoryV1(EntityManagerFactoryBuilder builder, @Qualifier("v1") DataSource dataSource) {
+//        return builder
+//                .dataSource(dataSource)
+//                .packages("org.lekitech.gafalag.entity.v1") // base package of your v1 entities
+//                .persistenceUnit("v1")
+//                .build();
+//    }
+//
+//    @Primary
+//    @Bean(name = "transactionManagerV1")
+//    public PlatformTransactionManager transactionManagerV1(@Qualifier("entityManagerFactoryV1") EntityManagerFactory entityManagerFactory) {
+//        return new JpaTransactionManager(entityManagerFactory);
+//    }
+
+//    @Bean(name="v2")
+//    public DataSource getDataSourceV2() {
+//        log.info("\n===== PASSED V2 DB PARAMS =====\n'" + dbUrlV2 + "'\n'" + dbUsernameV2 + "'\n'" + dbPasswordV2 + "'");
+//        DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
+//        dataSourceBuilder.url(dbUrlV2);
+//        dataSourceBuilder.username(dbUsernameV2);
+//        dataSourceBuilder.password(dbPasswordV2);
+//        return dataSourceBuilder.build();
+//    }
+//
+//    @Bean(name = "entityManagerFactoryV2")
+//    public LocalContainerEntityManagerFactoryBean entityManagerFactoryV2(EntityManagerFactoryBuilder builder, @Qualifier("v2") DataSource dataSource) {
+//        return builder
+//                .dataSource(dataSource)
+//                .packages("org.lekitech.gafalag.entity.v2") // base package of your v2 entities
+//                .persistenceUnit("v2")
+//                .build();
+//    }
+//
+//    @Bean(name = "transactionManagerV2")
+//    public PlatformTransactionManager transactionManagerV2(@Qualifier("entityManagerFactoryV2") EntityManagerFactory entityManagerFactory) {
+//        return new JpaTransactionManager(entityManagerFactory);
+//    }
 
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {

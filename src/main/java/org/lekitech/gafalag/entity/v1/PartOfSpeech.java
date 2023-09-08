@@ -1,4 +1,4 @@
-package org.lekitech.gafalag.entity;
+package org.lekitech.gafalag.entity.v1;
 
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -12,11 +12,11 @@ import java.sql.Timestamp;
 @Setter
 @NoArgsConstructor
 @EqualsAndHashCode(of = {"id", "name"})
-@Table(name = "gender")
-public class Gender {
+@Table(name = "part_of_speech")
+public class PartOfSpeech {
 
     @Id
-    @GeneratedValue(generator = "gender_id_seq")
+    @GeneratedValue(generator = "part_of_speech_id_seq")
     private Long id;
 
     @Column(name = "name")
@@ -30,7 +30,7 @@ public class Gender {
     @Column(name = "updated_at")
     private Timestamp updatedAt;
 
-    public Gender(String name) {
+    public PartOfSpeech(String name) {
         this.name = name;
     }
 }

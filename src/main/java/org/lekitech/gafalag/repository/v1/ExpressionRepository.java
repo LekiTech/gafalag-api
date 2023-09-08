@@ -1,17 +1,19 @@
-package org.lekitech.gafalag.repository;
+package org.lekitech.gafalag.repository.v1;
 
 import lombok.NonNull;
-import org.lekitech.gafalag.entity.Expression;
+import org.lekitech.gafalag.entity.v1.Expression;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
 
 @Repository
+@Transactional("transactionManagerV1")
 public interface ExpressionRepository extends JpaRepository<Expression, UUID> {
 
     @NonNull Page<Expression> findAll(@NonNull Pageable pageable);

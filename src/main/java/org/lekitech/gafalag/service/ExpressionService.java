@@ -5,12 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.lekitech.gafalag.dto.PaginatedResult;
 import org.lekitech.gafalag.dto.expression.*;
-import org.lekitech.gafalag.entity.*;
-import org.lekitech.gafalag.repository.ExpressionRepository;
+import org.lekitech.gafalag.entity.v1.Definition;
+import org.lekitech.gafalag.entity.v1.Expression;
+import org.lekitech.gafalag.entity.v1.Source;
+import org.lekitech.gafalag.repository.v1.ExpressionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

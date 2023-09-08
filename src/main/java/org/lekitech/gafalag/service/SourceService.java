@@ -2,8 +2,8 @@ package org.lekitech.gafalag.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.lekitech.gafalag.entity.Source;
-import org.lekitech.gafalag.repository.SourceRepository;
+import org.lekitech.gafalag.entity.v1.Source;
+import org.lekitech.gafalag.repository.v1.SourceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

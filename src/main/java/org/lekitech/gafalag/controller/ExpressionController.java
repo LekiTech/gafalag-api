@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.lekitech.gafalag.dto.PaginatedResult;
 import org.lekitech.gafalag.dto.expression.*;
-import org.lekitech.gafalag.entity.Expression;
+import org.lekitech.gafalag.entity.v1.Expression;
 import org.lekitech.gafalag.service.ExpressionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

@@ -1,4 +1,4 @@
-package org.lekitech.gafalag.entity;
+package org.lekitech.gafalag.entity.v1;
 
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -6,18 +6,19 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.UUID;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @EqualsAndHashCode(of = {"id", "name"})
-@Table(name = "relation_type")
-public class RelationType {
+@Table(name = "category")
+public class Category {
 
     @Id
-    @GeneratedValue(generator = "relation_type_id_seq")
-    private Long id;
+    @GeneratedValue
+    private UUID id;
 
     @Column(name = "name")
     private String name;
@@ -30,7 +31,7 @@ public class RelationType {
     @Column(name = "updated_at")
     private Timestamp updatedAt;
 
-    public RelationType(String name) {
+    public Category(String name) {
         this.name = name;
     }
 }

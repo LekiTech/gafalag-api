@@ -1,4 +1,4 @@
-package org.lekitech.gafalag.entity;
+package org.lekitech.gafalag.entity.v1;
 
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -12,28 +12,32 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
-@EqualsAndHashCode(of = {"id", "etymologyText"})
-@Table(name = "etymology")
-public class Etymology {
+@EqualsAndHashCode(of = {"id", "text"})
+@Table(name = "definition")
+public class Definition {
 
     @Id
     @GeneratedValue
     private UUID id;
 
-    @Column(name = "etymology_text")
-    private String etymologyText;
+    @Column(name = "definition_text")
+    private String text;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "expression_id")
     private Expression expression;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "part_of_speech_id")
+    private PartOfSpeech partOfSpeech;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "language_id")
     private Language language;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "dialect_id")
-    private Dialect dialect;
+    @JoinColumn(name = "source_id")
+    private Source source;
 
     @CreationTimestamp
     @Column(name = "created_at")
@@ -43,7 +47,11 @@ public class Etymology {
     @Column(name = "updated_at")
     private Timestamp updatedAt;
 
-    public Etymology(String etymologyText) {
-        this.etymologyText = etymologyText;
+    public Definition(String text,
+                      Language language,
+                      Source source) {
+        this.text = text;
+        this.language = language;
+        this.source = source;
     }
 }
