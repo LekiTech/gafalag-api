@@ -18,9 +18,9 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "case")
+@Table(name = "grammatical_case")
 @EqualsAndHashCode(of = {"id"})
-public class Case {
+public class GrammaticalCase {
 
     @Id
     @GeneratedValue
@@ -46,7 +46,7 @@ public class Case {
 
     //  - relations
 
-    @OneToMany(mappedBy = "case", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "grammatical_case", cascade = CascadeType.PERSIST)
     private Set<Declension> declensions = new HashSet<>();
 
 }

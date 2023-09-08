@@ -28,8 +28,8 @@ public class Declension {
     private ExpressionDetails expressionDetails;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "case_id")
-    private Case aCase;
+    @JoinColumn(name = "grammatical_case_id")
+    private GrammaticalCase grammaticalCase;
 
     @Column(name = "value")
     private String value;

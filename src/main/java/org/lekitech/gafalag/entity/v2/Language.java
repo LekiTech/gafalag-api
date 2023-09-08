@@ -41,6 +41,6 @@ public class Language {
     //  - relations
 
     @OneToMany(mappedBy = "language", cascade = CascadeType.PERSIST)
-    private Set<Case> cases = new HashSet<>();
+    private Set<GrammaticalCase> grammaticalCases = new HashSet<>();
 
 }
