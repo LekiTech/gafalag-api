@@ -17,7 +17,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @Table(name = "language")
-@EqualsAndHashCode(of = {"id", "name"})
+@EqualsAndHashCode(of = {"id"})
 public class Language {
 
     @Id
@@ -42,5 +42,8 @@ public class Language {
 
     @OneToMany(mappedBy = "language", cascade = CascadeType.PERSIST)
     private Set<GrammaticalCase> grammaticalCases = new HashSet<>();
+
+    @OneToMany(mappedBy = "language", cascade = CascadeType.PERSIST)
+    private Set<Dialect> dialects = new HashSet<>();
 
 }

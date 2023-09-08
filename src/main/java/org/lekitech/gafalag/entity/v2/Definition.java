@@ -9,31 +9,26 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "expression_details")
+@Table(name = "definition")
 @EqualsAndHashCode(of = {"id"})
-public class ExpressionDetails {
+public class Definition {
 
     @Id
     @GeneratedValue
     private UUID id;
 
-    @Column(name = "gr")
-    private String gr;
-
-    @Column(name = "inflection")
-    private String inflection;
+    @Column(name = "value")
+    private String value;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "source_id", nullable = false)
-    private Source source;
+    @JoinColumn(name = "definition_details_id")
+    private DefinitionDetails definitionDetails;
 
     @CreationTimestamp
     @Column(name = "created_at")
@@ -42,10 +37,5 @@ public class ExpressionDetails {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private Timestamp updatedAt;
-
-    //  - relations
-
-    @OneToMany(mappedBy = "expression_details", cascade = CascadeType.PERSIST)
-    private Set<DefinitionDetails> definitionDetails = new HashSet<>();
 
 }

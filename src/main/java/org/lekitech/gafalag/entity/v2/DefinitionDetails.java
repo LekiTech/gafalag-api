@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.lekitech.gafalag.entity.Language;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -17,23 +18,25 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "expression_details")
+@Table(name = "definition_details")
 @EqualsAndHashCode(of = {"id"})
-public class ExpressionDetails {
+public class DefinitionDetails {
 
     @Id
     @GeneratedValue
     private UUID id;
 
-    @Column(name = "gr")
-    private String gr;
-
-    @Column(name = "inflection")
-    private String inflection;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "expression_details_id")
+    private ExpressionDetails expressionDetails;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "source_id", nullable = false)
-    private Source source;
+    @JoinColumn(name = "language_id")
+    private Language language;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "dialect_id")
+    private Dialect dialect;
 
     @CreationTimestamp
     @Column(name = "created_at")
@@ -45,7 +48,7 @@ public class ExpressionDetails {
 
     //  - relations
 
-    @OneToMany(mappedBy = "expression_details", cascade = CascadeType.PERSIST)
-    private Set<DefinitionDetails> definitionDetails = new HashSet<>();
+    @OneToMany(mappedBy = "definition_details", cascade = CascadeType.PERSIST)
+    private Set<Definition> definitions = new HashSet<>();
 
 }

@@ -1,32 +1,36 @@
-package org.lekitech.gafalag.entity;
+package org.lekitech.gafalag.entity.v2;
 
-import lombok.*;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.lekitech.gafalag.entity.v2.DefinitionDetails;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
-@EqualsAndHashCode(of = {"id", "name"})
-@Table(name = "language")
-public class Language {
+@EqualsAndHashCode(of = {"id"})
+@Table(name = "dialect")
+public class Dialect {
 
     @Id
-    @Column(length = 3)
-    private String id;
+    @GeneratedValue
+    private UUID id;
 
     @Column(name = "name")
     private String name;
 
-    @Column(name = "iso_2", length = 2)
-    private String iso2;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "language_id")
+    private Language language;
 
     @CreationTimestamp
     @Column(name = "created_at")
@@ -36,12 +40,9 @@ public class Language {
     @Column(name = "updated_at")
     private Timestamp updatedAt;
 
-    //  - relations
+    // - relations
 
-    @OneToMany(mappedBy = "language", cascade = CascadeType.PERSIST)
-    private Set<Dialect> dialects = new HashSet<>();
-
-    @OneToMany(mappedBy = "language", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "dialect", cascade = CascadeType.PERSIST)
     private Set<DefinitionDetails> definitionDetails = new HashSet<>();
 
 }
