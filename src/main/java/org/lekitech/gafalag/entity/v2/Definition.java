@@ -9,6 +9,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -37,5 +39,10 @@ public class Definition {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private Timestamp updatedAt;
+
+    // - relations
+
+    @OneToMany(mappedBy = "definition", cascade = CascadeType.PERSIST)
+    private Set<DefinitionTag> definitionTags = new HashSet<>();
 
 }
