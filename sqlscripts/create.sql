@@ -417,6 +417,8 @@ EXECUTE PROCEDURE set_current_timestamp();
 
 -- region INDEXES
 CREATE INDEX exp_gin_idx ON expression USING gin (spelling gin_trgm_ops);
+
+CREATE UNIQUE INDEX expression_idx ON expression (spelling, language_id);
 -- endregion
 
 -- region Comments
