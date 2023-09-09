@@ -61,7 +61,7 @@ public class DataV1Configuration {
      * Loading db connection programmatically for secure connection string passing in production
      * @return
      */
-    @Primary
+//    @Primary
     @Bean(name="v1")
     public DataSource getDataSourceV1() {
         log.info("\n===== PASSED V1 DB PARAMS =====\n'" + dbUrlV1 + "'\n'" + dbUsernameV1 + "'\n'" + dbPasswordV1 + "'");
@@ -72,7 +72,7 @@ public class DataV1Configuration {
         return dataSourceBuilder.build();
     }
 
-    @Primary
+//    @Primary
     @Bean(name = "transactionManagerV1")
     public PlatformTransactionManager userTransactionManager() {
 
