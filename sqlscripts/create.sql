@@ -76,14 +76,19 @@ CREATE TABLE expression (
     updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+CREATE TABLE "expression_match_details" (
+    expression_details_id UUID        NOT NULL,
+    expression_id         UUID        NOT NULL,
+    created_at            TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
 CREATE TABLE expression_details (
-    id            UUID PRIMARY KEY     DEFAULT uuid_generate_v4(),
-    gr            VARCHAR     NOT NULL,
-    inflection    VARCHAR,
-    expression_id UUID        NOT NULL,
-    source_id     UUID        NOT NULL,
-    created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+    id         UUID PRIMARY KEY     DEFAULT uuid_generate_v4(),
+    gr         VARCHAR     NOT NULL,
+    inflection VARCHAR,
+    source_id  UUID        NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE TABLE definition_details (
@@ -113,6 +118,12 @@ CREATE TABLE definition_tag (
     tag_abbr      VARCHAR(10) NOT NULL,
     definition_id UUID        NOT NULL,
     created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE example_tag (
+    tag_abbr   VARCHAR(10) NOT NULL,
+    example_id UUID        NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE TABLE tag (
@@ -254,11 +265,13 @@ ALTER TABLE expression
     ADD FOREIGN KEY (language_id) REFERENCES language (id);
 
 ALTER TABLE expression_details
-    ADD FOREIGN KEY (expression_id) REFERENCES expression (id),
     ADD FOREIGN KEY (source_id) REFERENCES source (id);
 
+ALTER TABLE expression_match_details
+    ADD FOREIGN KEY (expression_id) REFERENCES expression (id),
+    ADD FOREIGN KEY (expression_details_id) REFERENCES expression_details (id);
+
 ALTER TABLE definition_details
-    ADD FOREIGN KEY (expression_details_id) REFERENCES expression_details (id),
     ADD FOREIGN KEY (language_id) REFERENCES language (id),
     ADD FOREIGN KEY (dialect_id) REFERENCES dialect (id);
 
@@ -272,6 +285,10 @@ ALTER TABLE definition
 ALTER TABLE definition_tag
     ADD FOREIGN KEY (tag_abbr) REFERENCES tag (abbreviation),
     ADD FOREIGN KEY (definition_id) REFERENCES definition (id);
+
+ALTER TABLE example_tag
+    ADD FOREIGN KEY (tag_abbr) REFERENCES tag (abbreviation),
+    ADD FOREIGN KEY (example_id) REFERENCES definition (id);
 
 ALTER TABLE expression_example
     ADD FOREIGN KEY (expression_details_id) REFERENCES expression_details (id),
@@ -447,4 +464,12 @@ COMMENT ON TABLE declension IS 'Склонение';
 COMMENT ON COLUMN declension.expression_details_id IS 'expression to decline according to the given case | слово для склонения согласно указанному падежу';
 
 COMMENT ON COLUMN declension.num IS 'grammatical number e.g. single_1 for "доске" and plural_many for "досках"';
+-- endregion
+
+-- region Initial values
+INSERT INTO language
+VALUES ('lez', 'Lezgi', 'lz'),
+       ('tab', 'Tabasaran', ''),
+       ('eng', 'English', 'en'),
+       ('rus', 'Russian', 'ru');
 -- endregion

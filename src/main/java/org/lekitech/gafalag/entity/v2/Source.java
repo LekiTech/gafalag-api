@@ -21,6 +21,9 @@ import java.util.UUID;
 @EqualsAndHashCode(of = {"id"})
 public class Source {
 
+    public final static String USER = "USER";
+    public final static String WRITTEN = "WRITTEN";
+
     @Id
     @GeneratedValue
     private UUID id;
@@ -43,6 +46,9 @@ public class Source {
 
     @OneToMany(mappedBy = "source", cascade = CascadeType.PERSIST)
     private Set<WrittenSource> writtenSources = new HashSet<>();
+
+//    @OneToMany(mappedBy = "source", cascade = CascadeType.PERSIST)
+//    private Set<UserSource> users = new HashSet<>();
 
     public Source(String type) {
         this.type = type;

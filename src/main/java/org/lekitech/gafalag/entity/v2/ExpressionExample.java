@@ -34,8 +34,8 @@ public class ExpressionExample {
     private Timestamp createdAt;
 
     public ExpressionExample(ExpressionDetails expressionDetails, Example example) {
-//        this.expressionDetails = expressionDetails;
-//        this.example = example;
+        this.expressionDetails = expressionDetails;
+        this.example = example;
         this.expressionExampleId = new ExpressionExampleId(
                 expressionDetails.getId(), example.getId()
         );

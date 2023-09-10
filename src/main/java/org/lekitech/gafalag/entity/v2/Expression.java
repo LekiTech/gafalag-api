@@ -46,13 +46,11 @@ public class Expression {
     private Set<MediaFile> mediaFiles = new HashSet<>();
 
     @OneToMany(mappedBy = "expression", cascade = CascadeType.PERSIST)
-    private Set<ExpressionDetails> expressionDetails = new HashSet<>();
+    private Set<ExpressionMatchDetails> expressionMatchDetails = new HashSet<>();
 
     public Expression(String spelling,
-                      Language language,
-                      Set<ExpressionDetails> expressionDetails) {
+                      Language language) {
         this.spelling = spelling;
         this.language = language;
-        this.expressionDetails = expressionDetails;
     }
 }

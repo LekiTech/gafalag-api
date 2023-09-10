@@ -58,4 +58,7 @@ public class Example {
     @OneToMany(mappedBy = "example", cascade = CascadeType.PERSIST)
     private Set<ExpressionExample> expressionExamples = new HashSet<>();
 
+    @OneToMany(mappedBy = "example", cascade = CascadeType.PERSIST)
+    private Set<ExampleTag> exampleTags = new HashSet<>();
+
 }

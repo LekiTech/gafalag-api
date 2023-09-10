@@ -46,4 +46,7 @@ public class Tag {
     @OneToMany(mappedBy = "tag", cascade = CascadeType.PERSIST)
     private Set<DefinitionTag> definitionTags = new HashSet<>();
 
+    @OneToMany(mappedBy = "tag", cascade = CascadeType.PERSIST)
+    private Set<ExampleTag> exampleTags = new HashSet<>();
+
 }
