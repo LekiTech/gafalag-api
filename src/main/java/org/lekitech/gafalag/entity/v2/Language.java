@@ -55,4 +55,9 @@ public class Language {
     @OneToMany(mappedBy = "language", cascade = CascadeType.PERSIST)
     private Set<Expression> expressions = new HashSet<>();
 
+    public Language(String id, String name, String iso2) {
+        this.id = id;
+        this.name = name;
+        this.iso2 = iso2;
+    }
 }

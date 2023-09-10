@@ -1,7 +1,6 @@
 package org.lekitech.gafalag.dto.v2;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * It represents the whole definition of a word for the following cases:
@@ -13,12 +12,12 @@ import java.util.Optional;
  *
  * @param gr                grammatical forms of the expression.
  * @param inflection
- * @param definitionDetails {@link DefinitionDetails}
- * @param examples          {@link Example}
+ * @param definitionDetails {@link DefinitionDetailsDto}
+ * @param examples          {@link ExampleDto}
  */
-public record ExpressionDetails(
-        Optional<String> gr,
-        Optional<String> inflection,
-        List<DefinitionDetails> definitionDetails,
-        List<Example> examples
+public record ExpressionDetailsDto(
+        String gr,
+        String inflection,
+        List<DefinitionDetailsDto> definitionDetails,
+        List<ExampleDto> examples
 ) {}

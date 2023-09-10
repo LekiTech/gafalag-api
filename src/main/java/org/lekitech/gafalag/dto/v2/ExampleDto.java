@@ -9,7 +9,7 @@ import java.util.Optional;
  * @param trl
  * @param tags
  */
-public record Example(
+public record ExampleDto(
         String raw,
         Optional<String> src,
         Optional<String> trl,

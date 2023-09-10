@@ -71,19 +71,19 @@ CREATE TYPE GENDER AS ENUM (
 CREATE TABLE expression (
     id          UUID PRIMARY KEY     DEFAULT uuid_generate_v4(),
     spelling    VARCHAR     NOT NULL,
-    details_id  UUID        NOT NULL,
     language_id VARCHAR(3)  NOT NULL,
     created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE TABLE expression_details (
-    id         UUID PRIMARY KEY     DEFAULT uuid_generate_v4(),
-    gr         VARCHAR     NOT NULL,
-    inflection VARCHAR,
-    source_id  UUID        NOT NULL,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    id            UUID PRIMARY KEY     DEFAULT uuid_generate_v4(),
+    gr            VARCHAR     NOT NULL,
+    inflection    VARCHAR,
+    expression_id UUID        NOT NULL,
+    source_id     UUID        NOT NULL,
+    created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at    TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE TABLE definition_details (
@@ -251,10 +251,10 @@ CREATE TABLE declension (
 
 -- region ALTER TABLES
 ALTER TABLE expression
-    ADD FOREIGN KEY (details_id) REFERENCES expression_details (id),
     ADD FOREIGN KEY (language_id) REFERENCES language (id);
 
 ALTER TABLE expression_details
+    ADD FOREIGN KEY (expression_id) REFERENCES expression (id),
     ADD FOREIGN KEY (source_id) REFERENCES source (id);
 
 ALTER TABLE definition_details

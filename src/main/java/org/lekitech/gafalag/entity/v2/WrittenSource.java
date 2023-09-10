@@ -63,4 +63,25 @@ public class WrittenSource {
     @Column(name = "updated_at")
     private Timestamp updatedAt;
 
+    public WrittenSource(Source source,
+                         String name,
+                         String authors,
+                         String publicationYear,
+                         String providedBy,
+                         String providedByUrl,
+                         String processedBy,
+                         String copyright,
+                         String seeSourceUrl,
+                         String description) {
+        this.source = source;
+        this.name = name;
+        this.authors = authors;
+        this.publicationYear = publicationYear;
+        this.providedBy = providedBy;
+        this.providedByUrl = providedByUrl;
+        this.processedBy = processedBy;
+        this.copyright = copyright;
+        this.seeSourceUrl = seeSourceUrl;
+        this.description = description;
+    }
 }

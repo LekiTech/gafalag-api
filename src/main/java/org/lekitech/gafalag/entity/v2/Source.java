@@ -44,4 +44,7 @@ public class Source {
     @OneToMany(mappedBy = "source", cascade = CascadeType.PERSIST)
     private Set<WrittenSource> writtenSources = new HashSet<>();
 
+    public Source(String type) {
+        this.type = type;
+    }
 }

@@ -32,6 +32,10 @@ public class ExpressionDetails {
     private String inflection;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "expression_id")
+    private Expression expression;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "source_id", nullable = false)
     private Source source;
 
@@ -49,9 +53,13 @@ public class ExpressionDetails {
     private Set<DefinitionDetails> definitionDetails = new HashSet<>();
 
     @OneToMany(mappedBy = "expressionDetails", cascade = CascadeType.PERSIST)
-    private Set<Expression> expressions = new HashSet<>();
-
-    @OneToMany(mappedBy = "expressionDetails", cascade = CascadeType.PERSIST)
     private Set<ExpressionExample> expressionExamples = new HashSet<>();
 
+    public ExpressionDetails(String gr,
+                             String inflection,
+                             Source source) {
+        this.gr = gr;
+        this.inflection = inflection;
+        this.source = source;
+    }
 }

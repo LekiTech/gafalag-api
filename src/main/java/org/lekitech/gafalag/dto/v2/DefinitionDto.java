@@ -6,7 +6,7 @@ import java.util.List;
  * @param value
  * @param tags  applicable to all `definitions` and `examples`.
  */
-public record Definition(
+public record DefinitionDto(
         String value,
         List<String> tags
 ) {}

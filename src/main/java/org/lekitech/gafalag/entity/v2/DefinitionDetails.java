@@ -56,4 +56,11 @@ public class DefinitionDetails {
     @OneToMany(mappedBy = "definitionDetails", cascade = CascadeType.PERSIST)
     private Set<DefinitionExample> definitionExamples = new HashSet<>();
 
+    public DefinitionDetails(ExpressionDetails expressionDetails,
+                             Language language,
+                             Dialect dialect) {
+        this.expressionDetails = expressionDetails;
+        this.language = language;
+        this.dialect = dialect;
+    }
 }

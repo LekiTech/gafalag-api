@@ -29,10 +29,6 @@ public class Expression {
     private String spelling;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "details_id")
-    private ExpressionDetails expressionDetails;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "language_id")
     private Language language;
 
@@ -49,4 +45,14 @@ public class Expression {
     @OneToMany(mappedBy = "expression", cascade = CascadeType.PERSIST)
     private Set<MediaFile> mediaFiles = new HashSet<>();
 
+    @OneToMany(mappedBy = "expression", cascade = CascadeType.PERSIST)
+    private Set<ExpressionDetails> expressionDetails = new HashSet<>();
+
+    public Expression(String spelling,
+                      Language language,
+                      Set<ExpressionDetails> expressionDetails) {
+        this.spelling = spelling;
+        this.language = language;
+        this.expressionDetails = expressionDetails;
+    }
 }
