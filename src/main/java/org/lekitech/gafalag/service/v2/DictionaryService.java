@@ -9,6 +9,7 @@ import org.lekitech.gafalag.entity.v2.*;
 import org.lekitech.gafalag.repository.v2.DictionaryRepository;
 import org.lekitech.gafalag.repository.v2.LanguageRepositoryV2;
 import org.lekitech.gafalag.repository.v2.SourceRepositoryV2;
+import org.lekitech.gafalag.repository.v2.WrittenSourceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,7 @@ import java.util.List;
 public class DictionaryService {
 
     private final DictionaryRepository dictionaryRepository;
+    private final WrittenSourceRepository writtenSourceRepository;
     private final SourceRepositoryV2 sourceRepositoryV2;
     private final LanguageRepositoryV2 languageRepositoryV2;
 
@@ -30,6 +32,7 @@ public class DictionaryService {
         dictionaryRepository.save(new Expression());
     }
 
+    @Transactional
     public void saveDictionary(DictionaryDto dto) {
 
         val source = sourceRepositoryV2.save(new Source(Source.WRITTEN));
@@ -46,26 +49,37 @@ public class DictionaryService {
                 dto.seeSourceURL(),
                 dto.description()
         );
+        writtenSourceRepository.save(writtenSource);
 
         val expLang = languageRepositoryV2.getById(dto.expressionLanguageId());
         val defLang = languageRepositoryV2.getById(dto.definitionLanguageId());
 
+        List<Expression> expressionEntities = new ArrayList<>();
         for (val expression : dto.expressions()) {
+
+            Expression expressionEntity = new Expression(expression.spelling(), expLang);
+
             List<ExpressionDetails> expressionDetailsEntities = new ArrayList<>();
+
             for (val expDetail : expression.details()) {
 
                 ExpressionDetails expressionDetailsEntity = new ExpressionDetails(
                         expDetail.gr(),
                         expDetail.inflection(),
-                        source,
-                        null // TODO: 9/11/23
-                );
-                List<ExpressionExample> expressionExampleEntities = expDetail.examples().stream()
-                        .map(exampleDto -> new ExpressionExample(
-                                expressionDetailsEntity,
-                                new Example(exampleDto.src(), exampleDto.trl(), expLang, defLang, exampleDto.raw())
-                        )).toList();
-                expressionDetailsEntity.addExpressionExamples(expressionExampleEntities);
+                        source);
+
+                if (expDetail.examples() != null) {
+                    List<ExpressionExample> expressionExampleEntities = expDetail.examples().stream()
+                            .map(exampleDto -> new ExpressionExample(
+                                    expressionDetailsEntity,
+                                    new Example(exampleDto.src(), exampleDto.trl(), expLang, defLang, exampleDto.raw())
+                            )).toList();
+                    expressionDetailsEntity.addExpressionExamples(expressionExampleEntities);
+                }
+
+                ExpressionMatchDetails expressionMatchDetailsEntity = new ExpressionMatchDetails(expressionEntity, expressionDetailsEntity);
+                expressionDetailsEntity.addExpressionMatchDetails(List.of(expressionMatchDetailsEntity));
+
 
                 expressionDetailsEntities.add(expressionDetailsEntity);
 
@@ -77,41 +91,52 @@ public class DictionaryService {
                     for (val definition : defDetail.definitions()) {
 
                         Definition definitionEntity = new Definition(definition.value());
-                        List<DefinitionTag> definitionTagEntities = new ArrayList<>();
-                        for (val definitionTag : definition.tags()) {
-                            Tag tagEntity = new Tag(definitionTag);
-                            DefinitionTag definitionTagEntity = new DefinitionTag(tagEntity, definitionEntity);
-                            definitionTagEntities.add(definitionTagEntity);
+
+                        if (definition.tags() != null) {
+                            List<DefinitionTag> definitionTagEntities = new ArrayList<>();
+                            for (val definitionTag : definition.tags()) {
+                                Tag tagEntity = new Tag(definitionTag);
+                                DefinitionTag definitionTagEntity = new DefinitionTag(tagEntity, definitionEntity);
+                                definitionTagEntities.add(definitionTagEntity);
+                            }
                         }
+
                         definitionEntities.add(definitionEntity);
                     }
 
-                    List<Example> exampleEntities = new ArrayList<>();
-                    for (val defDetailExample : defDetail.examples()) {
-                        Example exampleEntity = new Example(
-                                defDetailExample.src(),
-                                defDetailExample.trl(),
-                                expLang,
-                                defLang,
-                                defDetailExample.raw()
-                        );
-                        List<ExampleTag> exampleTagEntities = new ArrayList<>();
-                        for (val defDetailExampleTag : defDetailExample.tags()) {
-                            Tag tagEntity = new Tag(defDetailExampleTag);
-                            exampleTagEntities.add(new ExampleTag(tagEntity, exampleEntity));
+                    if (defDetail.examples() != null) {
+                        List<Example> exampleEntities = new ArrayList<>();
+                        for (val defDetailExample : defDetail.examples()) {
+                            Example exampleEntity = new Example(
+                                    defDetailExample.src(),
+                                    defDetailExample.trl(),
+                                    expLang,
+                                    defLang,
+                                    defDetailExample.raw()
+                            );
+                            List<ExampleTag> exampleTagEntities = new ArrayList<>();
+                            if (defDetailExample.tags() != null) {
+                                for (val defDetailExampleTag : defDetailExample.tags()) {
+                                    Tag tagEntity = new Tag(defDetailExampleTag);
+                                    exampleTagEntities.add(new ExampleTag(tagEntity, exampleEntity));
+                                }
+                            }
+                            exampleEntities.add(exampleEntity);
                         }
-                        exampleEntities.add(exampleEntity);
                     }
 
-                    List<DefinitionDetailsTag> definitionDetailsTagEntities = new ArrayList<>();
-                    for (val defDetailTag : defDetail.tags()) {
-                        Tag tagEntity = new Tag(defDetailTag);
-                        definitionDetailsTagEntities.add(new DefinitionDetailsTag(tagEntity, definitionDetailEntity));
+                    if (defDetail.tags() != null) {
+                        List<DefinitionDetailsTag> definitionDetailsTagEntities = new ArrayList<>();
+                        for (val defDetailTag : defDetail.tags()) {
+                            Tag tagEntity = new Tag(defDetailTag);
+                            definitionDetailsTagEntities.add(new DefinitionDetailsTag(tagEntity, definitionDetailEntity));
+                        }
                     }
 
 
                 }
             }
+            expressionEntities.add(expressionEntity);
         }
 
         val expressions = dto.expressions()

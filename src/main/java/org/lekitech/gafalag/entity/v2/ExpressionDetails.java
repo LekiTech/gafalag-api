@@ -53,12 +53,10 @@ public class ExpressionDetails {
 
     public ExpressionDetails(String gr,
                              String inflection,
-                             Source source,
-                             List<ExpressionMatchDetails> expressionMatchDetails) {
+                             Source source) {
         this.gr = gr;
         this.inflection = inflection;
         this.source = source;
-        this.expressionMatchDetails = expressionMatchDetails;
     }
 
     public void addExpressionExamples(List<ExpressionExample> expressionExampleEntities) {
@@ -68,4 +66,7 @@ public class ExpressionDetails {
         this.expressionExamples = expressionExampleEntities;
     }
 
+    public void addExpressionMatchDetails(List<ExpressionMatchDetails> expressionMatchDetailsEntities) {
+        this.expressionMatchDetails = expressionMatchDetailsEntities;
+    }
 }

@@ -37,11 +37,9 @@ public class DictionaryController {
     }
 
     public DictionaryDto mapToDictionary(MultipartFile file) throws IOException {
-        // Using Jdk8Module for mapping to Optional types
+        /* Using Jdk8Module for mapping to Optional types */
         val mapper = new ObjectMapper().registerModule(new Jdk8Module());
-        val dictionary = mapper.readValue(file.getBytes(), DictionaryDto.class);
-        System.out.println(dictionary.name());
-        return dictionary;
+        return mapper.readValue(file.getBytes(), DictionaryDto.class);
     }
 
 }
