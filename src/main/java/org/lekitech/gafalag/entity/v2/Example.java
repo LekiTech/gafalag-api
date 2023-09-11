@@ -61,4 +61,15 @@ public class Example {
     @OneToMany(mappedBy = "example", cascade = CascadeType.PERSIST)
     private Set<ExampleTag> exampleTags = new HashSet<>();
 
+    public Example(String source,
+                   String translation,
+                   Language srcLanguage,
+                   Language trlLanguage,
+                   String raw) {
+        this.source = source;
+        this.translation = translation;
+        this.srcLanguage = srcLanguage;
+        this.trlLanguage = trlLanguage;
+        this.raw = raw;
+    }
 }

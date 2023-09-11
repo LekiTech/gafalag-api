@@ -1,7 +1,6 @@
 package org.lekitech.gafalag.dto.v2;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @param raw
@@ -11,7 +10,7 @@ import java.util.Optional;
  */
 public record ExampleDto(
         String raw,
-        Optional<String> src,
-        Optional<String> trl,
+        String src,
+        String trl,
         List<String> tags
 ) {}

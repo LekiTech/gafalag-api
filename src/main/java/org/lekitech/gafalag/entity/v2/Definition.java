@@ -47,4 +47,7 @@ public class Definition {
     @OneToMany(mappedBy = "definition", cascade = CascadeType.PERSIST)
     private Set<DefinitionTag> definitionTags = new HashSet<>();
 
+    public Definition(String value) {
+        this.value = value;
+    }
 }

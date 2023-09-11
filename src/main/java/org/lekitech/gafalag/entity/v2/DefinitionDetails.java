@@ -57,10 +57,8 @@ public class DefinitionDetails {
     private Set<DefinitionExample> definitionExamples = new HashSet<>();
 
     public DefinitionDetails(ExpressionDetails expressionDetails,
-                             Language language,
-                             Dialect dialect) {
+                             Language language) {
         this.expressionDetails = expressionDetails;
         this.language = language;
-        this.dialect = dialect;
     }
 }

@@ -20,6 +20,11 @@ import java.util.Set;
 @Table(name = "tag")
 public class Tag {
 
+    public static final String CATEGORY = "CATEGORY";
+    public static final String GRAMMAR = "GRAMMAR";
+    public static final String ETYMOLOGY = "ETYMOLOGY";
+    public static final String UNKNOWN = "UNKNOWN";
+
     @Id
     @Column(name = "abbreviation", length = 10)
     private String abbreviation;
@@ -49,4 +54,8 @@ public class Tag {
     @OneToMany(mappedBy = "tag", cascade = CascadeType.PERSIST)
     private Set<ExampleTag> exampleTags = new HashSet<>();
 
+    public Tag(String abbreviation) {
+        this.abbreviation = abbreviation;
+        this.type = UNKNOWN;
+    }
 }

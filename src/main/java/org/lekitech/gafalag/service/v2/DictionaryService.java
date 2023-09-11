@@ -5,15 +5,16 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.lekitech.gafalag.dto.v2.DictionaryDto;
 import org.lekitech.gafalag.dto.v2.ExpressionDto;
-import org.lekitech.gafalag.entity.v2.Expression;
-import org.lekitech.gafalag.entity.v2.Source;
-import org.lekitech.gafalag.entity.v2.WrittenSource;
+import org.lekitech.gafalag.entity.v2.*;
 import org.lekitech.gafalag.repository.v2.DictionaryRepository;
 import org.lekitech.gafalag.repository.v2.LanguageRepositoryV2;
 import org.lekitech.gafalag.repository.v2.SourceRepositoryV2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -31,7 +32,6 @@ public class DictionaryService {
 
     public void saveDictionary(DictionaryDto dto) {
 
-
         val source = sourceRepositoryV2.save(new Source(Source.WRITTEN));
 
         val writtenSource = new WrittenSource(
@@ -47,7 +47,6 @@ public class DictionaryService {
                 dto.description()
         );
 
-
         val expLang = languageRepositoryV2.getById(dto.expressionLanguageId());
         val defLang = languageRepositoryV2.getById(dto.definitionLanguageId());
 
@@ -57,23 +56,41 @@ public class DictionaryService {
 
                 for (val defDetail : expDetail.definitionDetails()) {
 
+                    DefinitionDetails definitionDetailEntity = new DefinitionDetails(); // TODO: 9/10/23
+                    List<Definition> definitionEntities = new ArrayList<>();
                     for (val definition : defDetail.definitions()) {
 
+                        Definition definitionEntity = new Definition(definition.value());
+                        List<DefinitionTag> definitionTagEntities = new ArrayList<>();
                         for (val definitionTag : definition.tags()) {
-
+                            Tag tagEntity = new Tag(definitionTag);
+                            DefinitionTag definitionTagEntity = new DefinitionTag(tagEntity, definitionEntity);
+                            definitionTagEntities.add(definitionTagEntity);
                         }
+                        definitionEntities.add(definitionEntity);
                     }
 
+                    List<Example> exampleEntities = new ArrayList<>();
                     for (val defDetailExample : defDetail.examples()) {
-
+                        Example exampleEntity = new Example(
+                                defDetailExample.src(),
+                                defDetailExample.trl(),
+                                expLang,
+                                defLang,
+                                defDetailExample.raw()
+                        );
+                        List<ExampleTag> exampleTagEntities = new ArrayList<>();
                         for (val defDetailExampleTag : defDetailExample.tags()) {
-
+                            Tag tagEntity = new Tag(defDetailExampleTag);
+                            exampleTagEntities.add(new ExampleTag(tagEntity, exampleEntity));
                         }
-
+                        exampleEntities.add(exampleEntity);
                     }
 
+                    List<DefinitionDetailsTag> definitionDetailsTagEntities = new ArrayList<>();
                     for (val defDetailTag : defDetail.tags()) {
-
+                        Tag tagEntity = new Tag(defDetailTag);
+                        definitionDetailsTagEntities.add(new DefinitionDetailsTag(tagEntity, definitionDetailEntity));
                     }
 
 
