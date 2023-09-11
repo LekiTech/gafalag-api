@@ -51,12 +51,28 @@ public class DictionaryService {
         val defLang = languageRepositoryV2.getById(dto.definitionLanguageId());
 
         for (val expression : dto.expressions()) {
-
+            List<ExpressionDetails> expressionDetailsEntities = new ArrayList<>();
             for (val expDetail : expression.details()) {
+
+                ExpressionDetails expressionDetailsEntity = new ExpressionDetails(
+                        expDetail.gr(),
+                        expDetail.inflection(),
+                        source,
+                        null // TODO: 9/11/23
+                );
+                List<ExpressionExample> expressionExampleEntities = expDetail.examples().stream()
+                        .map(exampleDto -> new ExpressionExample(
+                                expressionDetailsEntity,
+                                new Example(exampleDto.src(), exampleDto.trl(), expLang, defLang, exampleDto.raw())
+                        )).toList();
+                expressionDetailsEntity.addExpressionExamples(expressionExampleEntities);
+
+                expressionDetailsEntities.add(expressionDetailsEntity);
+
 
                 for (val defDetail : expDetail.definitionDetails()) {
 
-                    DefinitionDetails definitionDetailEntity = new DefinitionDetails(); // TODO: 9/10/23
+                    DefinitionDetails definitionDetailEntity = new DefinitionDetails(expressionDetailsEntity, defLang); // TODO: 9/10/23
                     List<Definition> definitionEntities = new ArrayList<>();
                     for (val definition : defDetail.definitions()) {
 

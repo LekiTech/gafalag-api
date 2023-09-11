@@ -9,8 +9,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -46,20 +46,26 @@ public class ExpressionDetails {
     //  - relations
 
     @OneToMany(mappedBy = "expressionDetails", cascade = CascadeType.PERSIST)
-    private Set<ExpressionMatchDetails> expressionMatchDetails = new HashSet<>();
+    private List<ExpressionMatchDetails> expressionMatchDetails = new ArrayList<>();
 
     @OneToMany(mappedBy = "expressionDetails", cascade = CascadeType.PERSIST)
-    private Set<ExpressionExample> expressionExamples = new HashSet<>();
+    private List<ExpressionExample> expressionExamples = new ArrayList<>();
 
     public ExpressionDetails(String gr,
                              String inflection,
                              Source source,
-                             Set<ExpressionMatchDetails> expressionMatchDetails,
-                             Set<ExpressionExample> expressionExamples) {
+                             List<ExpressionMatchDetails> expressionMatchDetails) {
         this.gr = gr;
         this.inflection = inflection;
         this.source = source;
         this.expressionMatchDetails = expressionMatchDetails;
-        this.expressionExamples = expressionExamples;
     }
+
+    public void addExpressionExamples(List<ExpressionExample> expressionExampleEntities) {
+        for (ExpressionExample expressionExampleEntity : expressionExampleEntities) {
+            expressionExampleEntity.setExpressionDetails(this);
+        }
+        this.expressionExamples = expressionExampleEntities;
+    }
+
 }
