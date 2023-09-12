@@ -288,7 +288,7 @@ ALTER TABLE definition_tag
 
 ALTER TABLE example_tag
     ADD FOREIGN KEY (tag_abbr) REFERENCES tag (abbreviation),
-    ADD FOREIGN KEY (example_id) REFERENCES definition (id);
+    ADD FOREIGN KEY (example_id) REFERENCES example (id);
 
 ALTER TABLE expression_example
     ADD FOREIGN KEY (expression_details_id) REFERENCES expression_details (id),

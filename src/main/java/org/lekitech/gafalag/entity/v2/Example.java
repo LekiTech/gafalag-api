@@ -75,6 +75,6 @@ public class Example {
 
     public void addExampleTags(List<ExampleTag> exampleTagEntities) {
         exampleTagEntities.forEach(exampleTag -> exampleTag.setExample(this));
-        setExampleTags(exampleTags);
+        this.exampleTags = exampleTagEntities;
     }
 }
