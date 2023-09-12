@@ -25,7 +25,6 @@ public class ExpressionDetails {
     @GeneratedValue
     private UUID id;
 
-    //TODO: 9/11/23 is it Gender, @tadzjibov? CREATE TYPE GENDER AS enum ('MALE', 'FEMALE', 'NONE', 'BOTH');
     @Column(name = "gr")
     private String gr;
 

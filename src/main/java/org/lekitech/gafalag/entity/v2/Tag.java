@@ -20,11 +20,6 @@ import java.util.Set;
 @Table(name = "tag")
 public class Tag {
 
-    public static final String CATEGORY = "CATEGORY";
-    public static final String GRAMMAR = "GRAMMAR";
-    public static final String ETYMOLOGY = "ETYMOLOGY";
-    public static final String UNKNOWN = "UNKNOWN";
-
     @Id
     @Column(name = "abbreviation", length = 10)
     private String abbreviation;
@@ -32,8 +27,9 @@ public class Tag {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "type")
-    private String type;
+    @Enumerated(EnumType.STRING)
+    @org.hibernate.annotations.Type(type = "org.lekitech.gafalag.entity.v2.typemapping.EnumTypePostgreSql")
+    private Type type;
 
     @CreationTimestamp
     @Column(name = "created_at")
@@ -56,6 +52,19 @@ public class Tag {
 
     public Tag(String abbreviation) {
         this.abbreviation = abbreviation;
-        this.type = UNKNOWN;
+        this.type = Type.UNKNOWN;
+    }
+
+    public Tag(String abbreviation, String description, Type type) {
+        this.abbreviation = abbreviation;
+        this.description = description;
+        this.type = type;
+    }
+
+    public enum Type {
+        CATEGORY,
+        GRAMMAR,
+        ETYMOLOGY,
+        UNKNOWN
     }
 }

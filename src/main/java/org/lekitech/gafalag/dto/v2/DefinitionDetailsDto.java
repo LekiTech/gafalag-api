@@ -1,6 +1,7 @@
 package org.lekitech.gafalag.dto.v2;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @param definitions {@link DefinitionDto}
@@ -9,6 +10,7 @@ import java.util.List;
  */
 public record DefinitionDetailsDto(
         List<DefinitionDto> definitions,
-        List<ExampleDto> examples,
-        List<String> tags
-) {}
+        Optional<List<ExampleDto>> examples,
+        Optional<List<String>> tags
+) {
+}

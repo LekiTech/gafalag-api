@@ -26,7 +26,7 @@ public class Source {
     private UUID id;
 
     @Enumerated(EnumType.STRING)
-    @org.hibernate.annotations.Type(type = "org.lekitech.gafalag.entity.v2.EnumTypePostgreSql")
+    @org.hibernate.annotations.Type(type = "org.lekitech.gafalag.entity.v2.typemapping.EnumTypePostgreSql")
     private Type type;
 
     @CreationTimestamp

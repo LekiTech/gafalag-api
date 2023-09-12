@@ -10,8 +10,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Qualifier("v2")
@@ -45,7 +45,7 @@ public class Definition {
     // - relations
 
     @OneToMany(mappedBy = "definition", cascade = CascadeType.PERSIST)
-    private Set<DefinitionTag> definitionTags = new HashSet<>();
+    private List<DefinitionTag> definitionTags = new ArrayList<>();
 
     public Definition(String value,
                       DefinitionDetails definitionDetails) {

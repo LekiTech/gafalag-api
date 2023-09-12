@@ -17,8 +17,9 @@ import java.util.Optional;
  * @param examples          {@link ExampleDto}
  */
 public record ExpressionDetailsDto(
-        Optional<String> gr,
+        String gr,
         String inflection,
         List<DefinitionDetailsDto> definitionDetails,
         Optional<List<ExampleDto>> examples
-) {}
+) {
+}

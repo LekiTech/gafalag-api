@@ -3,7 +3,9 @@ package org.lekitech.gafalag.service.v2;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.lekitech.gafalag.dto.v2.DefinitionDetailsDto;
 import org.lekitech.gafalag.dto.v2.DictionaryDto;
+import org.lekitech.gafalag.dto.v2.ExampleDto;
 import org.lekitech.gafalag.dto.v2.ExpressionDto;
 import org.lekitech.gafalag.entity.v2.*;
 import org.lekitech.gafalag.repository.v2.DictionaryRepository;
@@ -64,7 +66,7 @@ public class DictionaryService {
             for (val expDetail : expression.details()) {
 
                 ExpressionDetails expressionDetailsEntity = new ExpressionDetails(
-                        expDetail.gr().orElse("NONE"), // TODO: 9/11/23 what if "gr" is null, @tadzjibov?
+                        expDetail.gr(),
                         expDetail.inflection(),
                         source
                 );
@@ -87,54 +89,23 @@ public class DictionaryService {
                 List<DefinitionDetails> definitionDetailsEntities = new ArrayList<>();
                 for (val defDetail : expDetail.definitionDetails()) {
 
-                    DefinitionDetails definitionDetailEntity = new DefinitionDetails(expressionDetailsEntity, defLang); // TODO: 9/10/23
-                    List<Definition> definitionEntities = new ArrayList<>();
-                    for (val definition : defDetail.definitions()) {
+                    DefinitionDetails definitionDetailEntity = new DefinitionDetails(expressionDetailsEntity, defLang);
 
-                        Definition definitionEntity = new Definition(definition.value(), definitionDetailEntity);
-
-                        if (definition.tags().isPresent()) {
-                            List<DefinitionTag> definitionTagEntities = new ArrayList<>();
-                            for (val definitionTag : definition.tags().get()) {
-                                Tag tagEntity = new Tag(definitionTag);
-                                DefinitionTag definitionTagEntity = new DefinitionTag(tagEntity, definitionEntity);
-                                definitionTagEntities.add(definitionTagEntity);
-                            }
-                        }
-
-                        definitionEntities.add(definitionEntity);
-                    }
+                    List<Definition> definitionEntities = createDefinitionList(defDetail, definitionDetailEntity);
                     definitionDetailEntity.addDefinitions(definitionEntities);
                     definitionDetailsEntities.add(definitionDetailEntity);
 
-                    if (defDetail.examples() != null) {
-                        List<Example> exampleEntities = new ArrayList<>();
-                        for (val defDetailExample : defDetail.examples()) {
-                            Example exampleEntity = new Example(
-                                    defDetailExample.src(),
-                                    defDetailExample.trl(),
-                                    expLang,
-                                    defLang,
-                                    defDetailExample.raw()
-                            );
-                            List<ExampleTag> exampleTagEntities = new ArrayList<>();
-                            if (defDetailExample.tags().isPresent()) {
-                                for (val defDetailExampleTag : defDetailExample.tags().get()) {
-                                    Tag tagEntity = new Tag(defDetailExampleTag);
-                                    exampleTagEntities.add(new ExampleTag(tagEntity, exampleEntity));
-                                }
-                            }
-                            exampleEntities.add(exampleEntity);
-                        }
+                    if (defDetail.examples().isPresent()) {
+                        List<DefinitionExample> definitionExampleList = createDefinitionExampleList(
+                                defDetail.examples().get(), definitionDetailEntity, expLang, defLang
+                        );
+                        definitionDetailEntity.addDefinitionExamples(definitionExampleList);
                     }
 
-                    if (defDetail.tags() != null) {                        List<DefinitionDetailsTag> definitionDetailsTagEntities = new ArrayList<>();
-
-                        for (val defDetailTag : defDetail.tags()) {
-                            Tag tagEntity = new Tag(defDetailTag);
-                            DefinitionDetailsTag definitionDetailsTagEntity = new DefinitionDetailsTag(tagEntity, definitionDetailEntity);
-                            definitionDetailsTagEntities.add(definitionDetailsTagEntity);
-                        }
+                    if (defDetail.tags().isPresent()) {
+                        List<DefinitionDetailsTag> definitionDetailsTagEntities = createDefinitionDetailsTags(
+                                defDetail.tags().get(), definitionDetailEntity
+                        );
                         definitionDetailEntity.addDefinitionDetailsTags(definitionDetailsTagEntities);
                     }
 
@@ -153,5 +124,68 @@ public class DictionaryService {
 
         dictionaryRepository.saveAll(expressionEntities);
     }
+
+    private List<DefinitionDetailsTag> createDefinitionDetailsTags(List<String> tags, DefinitionDetails definitionDetailEntity) {
+        List<DefinitionDetailsTag> definitionDetailsTagEntities = new ArrayList<>();
+        for (val defDetailTag : tags) {
+            Tag tagEntity = new Tag(defDetailTag);
+            DefinitionDetailsTag definitionDetailsTagEntity = new DefinitionDetailsTag(tagEntity, definitionDetailEntity);
+            definitionDetailsTagEntities.add(definitionDetailsTagEntity);
+        }
+        return definitionDetailsTagEntities;
+    }
+
+    private List<DefinitionExample> createDefinitionExampleList(List<ExampleDto> examples,
+                                                                DefinitionDetails definitionDetailsEntity,
+                                                                Language expLang,
+                                                                Language defLang) {
+        List<DefinitionExample> definitionExampleList = new ArrayList<>();
+        for (val defDetailExample : examples) {
+            Example exampleEntity = new Example(
+                    defDetailExample.src(),
+                    defDetailExample.trl(),
+                    expLang,
+                    defLang,
+                    defDetailExample.raw()
+            );
+            if (defDetailExample.tags().isPresent()) {
+                List<ExampleTag> exampleTagEntities = new ArrayList<>();
+                for (val defDetailExampleTag : defDetailExample.tags().get()) {
+                    Tag tagEntity = new Tag(defDetailExampleTag);
+                    val exampleTagEntity = new ExampleTag(tagEntity, exampleEntity);
+                    exampleTagEntities.add(exampleTagEntity);
+                }
+                exampleEntity.addExampleTags(exampleTagEntities);
+            }
+            val definitionExample = new DefinitionExample(exampleEntity, definitionDetailsEntity);
+            definitionExampleList.add(definitionExample);
+        }
+        return definitionExampleList;
+    }
+
+    private List<Definition> createDefinitionList(DefinitionDetailsDto defDetail, DefinitionDetails definitionDetailEntity) {
+        List<Definition> definitionEntities = new ArrayList<>();
+        for (val definition : defDetail.definitions()) {
+
+            Definition definitionEntity = new Definition(definition.value(), definitionDetailEntity);
+            if (definition.tags().isPresent()) {
+                val definitionTagList = createDefinitionTagList(definition.tags().get(), definitionEntity);
+                definitionEntity.setDefinitionTags(definitionTagList);
+            }
+            definitionEntities.add(definitionEntity);
+        }
+        return definitionEntities;
+    }
+
+    private List<DefinitionTag> createDefinitionTagList(List<String> definitionTags, Definition definitionEntity) {
+        List<DefinitionTag> definitionTagEntities = new ArrayList<>();
+        for (val definitionTag : definitionTags) {
+            Tag tagEntity = new Tag(definitionTag);
+            DefinitionTag definitionTagEntity = new DefinitionTag(tagEntity, definitionEntity);
+            definitionTagEntities.add(definitionTagEntity);
+        }
+        return definitionTagEntities;
+    }
+
 
 }

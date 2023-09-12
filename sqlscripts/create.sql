@@ -84,7 +84,7 @@ CREATE TABLE "expression_match_details" (
 
 CREATE TABLE expression_details (
     id         UUID PRIMARY KEY     DEFAULT uuid_generate_v4(),
-    gr         VARCHAR     NOT NULL,
+    gr         VARCHAR,
     inflection VARCHAR,
     source_id  UUID        NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -95,7 +95,7 @@ CREATE TABLE definition_details (
     id                    UUID PRIMARY KEY     DEFAULT uuid_generate_v4(),
     expression_details_id UUID        NOT NULL,
     language_id           VARCHAR(3)  NOT NULL,
-    dialect_id            UUID, -- todo NOT NULL doesn't work for this column
+    dialect_id            UUID,
     created_at            TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at            TIMESTAMPTZ NOT NULL DEFAULT now()
 );

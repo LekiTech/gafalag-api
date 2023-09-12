@@ -34,9 +34,9 @@ public class ExampleTag {
     private Timestamp createdAt;
 
     public ExampleTag(Tag tag, Example example) {
-        this.exampleTagId = new ExampleTagId(tag.getAbbreviation(), example.getId());
         this.tag = tag;
         this.example = example;
+        this.exampleTagId = new ExampleTagId(tag.getAbbreviation(), example.getId());
     }
 
     @Embeddable

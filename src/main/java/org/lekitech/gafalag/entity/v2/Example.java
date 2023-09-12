@@ -9,8 +9,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -53,13 +53,13 @@ public class Example {
     //  - relations
 
     @OneToMany(mappedBy = "example", cascade = CascadeType.PERSIST)
-    private Set<DefinitionExample> definitionExamples = new HashSet<>();
+    private List<DefinitionExample> definitionExamples = new ArrayList<>();
 
     @OneToMany(mappedBy = "example", cascade = CascadeType.PERSIST)
-    private Set<ExpressionExample> expressionExamples = new HashSet<>();
+    private List<ExpressionExample> expressionExamples = new ArrayList<>();
 
     @OneToMany(mappedBy = "example", cascade = CascadeType.PERSIST)
-    private Set<ExampleTag> exampleTags = new HashSet<>();
+    private List<ExampleTag> exampleTags = new ArrayList<>();
 
     public Example(String source,
                    String translation,
@@ -71,5 +71,10 @@ public class Example {
         this.srcLanguage = srcLanguage;
         this.trlLanguage = trlLanguage;
         this.raw = raw;
+    }
+
+    public void addExampleTags(List<ExampleTag> exampleTagEntities) {
+        exampleTagEntities.forEach(exampleTag -> exampleTag.setExample(this));
+        setExampleTags(exampleTags);
     }
 }

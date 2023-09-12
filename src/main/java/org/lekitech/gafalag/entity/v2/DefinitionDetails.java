@@ -71,4 +71,9 @@ public class DefinitionDetails {
         definitionDetailsTagEntities.forEach(definitionDetailsTag -> definitionDetailsTag.setDefinitionDetails(this));
         this.definitionDetailsTags = definitionDetailsTagEntities;
     }
+
+    public void addDefinitionExamples(List<DefinitionExample> definitionExampleList) {
+        definitionExampleList.forEach(definitionExample -> definitionExample.setDefinitionDetails(this));
+        setDefinitionExamples(definitionExampleList);
+    }
 }

@@ -21,13 +21,13 @@ public class GafalagMicroserviceApplication extends SpringBootServletInitializer
 
     private static final long MAXAGESECS = 3600;
 
+    public static void main(String[] args) {
+        SpringApplication.run(GafalagMicroserviceApplication.class, args);
+    }
+
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
         return application.sources(GafalagMicroserviceApplication.class);
-    }
-
-    public static void main(String[] args) {
-        SpringApplication.run(GafalagMicroserviceApplication.class, args);
     }
 
     public @Bean
@@ -46,7 +46,6 @@ public class GafalagMicroserviceApplication extends SpringBootServletInitializer
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(@NonNull CorsRegistry registry) {
-                // TODO Allowed frontend requests (CORS)
                 registry.addMapping("/**")
                         .allowedOriginPatterns("*")
                         .allowedMethods(GET.name(), POST.name(), PUT.name(), PATCH.name(), DELETE.name(), OPTIONS.name())
