@@ -64,9 +64,10 @@ public class DictionaryService {
             for (val expDetail : expression.details()) {
 
                 ExpressionDetails expressionDetailsEntity = new ExpressionDetails(
-                        expDetail.gr(),
+                        expDetail.gr() != null ? expDetail.gr() : "UNKNOWN", // TODO: 9/11/23 what if "gr" is null, @tadzjibov?
                         expDetail.inflection(),
-                        source);
+                        source
+                );
 
                 if (expDetail.examples() != null) {
                     List<ExpressionExample> expressionExampleEntities = expDetail.examples().stream()
@@ -136,6 +137,11 @@ public class DictionaryService {
 
                 }
             }
+            expressionEntity.setExpressionMatchDetails(
+                    expressionDetailsEntities.stream()
+                            .map(expressionDetails -> new ExpressionMatchDetails(expressionEntity, expressionDetails))
+                            .toList()
+            );
             expressionEntities.add(expressionEntity);
         }
 

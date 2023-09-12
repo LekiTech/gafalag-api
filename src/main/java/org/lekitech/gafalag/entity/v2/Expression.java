@@ -9,9 +9,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Getter
@@ -46,7 +44,7 @@ public class Expression {
     private Set<MediaFile> mediaFiles = new HashSet<>();
 
     @OneToMany(mappedBy = "expression", cascade = CascadeType.PERSIST)
-    private Set<ExpressionMatchDetails> expressionMatchDetails = new HashSet<>();
+    private List<ExpressionMatchDetails> expressionMatchDetails = new ArrayList<>();
 
     public Expression(String spelling,
                       Language language) {
