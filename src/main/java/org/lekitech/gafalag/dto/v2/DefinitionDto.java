@@ -1,6 +1,7 @@
 package org.lekitech.gafalag.dto.v2;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @param value
@@ -8,5 +9,5 @@ import java.util.List;
  */
 public record DefinitionDto(
         String value,
-        List<String> tags
+        Optional<List<String>> tags
 ) {}

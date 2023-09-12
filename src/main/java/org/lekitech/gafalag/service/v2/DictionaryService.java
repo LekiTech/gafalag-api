@@ -64,13 +64,14 @@ public class DictionaryService {
             for (val expDetail : expression.details()) {
 
                 ExpressionDetails expressionDetailsEntity = new ExpressionDetails(
-                        expDetail.gr() != null ? expDetail.gr() : "UNKNOWN", // TODO: 9/11/23 what if "gr" is null, @tadzjibov?
+                        expDetail.gr().orElse("NONE"), // TODO: 9/11/23 what if "gr" is null, @tadzjibov?
                         expDetail.inflection(),
                         source
                 );
 
-                if (expDetail.examples() != null) {
-                    List<ExpressionExample> expressionExampleEntities = expDetail.examples().stream()
+                if (expDetail.examples().isPresent()) {
+                    List<ExpressionExample> expressionExampleEntities = expDetail.examples().get()
+                            .stream()
                             .map(exampleDto -> new ExpressionExample(
                                     expressionDetailsEntity,
                                     new Example(exampleDto.src(), exampleDto.trl(), expLang, defLang, exampleDto.raw())
@@ -81,21 +82,20 @@ public class DictionaryService {
                 ExpressionMatchDetails expressionMatchDetailsEntity = new ExpressionMatchDetails(expressionEntity, expressionDetailsEntity);
                 expressionDetailsEntity.addExpressionMatchDetails(List.of(expressionMatchDetailsEntity));
 
-
                 expressionDetailsEntities.add(expressionDetailsEntity);
 
-
+                List<DefinitionDetails> definitionDetailsEntities = new ArrayList<>();
                 for (val defDetail : expDetail.definitionDetails()) {
 
                     DefinitionDetails definitionDetailEntity = new DefinitionDetails(expressionDetailsEntity, defLang); // TODO: 9/10/23
                     List<Definition> definitionEntities = new ArrayList<>();
                     for (val definition : defDetail.definitions()) {
 
-                        Definition definitionEntity = new Definition(definition.value());
+                        Definition definitionEntity = new Definition(definition.value(), definitionDetailEntity);
 
-                        if (definition.tags() != null) {
+                        if (definition.tags().isPresent()) {
                             List<DefinitionTag> definitionTagEntities = new ArrayList<>();
-                            for (val definitionTag : definition.tags()) {
+                            for (val definitionTag : definition.tags().get()) {
                                 Tag tagEntity = new Tag(definitionTag);
                                 DefinitionTag definitionTagEntity = new DefinitionTag(tagEntity, definitionEntity);
                                 definitionTagEntities.add(definitionTagEntity);
@@ -104,6 +104,8 @@ public class DictionaryService {
 
                         definitionEntities.add(definitionEntity);
                     }
+                    definitionDetailEntity.addDefinitions(definitionEntities);
+                    definitionDetailsEntities.add(definitionDetailEntity);
 
                     if (defDetail.examples() != null) {
                         List<Example> exampleEntities = new ArrayList<>();
@@ -116,8 +118,8 @@ public class DictionaryService {
                                     defDetailExample.raw()
                             );
                             List<ExampleTag> exampleTagEntities = new ArrayList<>();
-                            if (defDetailExample.tags() != null) {
-                                for (val defDetailExampleTag : defDetailExample.tags()) {
+                            if (defDetailExample.tags().isPresent()) {
+                                for (val defDetailExampleTag : defDetailExample.tags().get()) {
                                     Tag tagEntity = new Tag(defDetailExampleTag);
                                     exampleTagEntities.add(new ExampleTag(tagEntity, exampleEntity));
                                 }
@@ -126,16 +128,20 @@ public class DictionaryService {
                         }
                     }
 
-                    if (defDetail.tags() != null) {
-                        List<DefinitionDetailsTag> definitionDetailsTagEntities = new ArrayList<>();
+                    if (defDetail.tags() != null) {                        List<DefinitionDetailsTag> definitionDetailsTagEntities = new ArrayList<>();
+
                         for (val defDetailTag : defDetail.tags()) {
                             Tag tagEntity = new Tag(defDetailTag);
-                            definitionDetailsTagEntities.add(new DefinitionDetailsTag(tagEntity, definitionDetailEntity));
+                            DefinitionDetailsTag definitionDetailsTagEntity = new DefinitionDetailsTag(tagEntity, definitionDetailEntity);
+                            definitionDetailsTagEntities.add(definitionDetailsTagEntity);
                         }
+                        definitionDetailEntity.addDefinitionDetailsTags(definitionDetailsTagEntities);
                     }
 
 
                 }
+
+                expressionDetailsEntity.addDefinitionDetails(definitionDetailsEntities);
             }
             expressionEntity.setExpressionMatchDetails(
                     expressionDetailsEntities.stream()

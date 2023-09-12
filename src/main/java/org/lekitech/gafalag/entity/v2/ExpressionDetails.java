@@ -25,6 +25,7 @@ public class ExpressionDetails {
     @GeneratedValue
     private UUID id;
 
+    //TODO: 9/11/23 is it Gender, @tadzjibov? CREATE TYPE GENDER AS enum ('MALE', 'FEMALE', 'NONE', 'BOTH');
     @Column(name = "gr")
     private String gr;
 
@@ -51,6 +52,9 @@ public class ExpressionDetails {
     @OneToMany(mappedBy = "expressionDetails", cascade = CascadeType.PERSIST)
     private List<ExpressionExample> expressionExamples = new ArrayList<>();
 
+    @OneToMany(mappedBy = "expressionDetails", cascade = CascadeType.PERSIST)
+    private List<DefinitionDetails> definitionDetails = new ArrayList<>();
+
     public ExpressionDetails(String gr,
                              String inflection,
                              Source source) {
@@ -60,13 +64,16 @@ public class ExpressionDetails {
     }
 
     public void addExpressionExamples(List<ExpressionExample> expressionExampleEntities) {
-        for (ExpressionExample expressionExampleEntity : expressionExampleEntities) {
-            expressionExampleEntity.setExpressionDetails(this);
-        }
+        expressionExampleEntities.forEach(expressionExample -> expressionExample.setExpressionDetails(this));
         this.expressionExamples = expressionExampleEntities;
     }
 
     public void addExpressionMatchDetails(List<ExpressionMatchDetails> expressionMatchDetailsEntities) {
         this.expressionMatchDetails = expressionMatchDetailsEntities;
+    }
+
+    public void addDefinitionDetails(List<DefinitionDetails> definitionDetailsEntities) {
+        definitionDetailsEntities.forEach(definitionDetailsEntity -> definitionDetailsEntity.setExpressionDetails(this));
+        this.definitionDetails = definitionDetailsEntities;
     }
 }

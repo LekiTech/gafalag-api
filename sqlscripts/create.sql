@@ -95,7 +95,7 @@ CREATE TABLE definition_details (
     id                    UUID PRIMARY KEY     DEFAULT uuid_generate_v4(),
     expression_details_id UUID        NOT NULL,
     language_id           VARCHAR(3)  NOT NULL,
-    dialect_id            UUID        NOT NULL,
+    dialect_id            UUID, -- todo NOT NULL doesn't work for this column
     created_at            TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at            TIMESTAMPTZ NOT NULL DEFAULT now()
 );

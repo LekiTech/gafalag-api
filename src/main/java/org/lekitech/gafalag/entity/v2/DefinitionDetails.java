@@ -9,8 +9,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -48,17 +48,27 @@ public class DefinitionDetails {
     //  - relations
 
     @OneToMany(mappedBy = "definitionDetails", cascade = CascadeType.PERSIST)
-    private Set<Definition> definitions = new HashSet<>();
+    private List<Definition> definitions = new ArrayList<>();
 
     @OneToMany(mappedBy = "definitionDetails", cascade = CascadeType.PERSIST)
-    private Set<DefinitionDetailsTag> definitionDetailsTags = new HashSet<>();
+    private List<DefinitionDetailsTag> definitionDetailsTags = new ArrayList<>();
 
     @OneToMany(mappedBy = "definitionDetails", cascade = CascadeType.PERSIST)
-    private Set<DefinitionExample> definitionExamples = new HashSet<>();
+    private List<DefinitionExample> definitionExamples = new ArrayList<>();
 
     public DefinitionDetails(ExpressionDetails expressionDetails,
                              Language language) {
         this.expressionDetails = expressionDetails;
         this.language = language;
+    }
+
+    public void addDefinitions(List<Definition> definitions) {
+        definitions.forEach(definition -> definition.setDefinitionDetails(this));
+        this.definitions = definitions;
+    }
+
+    public void addDefinitionDetailsTags(List<DefinitionDetailsTag> definitionDetailsTagEntities) {
+        definitionDetailsTagEntities.forEach(definitionDetailsTag -> definitionDetailsTag.setDefinitionDetails(this));
+        this.definitionDetailsTags = definitionDetailsTagEntities;
     }
 }
