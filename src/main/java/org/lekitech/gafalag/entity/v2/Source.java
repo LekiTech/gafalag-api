@@ -21,15 +21,13 @@ import java.util.UUID;
 @EqualsAndHashCode(of = {"id"})
 public class Source {
 
-    public final static String USER = "USER";
-    public final static String WRITTEN = "WRITTEN";
-
     @Id
     @GeneratedValue
     private UUID id;
 
-    @Column(name = "type")
-    private String type;
+    @Enumerated(EnumType.STRING)
+    @org.hibernate.annotations.Type(type = "org.lekitech.gafalag.entity.v2.EnumTypePostgreSql")
+    private Type type;
 
     @CreationTimestamp
     @Column(name = "created_at")
@@ -50,7 +48,13 @@ public class Source {
 //    @OneToMany(mappedBy = "source", cascade = CascadeType.PERSIST)
 //    private Set<UserSource> users = new HashSet<>();
 
-    public Source(String type) {
+    public Source(Type type) {
         this.type = type;
     }
+
+    public enum Type {
+        WRITTEN,
+        SOURCE
+    }
+
 }

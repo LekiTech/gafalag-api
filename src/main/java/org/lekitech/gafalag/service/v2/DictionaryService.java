@@ -35,7 +35,7 @@ public class DictionaryService {
     @Transactional
     public void saveDictionary(DictionaryDto dto) {
 
-        val source = sourceRepositoryV2.save(new Source(Source.WRITTEN));
+        val source = sourceRepositoryV2.save(new Source(Source.Type.WRITTEN));
 
         val writtenSource = new WrittenSource(
                 source,
@@ -139,12 +139,7 @@ public class DictionaryService {
             expressionEntities.add(expressionEntity);
         }
 
-        val expressions = dto.expressions()
-                .stream()
-                .map(expression -> new Expression())
-                .toList();
-
-        dictionaryRepository.saveAll(expressions);
+        dictionaryRepository.saveAll(expressionEntities);
     }
 
 }
