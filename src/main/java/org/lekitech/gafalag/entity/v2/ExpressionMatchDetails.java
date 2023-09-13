@@ -25,7 +25,7 @@ public class ExpressionMatchDetails {
     private Expression expression;
 
     @MapsId("expressionDetailsId")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "expression_details_id")
     private ExpressionDetails expressionDetails;
 

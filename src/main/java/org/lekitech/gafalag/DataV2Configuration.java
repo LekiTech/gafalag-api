@@ -58,10 +58,11 @@ public class DataV2Configuration {
 
     /**
      * Loading db connection programmatically for secure connection string passing in production
+     *
      * @return
      */
     @Primary
-    @Bean(name="v2")
+    @Bean(name = "v2")
     public DataSource getDataSourceV2() {
         log.info("\n===== PASSED V2 DB PARAMS =====\n'" + dbUrlV2 + "'\n'" + dbUsernameV2 + "'\n'" + dbPasswordV2 + "'");
         DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();

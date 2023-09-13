@@ -10,4 +10,5 @@ import java.util.Optional;
 public record DefinitionDto(
         String value,
         Optional<List<String>> tags
-) {}
+) {
+}

@@ -14,4 +14,5 @@ public record ExampleDto(
         String src,
         String trl,
         Optional<List<String>> tags
-) {}
+) {
+}

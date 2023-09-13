@@ -6,4 +6,5 @@ public record DefinitionResponse(
         String text,
         String languageId,
         UUID sourceId
-) {}
+) {
+}

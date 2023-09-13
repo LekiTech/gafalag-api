@@ -9,4 +9,5 @@ import java.util.List;
 public record ExpressionDto(
         String spelling,
         List<ExpressionDetailsDto> details
-) {}
+) {
+}

@@ -27,5 +27,6 @@ public record ExpressionBatchRequest(
             String spelling,
             Optional<String> inflection,
             List<String> definitions
-    ) {}
+    ) {
+    }
 }

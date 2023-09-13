@@ -64,12 +64,12 @@ public class DefinitionDetails {
 
     public void addDefinitions(List<Definition> definitions) {
         definitions.forEach(definition -> definition.setDefinitionDetails(this));
-        this.definitions = definitions;
+        setDefinitions(definitions);
     }
 
     public void addDefinitionDetailsTags(List<DefinitionDetailsTag> definitionDetailsTagEntities) {
         definitionDetailsTagEntities.forEach(definitionDetailsTag -> definitionDetailsTag.setDefinitionDetails(this));
-        this.definitionDetailsTags = definitionDetailsTagEntities;
+        setDefinitionDetailsTags(definitionDetailsTagEntities);
     }
 
     public void addDefinitionExamples(List<DefinitionExample> definitionExampleList) {

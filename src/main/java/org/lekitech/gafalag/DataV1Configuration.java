@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
@@ -36,7 +35,7 @@ public class DataV1Configuration {
     private String dbPasswordV1;
 
 
-//    @Primary
+    //    @Primary
     @Bean(name = "entityManagerFactoryV1")
     public LocalContainerEntityManagerFactoryBean entityManagerFactoryV1() {
         LocalContainerEntityManagerFactoryBean em
@@ -59,10 +58,11 @@ public class DataV1Configuration {
 
     /**
      * Loading db connection programmatically for secure connection string passing in production
+     *
      * @return
      */
 //    @Primary
-    @Bean(name="v1")
+    @Bean(name = "v1")
     public DataSource getDataSourceV1() {
         log.info("\n===== PASSED V1 DB PARAMS =====\n'" + dbUrlV1 + "'\n'" + dbUsernameV1 + "'\n'" + dbPasswordV1 + "'");
         DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
@@ -72,7 +72,7 @@ public class DataV1Configuration {
         return dataSourceBuilder.build();
     }
 
-//    @Primary
+    //    @Primary
     @Bean(name = "transactionManagerV1")
     public PlatformTransactionManager userTransactionManager() {
 

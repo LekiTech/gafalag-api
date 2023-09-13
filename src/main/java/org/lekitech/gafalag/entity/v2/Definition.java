@@ -52,4 +52,9 @@ public class Definition {
         this.value = value;
         this.definitionDetails = definitionDetails;
     }
+
+    public void addDefinitionTags(List<DefinitionTag> definitionTagList) {
+        definitionTagList.forEach(definitionTag -> definitionTag.setDefinition(this));
+        setDefinitionTags(definitionTagList);
+    }
 }

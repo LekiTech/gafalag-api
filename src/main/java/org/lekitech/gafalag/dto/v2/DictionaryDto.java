@@ -29,4 +29,5 @@ public record DictionaryDto(
         String expressionLanguageId,
         String definitionLanguageId,
         List<ExpressionDto> expressions
-) {}
+) {
+}
