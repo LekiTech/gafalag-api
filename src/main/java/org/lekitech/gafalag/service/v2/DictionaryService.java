@@ -20,14 +20,14 @@ import java.util.Optional;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class DictionaryService {
 
-    private final DictionaryRepository dictionaryRepository;
+    private final ExpressionRepositoryV2 expressionRepositoryV2;
     private final WrittenSourceRepository writtenSourceRepository;
     private final SourceRepositoryV2 sourceRepositoryV2;
     private final LanguageRepositoryV2 languageRepositoryV2;
     private final TagRepository tagRepositoryV2;
 
     public void save(ExpressionDto dto) {
-        dictionaryRepository.save(new Expression());
+        expressionRepositoryV2.save(new Expression());
     }
 
     @Transactional
@@ -50,16 +50,24 @@ public class DictionaryService {
         val defLang = languageRepositoryV2.getById(dto.definitionLanguageId());
         final List<Expression> expressionEntities = new ArrayList<>();
         for (ExpressionDto expressionDto : dto.expressions()) {
-            final Expression expressionEntity = new Expression(expressionDto.spelling(), expLang);
-            final List<ExpressionDetails> expressionDetailsEntities = createExpressionDetails(source, expLang, defLang, expressionDto);
-            expressionEntity.setExpressionMatchDetails(
-                    expressionDetailsEntities.stream().map(
-                            expressionDetails -> new ExpressionMatchDetails(expressionEntity, expressionDetails)
-                    ).toList()
+            final Expression expressionEntity = expressionRepositoryV2
+                    .findBySpellingAndLanguage(expressionDto.spelling(), expLang)
+                    .orElse(new Expression(expressionDto.spelling(), expLang));
+            final List<ExpressionDetails> expressionDetailsEntities = createExpressionDetails(
+                    source, expLang, defLang, expressionDto
             );
+            final List<ExpressionMatchDetails> expressionMatchDetailsEntities = expressionDetailsEntities
+                    .stream().map(expressionDetails -> new ExpressionMatchDetails(expressionEntity, expressionDetails))
+                    .toList();
+            if (expressionEntity.getExpressionMatchDetails().isEmpty()) {
+                expressionEntity.setExpressionMatchDetails(expressionMatchDetailsEntities);
+            } else {
+                expressionEntity.getExpressionMatchDetails().addAll(expressionMatchDetailsEntities);
+            }
+
             expressionEntities.add(expressionEntity);
         }
-        dictionaryRepository.saveAll(expressionEntities);
+        expressionRepositoryV2.saveAll(expressionEntities);
     }
 
     private List<ExpressionDetails> createExpressionDetails(Source source,
