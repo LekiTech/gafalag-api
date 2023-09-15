@@ -76,10 +76,11 @@ CREATE TABLE expression (
     updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE "expression_match_details" (
+CREATE TABLE expression_match_details (
     expression_details_id UUID        NOT NULL,
     expression_id         UUID        NOT NULL,
-    created_at            TIMESTAMPTZ NOT NULL DEFAULT now()
+    created_at            TIMESTAMPTZ NOT NULL DEFAULT now(),
+    PRIMARY KEY (expression_id, expression_details_id)
 );
 
 CREATE TABLE expression_details (
@@ -101,9 +102,10 @@ CREATE TABLE definition_details (
 );
 
 CREATE TABLE definition_details_tag (
-    tag_abbr              VARCHAR(10) NOT NULL,
+    tag_abbr              VARCHAR(20) NOT NULL,
     definition_details_id UUID        NOT NULL,
-    created_at            TIMESTAMPTZ NOT NULL DEFAULT now()
+    created_at            TIMESTAMPTZ NOT NULL DEFAULT now(),
+    PRIMARY KEY (tag_abbr, definition_details_id)
 );
 
 CREATE TABLE definition (
@@ -115,19 +117,21 @@ CREATE TABLE definition (
 );
 
 CREATE TABLE definition_tag (
-    tag_abbr      VARCHAR(10) NOT NULL,
+    tag_abbr      VARCHAR(20) NOT NULL,
     definition_id UUID        NOT NULL,
-    created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+    created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+    PRIMARY KEY (tag_abbr, definition_id)
 );
 
 CREATE TABLE example_tag (
-    tag_abbr   VARCHAR(10) NOT NULL,
+    tag_abbr   VARCHAR(20) NOT NULL,
     example_id UUID        NOT NULL,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    PRIMARY KEY (tag_abbr, example_id)
 );
 
 CREATE TABLE tag (
-    abbreviation VARCHAR(10) PRIMARY KEY,
+    abbreviation VARCHAR(20) PRIMARY KEY,
     description  VARCHAR,
     "type"       TAG_TYPE    NOT NULL,
     created_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -137,13 +141,15 @@ CREATE TABLE tag (
 CREATE TABLE expression_example (
     expression_details_id UUID        NOT NULL,
     example_id            UUID        NOT NULL,
-    created_at            TIMESTAMPTZ NOT NULL DEFAULT now()
+    created_at            TIMESTAMPTZ NOT NULL DEFAULT now(),
+    PRIMARY KEY (expression_details_id, example_id)
 );
 
 CREATE TABLE definition_example (
     example_id            UUID        NOT NULL,
     definition_details_id UUID        NOT NULL,
-    created_at            TIMESTAMPTZ NOT NULL DEFAULT now()
+    created_at            TIMESTAMPTZ NOT NULL DEFAULT now(),
+    PRIMARY KEY (example_id, definition_details_id)
 );
 
 CREATE TABLE example (
@@ -189,7 +195,8 @@ CREATE TABLE expression_relation (
     expression_1_id  UUID        NOT NULL,
     expression_2_id  UUID        NOT NULL,
     relation_type_id UUID        NOT NULL,
-    created_at       TIMESTAMPTZ NOT NULL DEFAULT now()
+    created_at       TIMESTAMPTZ NOT NULL DEFAULT now(),
+    PRIMARY KEY (expression_1_id, expression_2_id)
 );
 
 CREATE TABLE relation_type (
