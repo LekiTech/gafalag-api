@@ -45,8 +45,8 @@ public class ExpressionDetails {
 
     //  - relations
 
-    @OneToOne(mappedBy = "expressionDetails", cascade = CascadeType.PERSIST)
-    private ExpressionMatchDetails expressionMatchDetails;
+    @OneToMany(mappedBy = "expressionDetails", cascade = CascadeType.PERSIST)
+    private List<ExpressionMatchDetails> expressionMatchDetails;
 
     @OneToMany(mappedBy = "expressionDetails", cascade = CascadeType.PERSIST)
     private List<ExpressionExample> expressionExamples = new ArrayList<>();
