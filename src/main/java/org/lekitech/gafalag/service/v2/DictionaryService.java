@@ -21,6 +21,7 @@ import java.util.Optional;
 public class DictionaryService {
 
     private final ExpressionRepositoryV2 expressionRepositoryV2;
+    private final ExpressionMatchDetailsRepository expressionMatchDetailsRepository;
     private final WrittenSourceRepository writtenSourceRepository;
     private final SourceRepositoryV2 sourceRepositoryV2;
     private final LanguageRepositoryV2 languageRepositoryV2;
@@ -50,22 +51,27 @@ public class DictionaryService {
         val defLang = languageRepositoryV2.getById(dto.definitionLanguageId());
         final List<Expression> expressionEntities = new ArrayList<>();
         for (ExpressionDto expressionDto : dto.expressions()) {
-            final Expression expressionEntity = expressionRepositoryV2
-                    .findBySpellingAndLanguage(expressionDto.spelling(), expLang)
-                    .orElse(new Expression(expressionDto.spelling(), expLang));
-            final List<ExpressionDetails> expressionDetailsEntities = createExpressionDetails(
-                    source, expLang, defLang, expressionDto
-            );
-            final List<ExpressionMatchDetails> expressionMatchDetailsEntities = expressionDetailsEntities
-                    .stream().map(expressionDetails -> new ExpressionMatchDetails(expressionEntity, expressionDetails))
-                    .toList();
-            if (expressionEntity.getExpressionMatchDetails().isEmpty()) {
-                expressionEntity.setExpressionMatchDetails(expressionMatchDetailsEntities);
+            val optionalExpression = expressionRepositoryV2.findBySpellingAndLanguage(expressionDto.spelling(), expLang);
+            val expressionDetailsEntities = createExpressionDetails(source, expLang, defLang, expressionDto);
+            if (optionalExpression.isPresent()) {
+                val expressionEntity = optionalExpression.get();
+                val expressionMatchDetailsEntities = expressionDetailsEntities.stream().map(
+                        expressionDetails -> new ExpressionMatchDetails(expressionEntity, expressionDetails)
+                ).toList();
+                expressionMatchDetailsRepository.saveAll(expressionMatchDetailsEntities);
             } else {
-                expressionEntity.getExpressionMatchDetails().addAll(expressionMatchDetailsEntities);
+                val expressionEntity = new Expression(expressionDto.spelling(), expLang);
+                val expressionMatchDetailsEntities = expressionDetailsEntities.stream().map(
+                        expressionDetails -> new ExpressionMatchDetails(expressionEntity, expressionDetails)
+                ).toList();
+                if (expressionEntity.getExpressionMatchDetails().isEmpty()) {
+                    expressionEntity.setExpressionMatchDetails(expressionMatchDetailsEntities);
+                } else {
+                    expressionEntity.getExpressionMatchDetails().addAll(expressionMatchDetailsEntities);
+                }
+                expressionEntity.setExpressionMatchDetails(expressionMatchDetailsEntities);
+                expressionEntities.add(expressionEntity);
             }
-
-            expressionEntities.add(expressionEntity);
         }
         expressionRepositoryV2.saveAll(expressionEntities);
     }
@@ -73,9 +79,9 @@ public class DictionaryService {
     private List<ExpressionDetails> createExpressionDetails(Source source,
                                                             Language expLang,
                                                             Language defLang,
-                                                            ExpressionDto expression) {
+                                                            ExpressionDto expressionDto) {
         final List<ExpressionDetails> expressionDetailsEntities = new ArrayList<>();
-        for (ExpressionDetailsDto expressionDetailsDto : expression.details()) {
+        for (ExpressionDetailsDto expressionDetailsDto : expressionDto.details()) {
             final ExpressionDetails expressionDetailsEntity = new ExpressionDetails(
                     expressionDetailsDto.gr(),
                     expressionDetailsDto.inflection(),
