@@ -55,9 +55,13 @@ public class DictionaryService {
             val expressionDetailsEntities = createExpressionDetails(source, expLang, defLang, expressionDto);
             if (optionalExpression.isPresent()) {
                 val expressionEntity = optionalExpression.get();
+                // TODO: @eskendarov & @devmagomedov
+                // val expressionEntities = ... // Type of List<Expression>
+                // for (expressionEntity : expressionEntities) {
                 val expressionMatchDetailsEntities = expressionDetailsEntities.stream().map(
                         expressionDetails -> new ExpressionMatchDetails(expressionEntity, expressionDetails)
                 ).toList();
+                // }
                 expressionMatchDetailsRepository.saveAll(expressionMatchDetailsEntities);
             } else {
                 val expressionEntity = new Expression(expressionDto.spelling(), expLang);
