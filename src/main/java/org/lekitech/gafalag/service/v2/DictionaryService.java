@@ -34,8 +34,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -54,7 +56,6 @@ public class DictionaryService {
         expressionRepositoryV2.save(new Expression());
     }
 
-    @Transactional
     public void saveDictionary(DictionaryDto dto) {
         val source = sourceRepositoryV2.save(new Source(Source.Type.WRITTEN));
         val writtenSource = new WrittenSource(
@@ -70,6 +71,12 @@ public class DictionaryService {
                 dto.description()
         );
         writtenSourceRepository.save(writtenSource);
+//        saveAllExpressionsNoRelations(dto);
+        saveExpressionsRelations(dto, source);
+    }
+
+    @Transactional
+    public void saveExpressionsRelations(DictionaryDto dto, Source source) {
         val expLang = languageRepositoryV2.getById(dto.expressionLanguageId());
         val defLang = languageRepositoryV2.getById(dto.definitionLanguageId());
         final List<Expression> expressionEntities = new ArrayList<>();
@@ -81,33 +88,41 @@ public class DictionaryService {
         expressionRepositoryV2.saveAll(expressionEntities);
     }
 
+    @Transactional
+    public void saveAllExpressionsNoRelations(DictionaryDto dto) {
+        val expLang = languageRepositoryV2.getById(dto.expressionLanguageId());
+        final Set<Expression> expressionEntities = new HashSet<>();
+        for (ExpressionDto expressionDto : dto.expressions()) {
+            for (String spelling : expressionDto.spelling()) {
+                expressionEntities.add(new Expression(spelling, expLang));
+            }
+        }
+        expressionRepositoryV2.saveAll(expressionEntities);
+    }
+
+    private Expression getOrCreateExpression(String spelling, Language expLang) {
+        final Optional<Expression> foundExpression = expressionRepositoryV2.findBySpellingAndLanguage(spelling, expLang);
+        return foundExpression.orElseGet(() -> expressionRepositoryV2.save(new Expression(spelling, expLang)));
+    }
+
     private void saveSingleExpression(String spelling,
                                       List<ExpressionDetailsDto> expressionDetailsDtoList,
                                       Language expLang,
                                       Source source,
                                       Language defLang,
                                       List<Expression> expressionEntities) {
-        val optionalExpression = expressionRepositoryV2.findBySpellingAndLanguage(spelling, expLang);
         val expressionDetailsEntities = createExpressionDetails(source, expLang, defLang, expressionDetailsDtoList);
-        if (optionalExpression.isPresent()) {
-            val expressionEntity = optionalExpression.get();
-            val expressionMatchDetailsEntities = expressionDetailsEntities.stream().map(
-                    expressionDetails -> new ExpressionMatchDetails(expressionEntity, expressionDetails)
-            ).toList();
-            expressionMatchDetailsRepository.saveAll(expressionMatchDetailsEntities);
-        } else {
-            val expressionEntity = new Expression(spelling, expLang);
-            val expressionMatchDetailsEntities = expressionDetailsEntities.stream().map(
-                    expressionDetails -> new ExpressionMatchDetails(expressionEntity, expressionDetails)
-            ).toList();
-            if (expressionEntity.getExpressionMatchDetails().isEmpty()) {
-                expressionEntity.setExpressionMatchDetails(expressionMatchDetailsEntities);
-            } else {
-                expressionEntity.getExpressionMatchDetails().addAll(expressionMatchDetailsEntities);
-            }
+        val expressionEntity = getOrCreateExpression(spelling, expLang);
+        val expressionMatchDetailsEntities = expressionDetailsEntities.stream().map(
+                expressionDetails -> new ExpressionMatchDetails(expressionEntity, expressionDetails)
+        ).toList();
+        if (expressionEntity.getExpressionMatchDetails().isEmpty()) {
             expressionEntity.setExpressionMatchDetails(expressionMatchDetailsEntities);
-            expressionEntities.add(expressionEntity);
+        } else {
+            expressionEntity.getExpressionMatchDetails().addAll(expressionMatchDetailsEntities);
         }
+        expressionEntity.setExpressionMatchDetails(expressionMatchDetailsEntities);
+        expressionEntities.add(expressionEntity);
     }
 
     private List<ExpressionDetails> createExpressionDetails(Source source,

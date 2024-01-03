@@ -16,7 +16,7 @@ import java.util.*;
 @Setter
 @NoArgsConstructor
 @Table(name = "expression")
-@EqualsAndHashCode(of = {"id"})
+@EqualsAndHashCode(of = {"id", "spelling", "language"})
 public class Expression {
 
     @Id
@@ -31,7 +31,7 @@ public class Expression {
     private Language language;
 
     @CreationTimestamp
-    @Column(name = "created_at")
+    @Column(name = "created_at", updatable = false)
     private Timestamp createdAt;
 
     @UpdateTimestamp
