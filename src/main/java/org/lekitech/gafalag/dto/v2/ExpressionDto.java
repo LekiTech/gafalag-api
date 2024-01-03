@@ -7,7 +7,7 @@ import java.util.List;
  * @param details  {@link ExpressionDetailsDto}
  */
 public record ExpressionDto(
-        String spelling,
+        List<String> spelling,
         List<ExpressionDetailsDto> details
 ) {
 }

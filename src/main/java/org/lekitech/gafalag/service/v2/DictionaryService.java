@@ -3,9 +3,32 @@ package org.lekitech.gafalag.service.v2;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.lekitech.gafalag.dto.v2.*;
-import org.lekitech.gafalag.entity.v2.*;
-import org.lekitech.gafalag.repository.v2.*;
+import org.lekitech.gafalag.dto.v2.DefinitionDetailsDto;
+import org.lekitech.gafalag.dto.v2.DictionaryDto;
+import org.lekitech.gafalag.dto.v2.ExampleDto;
+import org.lekitech.gafalag.dto.v2.ExpressionDetailsDto;
+import org.lekitech.gafalag.dto.v2.ExpressionDto;
+import org.lekitech.gafalag.entity.v2.Definition;
+import org.lekitech.gafalag.entity.v2.DefinitionDetails;
+import org.lekitech.gafalag.entity.v2.DefinitionDetailsTag;
+import org.lekitech.gafalag.entity.v2.DefinitionExample;
+import org.lekitech.gafalag.entity.v2.DefinitionTag;
+import org.lekitech.gafalag.entity.v2.Example;
+import org.lekitech.gafalag.entity.v2.ExampleTag;
+import org.lekitech.gafalag.entity.v2.Expression;
+import org.lekitech.gafalag.entity.v2.ExpressionDetails;
+import org.lekitech.gafalag.entity.v2.ExpressionExample;
+import org.lekitech.gafalag.entity.v2.ExpressionMatchDetails;
+import org.lekitech.gafalag.entity.v2.Language;
+import org.lekitech.gafalag.entity.v2.Source;
+import org.lekitech.gafalag.entity.v2.Tag;
+import org.lekitech.gafalag.entity.v2.WrittenSource;
+import org.lekitech.gafalag.repository.v2.ExpressionMatchDetailsRepository;
+import org.lekitech.gafalag.repository.v2.ExpressionRepositoryV2;
+import org.lekitech.gafalag.repository.v2.LanguageRepositoryV2;
+import org.lekitech.gafalag.repository.v2.SourceRepositoryV2;
+import org.lekitech.gafalag.repository.v2.TagRepository;
+import org.lekitech.gafalag.repository.v2.WrittenSourceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,37 +74,48 @@ public class DictionaryService {
         val defLang = languageRepositoryV2.getById(dto.definitionLanguageId());
         final List<Expression> expressionEntities = new ArrayList<>();
         for (ExpressionDto expressionDto : dto.expressions()) {
-            val optionalExpression = expressionRepositoryV2.findBySpellingAndLanguage(expressionDto.spelling(), expLang);
-            val expressionDetailsEntities = createExpressionDetails(source, expLang, defLang, expressionDto);
-            if (optionalExpression.isPresent()) {
-                val expressionEntity = optionalExpression.get();
-                val expressionMatchDetailsEntities = expressionDetailsEntities.stream().map(
-                        expressionDetails -> new ExpressionMatchDetails(expressionEntity, expressionDetails)
-                ).toList();
-                expressionMatchDetailsRepository.saveAll(expressionMatchDetailsEntities);
-            } else {
-                val expressionEntity = new Expression(expressionDto.spelling(), expLang);
-                val expressionMatchDetailsEntities = expressionDetailsEntities.stream().map(
-                        expressionDetails -> new ExpressionMatchDetails(expressionEntity, expressionDetails)
-                ).toList();
-                if (expressionEntity.getExpressionMatchDetails().isEmpty()) {
-                    expressionEntity.setExpressionMatchDetails(expressionMatchDetailsEntities);
-                } else {
-                    expressionEntity.getExpressionMatchDetails().addAll(expressionMatchDetailsEntities);
-                }
-                expressionEntity.setExpressionMatchDetails(expressionMatchDetailsEntities);
-                expressionEntities.add(expressionEntity);
+            for (String spelling : expressionDto.spelling()) {
+                saveSingleExpression(spelling, expressionDto.details(), expLang, source, defLang, expressionEntities);
             }
         }
         expressionRepositoryV2.saveAll(expressionEntities);
     }
 
+    private void saveSingleExpression(String spelling,
+                                      List<ExpressionDetailsDto> expressionDetailsDtoList,
+                                      Language expLang,
+                                      Source source,
+                                      Language defLang,
+                                      List<Expression> expressionEntities) {
+        val optionalExpression = expressionRepositoryV2.findBySpellingAndLanguage(spelling, expLang);
+        val expressionDetailsEntities = createExpressionDetails(source, expLang, defLang, expressionDetailsDtoList);
+        if (optionalExpression.isPresent()) {
+            val expressionEntity = optionalExpression.get();
+            val expressionMatchDetailsEntities = expressionDetailsEntities.stream().map(
+                    expressionDetails -> new ExpressionMatchDetails(expressionEntity, expressionDetails)
+            ).toList();
+            expressionMatchDetailsRepository.saveAll(expressionMatchDetailsEntities);
+        } else {
+            val expressionEntity = new Expression(spelling, expLang);
+            val expressionMatchDetailsEntities = expressionDetailsEntities.stream().map(
+                    expressionDetails -> new ExpressionMatchDetails(expressionEntity, expressionDetails)
+            ).toList();
+            if (expressionEntity.getExpressionMatchDetails().isEmpty()) {
+                expressionEntity.setExpressionMatchDetails(expressionMatchDetailsEntities);
+            } else {
+                expressionEntity.getExpressionMatchDetails().addAll(expressionMatchDetailsEntities);
+            }
+            expressionEntity.setExpressionMatchDetails(expressionMatchDetailsEntities);
+            expressionEntities.add(expressionEntity);
+        }
+    }
+
     private List<ExpressionDetails> createExpressionDetails(Source source,
                                                             Language expLang,
                                                             Language defLang,
-                                                            ExpressionDto expressionDto) {
+                                                            List<ExpressionDetailsDto> expressionDetailsDtoList) {
         final List<ExpressionDetails> expressionDetailsEntities = new ArrayList<>();
-        for (ExpressionDetailsDto expressionDetailsDto : expressionDto.details()) {
+        for (ExpressionDetailsDto expressionDetailsDto : expressionDetailsDtoList) {
             final ExpressionDetails expressionDetailsEntity = new ExpressionDetails(
                     expressionDetailsDto.gr(),
                     expressionDetailsDto.inflection(),
