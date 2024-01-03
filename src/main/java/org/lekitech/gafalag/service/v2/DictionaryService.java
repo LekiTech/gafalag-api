@@ -108,6 +108,7 @@ public class DictionaryService {
             expressionEntity.setExpressionMatchDetails(expressionMatchDetailsEntities);
             expressionEntities.add(expressionEntity);
         }
+        expressionRepositoryV2.saveAll(expressionEntities);
     }
 
     private List<ExpressionDetails> createExpressionDetails(Source source,
