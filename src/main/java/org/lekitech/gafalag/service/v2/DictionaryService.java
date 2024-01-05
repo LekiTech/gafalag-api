@@ -80,7 +80,7 @@ public class DictionaryService {
             saveAllExpressionData(dto, source);
 
             long seconds = (System.nanoTime() - startTime) / 1_000_000_000;
-            log.info("Successfully saved dictionary data. Executed in %d min. and %d sec.".formatted(seconds / 60, seconds % 60));
+            log.info("Successfully saved dictionary data. Executed in {} min. and {} sec.",seconds / 60, seconds % 60);
         } catch (Exception e) {
             log.error("Error saving dictionary data: {}", e.getMessage(), e);
         }
