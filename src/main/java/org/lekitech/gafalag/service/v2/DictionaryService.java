@@ -45,7 +45,6 @@ public class DictionaryService {
 
     private final ExpressionRepositoryV2 expressionRepositoryV2;
     private final ExpressionDetailsRepositoryV2 expressionDetailsRepositoryV2;
-    private final ExpressionMatchDetailsRepository expressionMatchDetailsRepository;
     private final WrittenSourceRepository writtenSourceRepository;
     private final SourceRepositoryV2 sourceRepositoryV2;
     private final LanguageRepositoryV2 languageRepositoryV2;
@@ -60,7 +59,6 @@ public class DictionaryService {
                              TagRepository tagRepositoryV2) {
         this.expressionRepositoryV2 = expressionRepositoryV2;
         this.expressionDetailsRepositoryV2 = expressionDetailsRepositoryV2;
-        this.expressionMatchDetailsRepository = expressionMatchDetailsRepository;
         this.writtenSourceRepository = writtenSourceRepository;
         this.sourceRepositoryV2 = sourceRepositoryV2;
         this.languageRepositoryV2 = languageRepositoryV2;
@@ -74,13 +72,11 @@ public class DictionaryService {
     @Transactional
     public void saveDictionary(DictionaryDto dto) {
         try {
-            long startTime = System.nanoTime();
 
             val source = createAndSaveSource(dto);
             saveAllExpressionData(dto, source);
 
-            long seconds = (System.nanoTime() - startTime) / 1_000_000_000;
-            log.info("Successfully saved dictionary data. Executed in {} min. and {} sec.",seconds / 60, seconds % 60);
+            log.info("Successfully saved dictionary data!");
         } catch (Exception e) {
             log.error("Error saving dictionary data: {}", e.getMessage(), e);
         }
@@ -116,7 +112,6 @@ public class DictionaryService {
                 expressionDtoMap.put(spelling, detailsList);
             }
         }
-
         expressionDtoMap.forEach((spelling, details) -> saveSingleExpression(spelling, details, expLang, source, defLang));
     }
 
@@ -125,19 +120,17 @@ public class DictionaryService {
                                       Language expLang,
                                       Source source,
                                       Language defLang) {
-        val expressionDetailsEntities = expressionDetailsRepositoryV2.saveAll(createExpressionDetails(source, expLang, defLang, expressionDetailsDtoList));
         val expressionEntity = expressionRepositoryV2.save(new Expression(spelling, expLang));
-        val expressionMatchDetailsEntities = expressionDetailsEntities.stream().map(
-                expressionDetails -> new ExpressionMatchDetails(expressionEntity, expressionDetails)
-        ).toList();
-
-        expressionMatchDetailsRepository.saveAllAndFlush(expressionMatchDetailsEntities);
+        expressionDetailsRepositoryV2.saveAll(
+                createExpressionDetails(source, expLang, defLang, expressionDetailsDtoList, expressionEntity)
+        );
     }
 
     private List<ExpressionDetails> createExpressionDetails(Source source,
                                                             Language expLang,
                                                             Language defLang,
-                                                            List<ExpressionDetailsDto> expressionDetailsDtoList) {
+                                                            List<ExpressionDetailsDto> expressionDetailsDtoList,
+                                                            Expression expressionEntity) {
         final List<ExpressionDetails> expressionDetailsEntities = new ArrayList<>();
         for (ExpressionDetailsDto expressionDetailsDto : expressionDetailsDtoList) {
             final ExpressionDetails expressionDetailsEntity = new ExpressionDetails(
@@ -159,6 +152,8 @@ public class DictionaryService {
                 definitionDetailsEntities.add(definitionDetailEntity);
             }
             expressionDetailsEntity.addDefinitionDetails(definitionDetailsEntities);
+            expressionDetailsEntity.getExpressionMatchDetails()
+                    .add(new ExpressionMatchDetails(expressionEntity, expressionDetailsEntity));
             expressionDetailsEntities.add(expressionDetailsEntity);
         }
         return expressionDetailsEntities;
