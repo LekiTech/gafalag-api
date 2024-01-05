@@ -37,7 +37,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -121,18 +120,13 @@ public class DictionaryService {
         expressionDtoMap.forEach((spelling, details) -> saveSingleExpression(spelling, details, expLang, source, defLang));
     }
 
-    private Expression getOrCreateExpression(String spelling, Language expLang) {
-        final Optional<Expression> foundExpression = expressionRepositoryV2.findBySpellingAndLanguage(spelling, expLang);
-        return foundExpression.orElseGet(() -> expressionRepositoryV2.save(new Expression(spelling, expLang)));
-    }
-
     private void saveSingleExpression(String spelling,
                                       List<ExpressionDetailsDto> expressionDetailsDtoList,
                                       Language expLang,
                                       Source source,
                                       Language defLang) {
         val expressionDetailsEntities = expressionDetailsRepositoryV2.saveAll(createExpressionDetails(source, expLang, defLang, expressionDetailsDtoList));
-        val expressionEntity = getOrCreateExpression(spelling, expLang);
+        val expressionEntity = expressionRepositoryV2.save(new Expression(spelling, expLang));
         val expressionMatchDetailsEntities = expressionDetailsEntities.stream().map(
                 expressionDetails -> new ExpressionMatchDetails(expressionEntity, expressionDetails)
         ).toList();
