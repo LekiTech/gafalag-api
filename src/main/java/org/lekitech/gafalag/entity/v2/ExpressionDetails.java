@@ -46,7 +46,7 @@ public class ExpressionDetails {
     //  - relations
 
     @OneToMany(mappedBy = "expressionDetails", cascade = CascadeType.PERSIST)
-    private List<ExpressionMatchDetails> expressionMatchDetails;
+    private List<ExpressionMatchDetails> expressionMatchDetails = new ArrayList<>();
 
     @OneToMany(mappedBy = "expressionDetails", cascade = CascadeType.PERSIST)
     private List<ExpressionExample> expressionExamples = new ArrayList<>();
@@ -64,11 +64,11 @@ public class ExpressionDetails {
 
     public void addExpressionExamples(List<ExpressionExample> expressionExampleEntities) {
         expressionExampleEntities.forEach(expressionExample -> expressionExample.setExpressionDetails(this));
-        setExpressionExamples(expressionExampleEntities);
+        expressionExamples.addAll(expressionExampleEntities);
     }
 
     public void addDefinitionDetails(List<DefinitionDetails> definitionDetailsEntities) {
         definitionDetailsEntities.forEach(definitionDetailsEntity -> definitionDetailsEntity.setExpressionDetails(this));
-        setDefinitionDetails(definitionDetailsEntities);
+        definitionDetails.addAll(definitionDetailsEntities);
     }
 }

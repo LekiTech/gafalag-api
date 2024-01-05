@@ -1,6 +1,5 @@
 package org.lekitech.gafalag.service.v2;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.lekitech.gafalag.dto.v2.DefinitionDetailsDto;
@@ -23,40 +22,72 @@ import org.lekitech.gafalag.entity.v2.Language;
 import org.lekitech.gafalag.entity.v2.Source;
 import org.lekitech.gafalag.entity.v2.Tag;
 import org.lekitech.gafalag.entity.v2.WrittenSource;
+import org.lekitech.gafalag.repository.v2.ExpressionDetailsRepositoryV2;
 import org.lekitech.gafalag.repository.v2.ExpressionMatchDetailsRepository;
 import org.lekitech.gafalag.repository.v2.ExpressionRepositoryV2;
 import org.lekitech.gafalag.repository.v2.LanguageRepositoryV2;
 import org.lekitech.gafalag.repository.v2.SourceRepositoryV2;
 import org.lekitech.gafalag.repository.v2.TagRepository;
 import org.lekitech.gafalag.repository.v2.WrittenSourceRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @Transactional
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class DictionaryService {
 
     private final ExpressionRepositoryV2 expressionRepositoryV2;
+    private final ExpressionDetailsRepositoryV2 expressionDetailsRepositoryV2;
     private final ExpressionMatchDetailsRepository expressionMatchDetailsRepository;
     private final WrittenSourceRepository writtenSourceRepository;
     private final SourceRepositoryV2 sourceRepositoryV2;
     private final LanguageRepositoryV2 languageRepositoryV2;
     private final TagRepository tagRepositoryV2;
 
+    public DictionaryService(ExpressionRepositoryV2 expressionRepositoryV2,
+                             ExpressionDetailsRepositoryV2 expressionDetailsRepositoryV2,
+                             ExpressionMatchDetailsRepository expressionMatchDetailsRepository,
+                             WrittenSourceRepository writtenSourceRepository,
+                             SourceRepositoryV2 sourceRepositoryV2,
+                             LanguageRepositoryV2 languageRepositoryV2,
+                             TagRepository tagRepositoryV2) {
+        this.expressionRepositoryV2 = expressionRepositoryV2;
+        this.expressionDetailsRepositoryV2 = expressionDetailsRepositoryV2;
+        this.expressionMatchDetailsRepository = expressionMatchDetailsRepository;
+        this.writtenSourceRepository = writtenSourceRepository;
+        this.sourceRepositoryV2 = sourceRepositoryV2;
+        this.languageRepositoryV2 = languageRepositoryV2;
+        this.tagRepositoryV2 = tagRepositoryV2;
+    }
+
     public void save(ExpressionDto dto) {
         expressionRepositoryV2.save(new Expression());
     }
 
+    @Transactional
     public void saveDictionary(DictionaryDto dto) {
+        try {
+            long startTime = System.nanoTime();
+
+            val source = createAndSaveSource(dto);
+            saveAllExpressionData(dto, source);
+
+            long seconds = (System.nanoTime() - startTime) / 1_000_000_000;
+            log.info("Successfully saved dictionary data. Executed in %d min. and %d sec.".formatted(seconds / 60, seconds % 60));
+        } catch (Exception e) {
+            log.error("Error saving dictionary data: {}", e.getMessage(), e);
+        }
+    }
+
+    private Source createAndSaveSource(DictionaryDto dto) {
         val source = sourceRepositoryV2.save(new Source(Source.Type.WRITTEN));
         val writtenSource = new WrittenSource(
                 source,
@@ -71,33 +102,23 @@ public class DictionaryService {
                 dto.description()
         );
         writtenSourceRepository.save(writtenSource);
-//        saveAllExpressionsNoRelations(dto);
-        saveExpressionsRelations(dto, source);
+        return source;
     }
 
-    @Transactional
-    public void saveExpressionsRelations(DictionaryDto dto, Source source) {
+    public void saveAllExpressionData(DictionaryDto dto, Source source) {
         val expLang = languageRepositoryV2.getById(dto.expressionLanguageId());
         val defLang = languageRepositoryV2.getById(dto.definitionLanguageId());
-        final List<Expression> expressionEntities = new ArrayList<>();
-        for (ExpressionDto expressionDto : dto.expressions()) {
-            for (String spelling : expressionDto.spelling()) {
-                saveSingleExpression(spelling, expressionDto.details(), expLang, source, defLang, expressionEntities);
-            }
-        }
-        expressionRepositoryV2.saveAll(expressionEntities);
-    }
 
-    @Transactional
-    public void saveAllExpressionsNoRelations(DictionaryDto dto) {
-        val expLang = languageRepositoryV2.getById(dto.expressionLanguageId());
-        final Set<Expression> expressionEntities = new HashSet<>();
-        for (ExpressionDto expressionDto : dto.expressions()) {
-            for (String spelling : expressionDto.spelling()) {
-                expressionEntities.add(new Expression(spelling, expLang));
+        final Map<String, List<ExpressionDetailsDto>> expressionDtoMap = new HashMap<>();
+        for (final ExpressionDto expressionDto : dto.expressions()) {
+            for (final String spelling : expressionDto.spelling()) {
+                List<ExpressionDetailsDto> detailsList = expressionDtoMap.getOrDefault(spelling, new ArrayList<>());
+                detailsList.addAll(expressionDto.details());
+                expressionDtoMap.put(spelling, detailsList);
             }
         }
-        expressionRepositoryV2.saveAll(expressionEntities);
+
+        expressionDtoMap.forEach((spelling, details) -> saveSingleExpression(spelling, details, expLang, source, defLang));
     }
 
     private Expression getOrCreateExpression(String spelling, Language expLang) {
@@ -109,20 +130,14 @@ public class DictionaryService {
                                       List<ExpressionDetailsDto> expressionDetailsDtoList,
                                       Language expLang,
                                       Source source,
-                                      Language defLang,
-                                      List<Expression> expressionEntities) {
-        val expressionDetailsEntities = createExpressionDetails(source, expLang, defLang, expressionDetailsDtoList);
+                                      Language defLang) {
+        val expressionDetailsEntities = expressionDetailsRepositoryV2.saveAll(createExpressionDetails(source, expLang, defLang, expressionDetailsDtoList));
         val expressionEntity = getOrCreateExpression(spelling, expLang);
         val expressionMatchDetailsEntities = expressionDetailsEntities.stream().map(
                 expressionDetails -> new ExpressionMatchDetails(expressionEntity, expressionDetails)
         ).toList();
-        if (expressionEntity.getExpressionMatchDetails().isEmpty()) {
-            expressionEntity.setExpressionMatchDetails(expressionMatchDetailsEntities);
-        } else {
-            expressionEntity.getExpressionMatchDetails().addAll(expressionMatchDetailsEntities);
-        }
-        expressionEntity.setExpressionMatchDetails(expressionMatchDetailsEntities);
-        expressionEntities.add(expressionEntity);
+
+        expressionMatchDetailsRepository.saveAllAndFlush(expressionMatchDetailsEntities);
     }
 
     private List<ExpressionDetails> createExpressionDetails(Source source,
