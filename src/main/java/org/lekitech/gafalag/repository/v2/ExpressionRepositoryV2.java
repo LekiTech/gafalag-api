@@ -7,6 +7,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -15,4 +16,6 @@ import java.util.UUID;
 public interface ExpressionRepositoryV2 extends JpaRepository<Expression, UUID> {
 
     Optional<Expression> findBySpellingAndLanguage(@NonNull String spelling, @NonNull Language language);
+
+    List<Expression> findAllByLanguage(@NonNull Language language);
 }

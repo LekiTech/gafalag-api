@@ -36,6 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -66,9 +67,8 @@ public class DictionaryService {
     public void saveDictionary(DictionaryDto dto) {
         try {
             final Source source = createAndSaveSource(dto);
-            saveAllExpressionData(dto, source);
 
-            log.info("Successfully saved dictionary data!");
+            saveAllExpressionData(dto, source);
         } catch (Exception e) {
             log.error("Error saving dictionary data: {}", e.getMessage(), e);
         }
@@ -97,6 +97,10 @@ public class DictionaryService {
         final Language expLang = languageRepositoryV2.getById(dto.expressionLanguageId());
         final Language defLang = languageRepositoryV2.getById(dto.definitionLanguageId());
         final Map<String, List<ExpressionDetailsDto>> expressionDtoMap = new HashMap<>();
+        /* this map contains expressions from database that have already been stored */
+        final Map<String, Expression> dbExpressionsMap = expressionRepositoryV2
+                .findAllByLanguage(expLang).stream()
+                .collect(Collectors.toMap(Expression::getSpelling, expression -> expression));
 
         for (final ExpressionDto expressionDto : dto.expressions()) {
             for (final String spelling : expressionDto.spelling()) {
@@ -107,7 +111,7 @@ public class DictionaryService {
         }
 
         expressionDtoMap.forEach(
-                (spelling, details) -> saveSingleExpression(spelling, details, expLang, source, defLang)
+                (spelling, details) -> saveSingleExpression(spelling, details, expLang, source, defLang, dbExpressionsMap)
         );
     }
 
@@ -115,8 +119,12 @@ public class DictionaryService {
                                       List<ExpressionDetailsDto> expressionDetailsDtoList,
                                       Language expLang,
                                       Source source,
-                                      Language defLang) {
-        final Expression expressionEntity = expressionRepositoryV2.save(new Expression(spelling, expLang));
+                                      Language defLang,
+                                      Map<String, Expression> dbExpressionsMap) {
+
+        final Expression expressionEntity = dbExpressionsMap.containsKey(spelling)
+                ? dbExpressionsMap.get(spelling)
+                : expressionRepositoryV2.save(new Expression(spelling, expLang));
 
         expressionDetailsRepositoryV2.saveAll(
                 createExpressionDetails(source, expLang, defLang, expressionDetailsDtoList, expressionEntity)
