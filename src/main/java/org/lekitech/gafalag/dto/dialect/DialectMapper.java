@@ -1,7 +1,7 @@
 package org.lekitech.gafalag.dto.dialect;
 
 import org.lekitech.gafalag.dto.language.LanguageMapper;
-import org.lekitech.gafalag.entity.Dialect;
+import org.lekitech.gafalag.entity.v1.Dialect;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

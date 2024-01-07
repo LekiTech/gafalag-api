@@ -1,6 +1,6 @@
 package org.lekitech.gafalag.dto.definition;
 
-import org.lekitech.gafalag.entity.Definition;
+import org.lekitech.gafalag.entity.v1.Definition;
 import org.mapstruct.*;
 
 import java.lang.annotation.*;

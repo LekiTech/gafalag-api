@@ -2,7 +2,7 @@ package org.lekitech.gafalag.dto.expression;
 
 import org.lekitech.gafalag.dto.PaginatedResult;
 import org.lekitech.gafalag.dto.definition.DefinitionMapper;
-import org.lekitech.gafalag.entity.Expression;
+import org.lekitech.gafalag.entity.v1.Expression;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.data.domain.Page;

@@ -1,6 +1,6 @@
 package org.lekitech.gafalag.dto.mapper;
 
-import org.lekitech.gafalag.entity.Source;
+import org.lekitech.gafalag.entity.v1.Source;
 import org.mapstruct.Mapper;
 import org.mapstruct.Qualifier;
 

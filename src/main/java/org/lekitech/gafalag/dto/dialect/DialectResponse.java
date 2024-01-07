@@ -4,4 +4,5 @@ public record DialectResponse(
         Long id,
         String name,
         String languageId
-) {}
+) {
+}
