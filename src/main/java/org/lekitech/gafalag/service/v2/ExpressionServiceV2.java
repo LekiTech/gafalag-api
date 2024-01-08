@@ -4,6 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.lekitech.gafalag.dto.v2.ExpressionDto;
 import org.lekitech.gafalag.entity.v2.Expression;
 import org.lekitech.gafalag.repository.v2.ExpressionRepositoryV2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -16,8 +18,7 @@ public class ExpressionServiceV2 {
         this.expressionRepositoryV2 = expressionRepositoryV2;
     }
 
-    public Expression save(ExpressionDto dto) {
-
-        return expressionRepositoryV2.save(new Expression());
+    public Page<ExpressionDto> findExpressionsBySpellingAndLanguageId(String spelling, String expLang, Pageable pageable) {
+        return null;
     }
 }
