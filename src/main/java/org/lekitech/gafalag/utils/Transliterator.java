@@ -1,9 +1,8 @@
 package org.lekitech.gafalag.utils;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.Set;
 
 /**
  * Utility class for transliterating English text to Cyrillic script. The transliteration
@@ -17,8 +16,7 @@ import java.util.Optional;
  */
 public class Transliterator {
 
-    private static final int UPPER = 1;
-    private static final int LOWER = 2;
+    private static final Set<String> LATIN_SCRIPT_LANGUAGES = Set.of("eng");
     private static final Map<String, String> map = makeTranslitMap();
 
     /* Initializes the transliteration mapping */
@@ -62,24 +60,32 @@ public class Transliterator {
         return map;
     }
 
-    /* Determines the character case */
-    private static int charClass(char c) {
-        return Character.isUpperCase(c) ? UPPER : LOWER;
+    /* Transforms the character to the correct case */
+    private static String transformCase(String s, boolean isUpper) {
+        if (isUpper && !s.isEmpty()) {
+            return Character.toUpperCase(s.charAt(0)) + s.substring(1);
+        }
+        return s;
     }
 
     /* Retrieves the transliteration for a given string if present */
-    private static Optional<String> get(String s) {
-        final int charClass = charClass(s.charAt(0));
-        return Optional.ofNullable(map.get(s.toLowerCase()))
-                .map(result -> charClass == UPPER
-                        ? (result.charAt(0) + "").toUpperCase() + (result.length() > 1 ? result.substring(1) : "")
-                        : result
-                );
+    private static String get(String s) {
+        final String lower = s.toLowerCase();
+        final String result = map.get(lower);
+        if (result != null) {
+            return transformCase(result, Character.isUpperCase(s.charAt(0)));
+        }
+        return null;
     }
 
     /* Checks if the text is English based on the character set */
     private static boolean isEnglishText(String text) {
-        return text.matches("^[a-zA-Z]+$");
+        for (char c : text.toCharArray()) {
+            if (!Character.isLetter(c) || (c > 'z')) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -91,8 +97,7 @@ public class Transliterator {
      * @return The transliterated text or original text if conditions aren't met
      */
     public static String translitToCyrillic(String text, String srcLang) {
-        final List<String> languagesOnCyrillic = List.of("lez", "tab", "rus");
-        if (!isEnglishText(text) || !languagesOnCyrillic.contains(srcLang)) {
+        if (LATIN_SCRIPT_LANGUAGES.contains(srcLang) || !isEnglishText(text)) {
             return text;
         }
 
@@ -100,14 +105,14 @@ public class Transliterator {
         final StringBuilder sb = new StringBuilder();
         for (int i = 0; i < len; ) {
             final String toTranslate = text.substring(i, Math.min(i + 2, len));
-            final Optional<String> translatedOpt = get(toTranslate);
+            String translated = get(toTranslate);
 
-            if (translatedOpt.isPresent()) {
-                sb.append(translatedOpt.get());
+            if (translated != null) {
+                sb.append(translated);
                 i += toTranslate.length();
             } else {
-                final Optional<String> singleCharOpt = get(toTranslate.charAt(0) + "");
-                sb.append(singleCharOpt.orElseGet(() -> toTranslate.substring(0, 1)));
+                translated = get(toTranslate.substring(0, 1));
+                sb.append(translated != null ? translated : toTranslate.substring(0, 1));
                 i++;
             }
         }
