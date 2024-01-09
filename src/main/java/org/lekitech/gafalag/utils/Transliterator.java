@@ -34,14 +34,17 @@ public class Transliterator {
         map.put("i", "и");
         map.put("j", "й");
         map.put("k", "к");
+        map.put("kI", "кI");
         map.put("l", "л");
         map.put("m", "м");
         map.put("n", "н");
         map.put("o", "о");
         map.put("p", "п");
+        map.put("pI", "пI");
         map.put("r", "р");
         map.put("s", "с");
         map.put("t", "т");
+        map.put("tI", "тI");
         map.put("u", "у");
         map.put("f", "ф");
         map.put("h", "х");
@@ -49,8 +52,8 @@ public class Transliterator {
         map.put("ch", "ч");
         map.put("sh", "ш");
         map.put("`", "ъ");
-        map.put("y", "у");
         map.put("'", "ь");
+        map.put("y", "ы");
         map.put("yu", "ю");
         map.put("ya", "я");
         map.put("x", "кс");
