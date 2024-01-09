@@ -45,13 +45,13 @@ public class ExpressionDetails {
 
     //  - relations
 
-    @OneToMany(mappedBy = "expressionDetails", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "expressionDetails", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private List<ExpressionMatchDetails> expressionMatchDetails = new ArrayList<>();
 
-    @OneToMany(mappedBy = "expressionDetails", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "expressionDetails", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private List<ExpressionExample> expressionExamples = new ArrayList<>();
 
-    @OneToMany(mappedBy = "expressionDetails", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "expressionDetails", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private List<DefinitionDetails> definitionDetails = new ArrayList<>();
 
     public ExpressionDetails(String gr,

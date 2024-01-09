@@ -52,13 +52,13 @@ public class Example {
 
     //  - relations
 
-    @OneToMany(mappedBy = "example", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "example", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private List<DefinitionExample> definitionExamples = new ArrayList<>();
 
-    @OneToMany(mappedBy = "example", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "example", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private List<ExpressionExample> expressionExamples = new ArrayList<>();
 
-    @OneToMany(mappedBy = "example", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "example", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private List<ExampleTag> exampleTags = new ArrayList<>();
 
     public Example(String source,

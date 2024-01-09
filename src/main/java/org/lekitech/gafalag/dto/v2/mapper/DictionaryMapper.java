@@ -7,9 +7,10 @@ import org.mapstruct.Mapping;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = ExpressionDetailsMapper.class)
 public interface DictionaryMapper {
 
     @Mapping(source = "spelling", target = "spelling")
+    @Mapping(source = "expressionDetails", target = "details")
     ExpressionResponseDto toDto(String spelling, List<ExpressionDetails> expressionDetails);
 }

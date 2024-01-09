@@ -40,10 +40,10 @@ public class Expression {
 
     // - relations
 
-    @OneToMany(mappedBy = "expression", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "expression", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private Set<MediaFile> mediaFiles = new HashSet<>();
 
-    @OneToMany(mappedBy = "expression", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "expression", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private List<ExpressionMatchDetails> expressionMatchDetails = new ArrayList<>();
 
     public Expression(String spelling,

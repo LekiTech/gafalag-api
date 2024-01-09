@@ -145,9 +145,10 @@ public class DictionaryService {
                     source
             );
 
-            if (expressionDetailsDto.examples().isPresent()) {
+            final List<ExampleDto> examples = expressionDetailsDto.examples();
+            if (examples != null && !examples.isEmpty()) {
                 final List<ExpressionExample> expressionExampleEntities = createExpressionExampleList(
-                        expressionDetailsDto.examples().get(), expressionDetailsEntity, expLang, defLang
+                        examples, expressionDetailsEntity, expLang, defLang
                 );
                 expressionDetailsEntity.addExpressionExamples(expressionExampleEntities);
             }
@@ -177,9 +178,10 @@ public class DictionaryService {
         final List<Definition> definitionEntities = createDefinitionList(defDetail, definitionDetailEntity);
         definitionDetailEntity.addDefinitions(definitionEntities);
 
-        if (defDetail.examples().isPresent()) {
+        final List<ExampleDto> examples = defDetail.examples();
+        if (examples != null && !examples.isEmpty()) {
             final List<DefinitionExample> definitionExampleList = createDefinitionExampleList(
-                    defDetail.examples().get(),
+                    examples,
                     definitionDetailEntity,
                     expLang,
                     defLang
@@ -187,9 +189,10 @@ public class DictionaryService {
             definitionDetailEntity.addDefinitionExamples(definitionExampleList);
         }
 
-        if (defDetail.tags().isPresent()) {
+        final List<String> tags = defDetail.tags();
+        if (tags != null && !tags.isEmpty()) {
             final List<DefinitionDetailsTag> definitionDetailsTagEntities = createDefinitionDetailsTags(
-                    defDetail.tags().get(),
+                    tags,
                     definitionDetailEntity
             );
             definitionDetailEntity.addDefinitionDetailsTags(definitionDetailsTagEntities);
@@ -265,9 +268,10 @@ public class DictionaryService {
                 defLang,
                 exampleDto.raw()
         );
-        if (exampleDto.tags().isPresent()) {
+        final List<String> tags = exampleDto.tags();
+        if (tags != null && !tags.isEmpty()) {
             final List<ExampleTag> exampleTagEntities = createExampleTags(
-                    exampleDto.tags().get(),
+                    tags,
                     exampleEntity
             );
             exampleEntity.addExampleTags(exampleTagEntities);
@@ -299,9 +303,10 @@ public class DictionaryService {
                     definition.value(),
                     definitionDetailEntity
             );
-            if (definition.tags().isPresent()) {
+            final List<String> tags = definition.tags();
+            if (tags != null && !tags.isEmpty()) {
                 final List<DefinitionTag> definitionTagList = createDefinitionTagList(
-                        definition.tags().get(),
+                        tags,
                         definitionEntity
                 );
                 definitionEntity.addDefinitionTags(definitionTagList);

@@ -27,8 +27,9 @@ public class ExpressionControllerV2 {
                                                                        @RequestParam String srcLang,
                                                                        Pageable pageable) {
         try {
+            final String checkedExp = Transliterator.translitToCyrillic(spelling, srcLang);
             final Page<ExpressionResponseDto> expressions = expressionServiceV2
-                    .findExpressionsBySpellingAndSrcLang(spelling, srcLang, pageable);
+                    .findExpressionsBySpellingAndSrcLang(checkedExp, srcLang, pageable);
             return ResponseEntity.ok(expressions);
         } catch (Exception e) {
             log.error("Failed to fetch expression pages: {}", e.getMessage(), e);
@@ -44,8 +45,7 @@ public class ExpressionControllerV2 {
                                                           Pageable pageable) {
         try {
             final String checkedExp = Transliterator.translitToCyrillic(exp, srcLang);
-            final Page<String> suggestions = expressionServiceV2
-                    .findSpellingsByExpressionAndSrcLang(checkedExp, srcLang, pageable);
+            final Page<String> suggestions = expressionServiceV2.searchSuggestions(checkedExp, srcLang, pageable);
             return ResponseEntity.ok(suggestions);
         } catch (Exception e) {
             log.error("Error occurred while retrieving search suggestions: {}", e.getMessage(), e);

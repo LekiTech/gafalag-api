@@ -36,4 +36,20 @@ public interface ExpressionRepositoryV2 extends JpaRepository<Expression, UUID> 
                                                      @NonNull @Param("srcLang") String srcLang,
                                                      Pageable pageable);
 
+    @Query(value = """
+            SELECT spelling
+            FROM expression e
+            WHERE e.language_id = :srcLang
+            ORDER BY spelling <-> :exp
+            """,
+            countQuery = """
+                    SELECT count(*)
+                    FROM expression e
+                    WHERE e.language_id = :srcLang
+                    """,
+            nativeQuery = true)
+    Page<String> fuzzySearchByExpressionAndSrcLang(@NonNull @Param("exp") String exp,
+                                                   @NonNull @Param("srcLang") String srcLang,
+                                                   Pageable pageable);
+
 }

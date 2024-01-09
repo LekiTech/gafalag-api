@@ -1,7 +1,6 @@
 package org.lekitech.gafalag.dto.v2;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * It represents the whole definition of a word for the following cases:
@@ -20,6 +19,6 @@ public record ExpressionDetailsDto(
         String gr,
         String inflection,
         List<DefinitionDetailsDto> definitionDetails,
-        Optional<List<ExampleDto>> examples
+        List<ExampleDto> examples
 ) {
 }
