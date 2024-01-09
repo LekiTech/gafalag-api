@@ -37,9 +37,9 @@ public class ExpressionServiceV2 {
 
         final List<ExpressionResponseDto> dtos = entities.stream().map(expression -> {
                     final List<ExpressionMatchDetails> matchDetails = expression.getExpressionMatchDetails();
-                    final List<ExpressionDetails> definitionDetails = matchDetails.stream()
+                    final List<ExpressionDetails> expressionDetails = matchDetails.stream()
                             .map(ExpressionMatchDetails::getExpressionDetails).toList();
-                    return mapper.toDto(expression.getSpelling(), definitionDetails);
+                    return mapper.toDto(expression.getSpelling(), expressionDetails);
                 }
         ).toList();
 
