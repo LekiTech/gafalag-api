@@ -81,7 +81,7 @@ public class Transliterator {
     /* Checks if the text is English based on the character set */
     private static boolean isEnglishText(String text) {
         for (char c : text.toCharArray()) {
-            if (!Character.isLetter(c) || (c > 'z')) {
+            if ((!Character.isLetter(c) || (c > 'z')) && c != '`' && c != '\'') {
                 return false;
             }
         }
