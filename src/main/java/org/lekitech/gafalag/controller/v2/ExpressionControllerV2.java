@@ -23,13 +23,14 @@ public class ExpressionControllerV2 {
     private final ExpressionServiceV2 expressionServiceV2;
 
     @GetMapping("/pages")
-    public ResponseEntity<Page<ExpressionResponseDto>> listExpressions(@RequestParam String spelling,
-                                                                       @RequestParam String srcLang,
+    public ResponseEntity<Page<ExpressionResponseDto>> listExpressions(@RequestParam(name = "spelling") String spelling,
+                                                                       @RequestParam(name = "expLang") String srcLang,
+                                                                       @RequestParam(name = "defLang") String distLang,
                                                                        Pageable pageable) {
         try {
             final String checkedExp = Transliterator.translitToCyrillic(spelling, srcLang);
             final Page<ExpressionResponseDto> expressions = expressionServiceV2
-                    .findExpressionsBySpellingAndSrcLang(checkedExp, srcLang, pageable);
+                    .findExpressionsBySpellingAndSrcLang(checkedExp, srcLang, distLang, pageable);
             return ResponseEntity.ok(expressions);
         } catch (Exception e) {
             log.error("Failed to fetch expression pages: {}", e.getMessage(), e);
@@ -40,8 +41,8 @@ public class ExpressionControllerV2 {
     }
 
     @GetMapping("/search/suggestions")
-    public ResponseEntity<Page<String>> searchSuggestions(@RequestParam String exp,
-                                                          @RequestParam String srcLang,
+    public ResponseEntity<Page<String>> searchSuggestions(@RequestParam(name = "exp") String exp,
+                                                          @RequestParam(name = "expLang") String srcLang,
                                                           Pageable pageable) {
         try {
             final String checkedExp = Transliterator.translitToCyrillic(exp, srcLang);

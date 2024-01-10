@@ -2,6 +2,7 @@ package org.lekitech.gafalag.service.v2;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.lekitech.gafalag.dto.v2.ExpressionResponseDto;
 import org.lekitech.gafalag.dto.v2.mapper.DictionaryMapper;
 import org.lekitech.gafalag.entity.v2.Expression;
@@ -22,23 +23,32 @@ import java.util.List;
 public class ExpressionServiceV2 {
 
     private final DictionaryMapper mapper;
-    private final ExpressionRepositoryV2 expressionRepositoryV2;
+    private final ExpressionRepositoryV2 expressionRepo;
 
     public Page<String> searchSuggestions(String exp, String srcLang, Pageable pageable) {
-        return expressionRepositoryV2.fuzzySearchByExpressionAndSrcLang(exp, srcLang, pageable);
+        return expressionRepo.fuzzySearchByExpressionAndSrcLang(exp, srcLang, pageable);
     }
 
     @Transactional(readOnly = true)
     public Page<ExpressionResponseDto> findExpressionsBySpellingAndSrcLang(String spelling,
                                                                            String srcLang,
+                                                                           String distLang,
                                                                            Pageable pageable) {
-        final Page<Expression> entities = expressionRepositoryV2
+        final Page<Expression> entities = expressionRepo
                 .fuzzySearchBySpellingAndSrcLang(spelling, srcLang, pageable);
 
         final List<ExpressionResponseDto> dtos = entities.stream().map(expression -> {
                     final List<ExpressionMatchDetails> matchDetails = expression.getExpressionMatchDetails();
                     final List<ExpressionDetails> expressionDetails = matchDetails.stream()
-                            .map(ExpressionMatchDetails::getExpressionDetails).toList();
+                            .map(expMatchDetails -> {
+                                val expDetail = expMatchDetails.getExpressionDetails();
+                                val filteredDefinitionDetailsByDistLang = expDetail.getDefinitionDetails()
+                                        .stream().filter(
+                                                defDetail -> defDetail.getLanguage().getId().equals(distLang)
+                                        ).toList();
+                                expDetail.setDefinitionDetails(filteredDefinitionDetailsByDistLang);
+                                return expDetail;
+                            }).toList();
                     return mapper.toDto(expression.getSpelling(), expressionDetails);
                 }
         ).toList();
