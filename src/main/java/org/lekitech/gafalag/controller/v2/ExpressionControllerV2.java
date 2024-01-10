@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(path = "/v2/expressions")
 public class ExpressionControllerV2 {
 
-    // Dependencies
+    /* Dependencies */
     private final ExpressionServiceV2 expService;
 
     /**
