@@ -337,7 +337,7 @@ ALTER TABLE declension
 -- endregion ALTER TABLES
 
 -- region FUNCTIONS
-CREATE OR REPLACE FUNCTION set_current_timestamp()
+CREATE OR REPLACE FUNCTION update_updated_at_column()
     RETURNS TRIGGER AS
 $$
 BEGIN
@@ -352,91 +352,91 @@ CREATE TRIGGER expression_updated
     BEFORE UPDATE
     ON expression
     FOR EACH ROW
-EXECUTE PROCEDURE set_current_timestamp();
+EXECUTE PROCEDURE update_updated_at_column();
 
 CREATE TRIGGER example_updated
     BEFORE UPDATE
     ON example
     FOR EACH ROW
-EXECUTE PROCEDURE set_current_timestamp();
+EXECUTE PROCEDURE update_updated_at_column();
 
 CREATE TRIGGER expression_details_updated
     BEFORE UPDATE
     ON expression_details
     FOR EACH ROW
-EXECUTE PROCEDURE set_current_timestamp();
+EXECUTE PROCEDURE update_updated_at_column();
 
 CREATE TRIGGER language_updated
     BEFORE UPDATE
     ON language
     FOR EACH ROW
-EXECUTE PROCEDURE set_current_timestamp();
+EXECUTE PROCEDURE update_updated_at_column();
 
 CREATE TRIGGER dialect_updated
     BEFORE UPDATE
     ON dialect
     FOR EACH ROW
-EXECUTE PROCEDURE set_current_timestamp();
+EXECUTE PROCEDURE update_updated_at_column();
 
 CREATE TRIGGER media_file_updated
     BEFORE UPDATE
     ON media_file
     FOR EACH ROW
-EXECUTE PROCEDURE set_current_timestamp();
+EXECUTE PROCEDURE update_updated_at_column();
 
 CREATE TRIGGER relation_type_updated
     BEFORE UPDATE
     ON relation_type
     FOR EACH ROW
-EXECUTE PROCEDURE set_current_timestamp();
+EXECUTE PROCEDURE update_updated_at_column();
 
 CREATE TRIGGER definition_updated
     BEFORE UPDATE
     ON definition
     FOR EACH ROW
-EXECUTE PROCEDURE set_current_timestamp();
+EXECUTE PROCEDURE update_updated_at_column();
 
 CREATE TRIGGER definition_details_updated
     BEFORE UPDATE
     ON definition_details
     FOR EACH ROW
-EXECUTE PROCEDURE set_current_timestamp();
+EXECUTE PROCEDURE update_updated_at_column();
 
 CREATE TRIGGER written_source_updated
     BEFORE UPDATE
     ON written_source
     FOR EACH ROW
-EXECUTE PROCEDURE set_current_timestamp();
+EXECUTE PROCEDURE update_updated_at_column();
 
 CREATE TRIGGER tag_updated
     BEFORE UPDATE
     ON tag
     FOR EACH ROW
-EXECUTE PROCEDURE set_current_timestamp();
+EXECUTE PROCEDURE update_updated_at_column();
 
 CREATE TRIGGER source_updated
     BEFORE UPDATE
     ON source
     FOR EACH ROW
-EXECUTE PROCEDURE set_current_timestamp();
+EXECUTE PROCEDURE update_updated_at_column();
 
 CREATE TRIGGER etymology_updated
     BEFORE UPDATE
     ON etymology
     FOR EACH ROW
-EXECUTE PROCEDURE set_current_timestamp();
+EXECUTE PROCEDURE update_updated_at_column();
 
 CREATE TRIGGER grammatical_case_updated
     BEFORE UPDATE
     ON grammatical_case
     FOR EACH ROW
-EXECUTE PROCEDURE set_current_timestamp();
+EXECUTE PROCEDURE update_updated_at_column();
 
 CREATE TRIGGER declension_updated
     BEFORE UPDATE
     ON declension
     FOR EACH ROW
-EXECUTE PROCEDURE set_current_timestamp();
+EXECUTE PROCEDURE update_updated_at_column();
 -- endregion TRIGGERS
 
 -- region INDEXES
@@ -479,4 +479,53 @@ VALUES ('lez', 'Lezgi', 'lz'),
        ('tab', 'Tabasaran', ''),
        ('eng', 'English', 'en'),
        ('rus', 'Russian', 'ru');
+-- endregion
+
+-- region AUTHENTICATION TABLES
+
+-- Create User table with essential fields
+CREATE TABLE "user" (
+    id         UUID PRIMARY KEY        DEFAULT uuid_generate_v4(),
+    username   VARCHAR(255) UNIQUE NOT NULL,
+    password   VARCHAR(255)        NOT NULL,
+    email      VARCHAR(255) UNIQUE NOT NULL,
+    created_at TIMESTAMPTZ    NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ    NOT NULL DEFAULT now()
+);
+
+-- Define Role as an Enum type
+CREATE TYPE ROLE_TYPE AS ENUM ('ADMIN', 'LINGUIST', 'USER');
+
+-- Create Role table with predefined roles
+CREATE TABLE "role" (
+    id         UUID PRIMARY KEY     DEFAULT uuid_generate_v4(),
+    name       ROLE_TYPE   NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Insert initial role data
+INSERT INTO "role" (name)
+VALUES ('ADMIN'), ('LINGUIST'), ('USER');
+
+-- Create User_Role join table to manage many-to-many relationship
+CREATE TABLE user_role (
+    user_id    UUID REFERENCES "user"(id),
+    role_id    UUID REFERENCES "role"(id),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    PRIMARY KEY (user_id, role_id)
+);
+
+-- Attach triggers to User and Role tables for updating 'updated_at'
+CREATE TRIGGER user_updated
+    BEFORE UPDATE
+    ON "user"
+    FOR EACH ROW
+EXECUTE PROCEDURE update_updated_at_column();
+
+CREATE TRIGGER role_updated
+    BEFORE UPDATE
+    ON "role"
+    FOR EACH ROW
+EXECUTE PROCEDURE update_updated_at_column();
 -- endregion
