@@ -17,18 +17,46 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+/**
+ * The `ExpressionServiceV2` class provides methods to interact with expressions and their details
+ * in a version 2 of the application. It handles operations like searching for expressions, finding
+ * expression suggestions, and retrieving expression details.
+ * <p>
+ * This service class is responsible for managing the business logic related to expressions and
+ * acts as an intermediary between the data layer and the presentation layer.
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class ExpressionServiceV2 {
 
+    /* Dependencies */
     private final DictionaryMapper mapper;
     private final ExpressionRepositoryV2 expressionRepo;
 
+    /**
+     * Retrieves a page of search suggestions based on the provided expression, source language,
+     * and pageable information.
+     *
+     * @param exp      The expression to search for.
+     * @param srcLang  The source language for the expression.
+     * @param pageable The pageable information for the search results.
+     * @return A Page of strings containing search suggestions.
+     */
     public Page<String> searchSuggestions(String exp, String srcLang, Pageable pageable) {
         return expressionRepo.fuzzySearchByExpressionAndSrcLang(exp, srcLang, pageable);
     }
 
+    /**
+     * Finds expressions by spelling, source language, and destination language with fuzzy matching,
+     * and returns a Page of ExpressionResponseDto objects.
+     *
+     * @param spelling The spelling of the expression to search for.
+     * @param srcLang  The source language for the expression.
+     * @param distLang The destination language for the expression details.
+     * @param pageable The pageable information for the search results.
+     * @return A Page of ExpressionResponseDto objects containing expression details.
+     */
     @Transactional(readOnly = true)
     public Page<ExpressionResponseDto> findExpressionsBySpellingAndSrcLang(String spelling,
                                                                            String srcLang,
@@ -38,22 +66,20 @@ public class ExpressionServiceV2 {
                 .fuzzySearchBySpellingAndSrcLang(spelling, srcLang, pageable);
 
         final List<ExpressionResponseDto> dtos = entities.stream().map(expression -> {
-                    final List<ExpressionMatchDetails> matchDetails = expression.getExpressionMatchDetails();
-                    final List<ExpressionDetails> expressionDetails = matchDetails.stream()
-                            .map(expMatchDetails -> {
-                                val expDetail = expMatchDetails.getExpressionDetails();
-                                val filteredDefinitionDetailsByDistLang = expDetail.getDefinitionDetails()
-                                        .stream().filter(
-                                                defDetail -> defDetail.getLanguage().getId().equals(distLang)
-                                        ).toList();
-                                expDetail.setDefinitionDetails(filteredDefinitionDetailsByDistLang);
-                                return expDetail;
-                            }).toList();
-                    return mapper.toDto(expression.getSpelling(), expressionDetails);
-                }
-        ).toList();
+            final List<ExpressionMatchDetails> matchDetails = expression.getExpressionMatchDetails();
+            final List<ExpressionDetails> expressionDetails = matchDetails.stream()
+                    .map(expMatchDetails -> {
+                        val expDetail = expMatchDetails.getExpressionDetails();
+                        val filteredDefinitionDetailsByDistLang = expDetail.getDefinitionDetails()
+                                .stream().filter(
+                                        defDetail -> defDetail.getLanguage().getId().equals(distLang)
+                                ).toList();
+                        expDetail.setDefinitionDetails(filteredDefinitionDetailsByDistLang);
+                        return expDetail;
+                    }).toList();
+            return mapper.toDto(expression.getSpelling(), expressionDetails);
+        }).toList();
 
         return new PageImpl<>(dtos, pageable, entities.getTotalElements());
     }
-
 }
