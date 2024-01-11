@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.lekitech.gafalag.dto.v2.ExpressionResponseDto;
 import org.lekitech.gafalag.service.v2.ExpressionServiceV2;
-import org.lekitech.gafalag.utils.Transliterator;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -41,16 +40,15 @@ public class ExpressionControllerV2 {
      * @param pageable The pageable information for the search results.
      * @return A ResponseEntity containing a Page of ExpressionResponseDto objects.
      */
-    @GetMapping("/pages")
+    @GetMapping(path = {"", "/"})
     public ResponseEntity<Page<ExpressionResponseDto>> listExpressions(
             @RequestParam(name = "spelling") String spelling,
             @RequestParam(name = "expLang") String srcLang,
             @RequestParam(name = "defLang") String distLang,
             Pageable pageable) {
         try {
-            final String checkedExp = Transliterator.translitToCyrillic(spelling, srcLang);
             final Page<ExpressionResponseDto> expressions = expService
-                    .findExpressionsBySpellingAndSrcLang(checkedExp, srcLang, distLang, pageable);
+                    .findExpressionsBySpellingAndSrcLang(spelling, srcLang, distLang, pageable);
             return ResponseEntity.ok(expressions);
         } catch (Exception e) {
             log.error("Failed to fetch expression pages: {}", e.getMessage(), e);
@@ -63,19 +61,18 @@ public class ExpressionControllerV2 {
     /**
      * Endpoint for retrieving search suggestions based on the provided expression and source language.
      *
-     * @param exp      The expression to search for.
+     * @param spelling The expression to search for.
      * @param srcLang  The source language for the expression.
      * @param pageable The pageable information for the search suggestions.
      * @return A ResponseEntity containing a Page of search suggestions as strings.
      */
-    @GetMapping("/search/suggestions")
+    @GetMapping(path = "/search/suggestions")
     public ResponseEntity<Page<String>> searchSuggestions(
-            @RequestParam(name = "exp") String exp,
+            @RequestParam(name = "spelling") String spelling,
             @RequestParam(name = "expLang") String srcLang,
             Pageable pageable) {
         try {
-            final String checkedExp = Transliterator.translitToCyrillic(exp, srcLang);
-            final Page<String> suggestions = expService.searchSuggestions(checkedExp, srcLang, pageable);
+            final Page<String> suggestions = expService.searchSuggestions(spelling, srcLang, pageable);
             return ResponseEntity.ok(suggestions);
         } catch (Exception e) {
             log.error("Error occurred while retrieving search suggestions: {}", e.getMessage(), e);

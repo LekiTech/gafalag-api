@@ -32,15 +32,15 @@ public interface ExpressionRepositoryV2 extends JpaRepository<Expression, UUID> 
                     WHERE e.language_id = :srcLang
                     """,
             nativeQuery = true)
-    Page<Expression> fuzzySearchBySpellingAndSrcLang(@NonNull @Param("spelling") String spelling,
-                                                     @NonNull @Param("srcLang") String srcLang,
-                                                     Pageable pageable);
+    Page<Expression> fuzzySearchSExpressionsListBySpellingAndSrcLang(@NonNull @Param("spelling") String spelling,
+                                                                     @NonNull @Param("srcLang") String srcLang,
+                                                                     Pageable pageable);
 
     @Query(value = """
             SELECT spelling
             FROM expression e
             WHERE e.language_id = :srcLang
-            ORDER BY spelling <-> :exp
+            ORDER BY spelling <-> :spelling
             """,
             countQuery = """
                     SELECT count(*)
@@ -48,8 +48,8 @@ public interface ExpressionRepositoryV2 extends JpaRepository<Expression, UUID> 
                     WHERE e.language_id = :srcLang
                     """,
             nativeQuery = true)
-    Page<String> fuzzySearchByExpressionAndSrcLang(@NonNull @Param("exp") String exp,
-                                                   @NonNull @Param("srcLang") String srcLang,
-                                                   Pageable pageable);
+    Page<String> fuzzySearchSpellingsListBySpellingAndSrcLang(@NonNull @Param("spelling") String spelling,
+                                                              @NonNull @Param("srcLang") String srcLang,
+                                                              Pageable pageable);
 
 }

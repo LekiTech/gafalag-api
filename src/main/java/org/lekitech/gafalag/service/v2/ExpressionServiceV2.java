@@ -44,7 +44,7 @@ public class ExpressionServiceV2 {
      * @return A Page of strings containing search suggestions.
      */
     public Page<String> searchSuggestions(String exp, String srcLang, Pageable pageable) {
-        return expressionRepo.fuzzySearchByExpressionAndSrcLang(exp, srcLang, pageable);
+        return expressionRepo.fuzzySearchSpellingsListBySpellingAndSrcLang(exp, srcLang, pageable);
     }
 
     /**
@@ -63,7 +63,7 @@ public class ExpressionServiceV2 {
                                                                            String distLang,
                                                                            Pageable pageable) {
         final Page<Expression> entities = expressionRepo
-                .fuzzySearchBySpellingAndSrcLang(spelling, srcLang, pageable);
+                .fuzzySearchSExpressionsListBySpellingAndSrcLang(spelling, srcLang, pageable);
 
         final List<ExpressionResponseDto> dtos = entities.stream().map(expression -> {
             final List<ExpressionMatchDetails> matchDetails = expression.getExpressionMatchDetails();
