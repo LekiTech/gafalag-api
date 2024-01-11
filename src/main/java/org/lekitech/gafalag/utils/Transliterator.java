@@ -34,25 +34,20 @@ public class Transliterator {
         map.put("i", "и");
         map.put("j", "й");
         map.put("k", "к");
-        map.put("kI", "кI");
         map.put("l", "л");
         map.put("m", "м");
         map.put("n", "н");
         map.put("o", "о");
         map.put("p", "п");
-        map.put("pI", "пI");
         map.put("r", "р");
         map.put("s", "с");
         map.put("t", "т");
-        map.put("tI", "тI");
         map.put("u", "у");
         map.put("f", "ф");
         map.put("h", "х");
         map.put("ts", "ц");
         map.put("ch", "ч");
         map.put("sh", "ш");
-        map.put("`", "ъ");
-        map.put("'", "ь");
         map.put("y", "ы");
         map.put("yu", "ю");
         map.put("ya", "я");
@@ -84,7 +79,7 @@ public class Transliterator {
     /* Checks if the text is English based on the character set */
     private static boolean isEnglishText(String text) {
         for (char c : text.toCharArray()) {
-            if ((!Character.isLetter(c) || (c > 'z')) && c != '`' && c != '\'') {
+            if (!Character.isLetter(c) || c > 'z') {
                 return false;
             }
         }
