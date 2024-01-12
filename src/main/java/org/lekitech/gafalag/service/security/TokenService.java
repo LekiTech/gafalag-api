@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -40,9 +42,9 @@ public class TokenService {
             /* Extracting essential information from UserDetails */
             final User user = (User) auth.getPrincipal();
             final String userId = user.getId().toString();
-            final String roles = user.getAuthorities().stream()
+            final Set<String> roles = user.getAuthorities().stream()
                     .map(GrantedAuthority::getAuthority)
-                    .collect(Collectors.joining(","));
+                    .collect(Collectors.toSet());
 
             /* Building the JWT Claims set */
             final JwtClaimsSet claims = JwtClaimsSet.builder()
