@@ -483,38 +483,52 @@ VALUES ('lez', 'Lezgi', 'lz'),
 
 -- region AUTHENTICATION TABLES
 
+-- Create enum type for permissions
+CREATE TYPE PERMISSION AS ENUM (
+    'EDIT',
+    'VIEW'
+    );
+
 -- Create User table with essential fields
 CREATE TABLE "user" (
-    id         UUID PRIMARY KEY        DEFAULT uuid_generate_v4(),
-    username   VARCHAR(255) UNIQUE NOT NULL,
-    password   VARCHAR(255)        NOT NULL,
-    email      VARCHAR(255) UNIQUE NOT NULL,
-    created_at TIMESTAMPTZ    NOT NULL DEFAULT now(),
-    updated_at TIMESTAMPTZ    NOT NULL DEFAULT now()
+    id         UUID PRIMARY KEY      DEFAULT uuid_generate_v4(),
+    first_name VARCHAR(255) NOT NULL,
+    last_name  VARCHAR(255),
+    email      VARCHAR(255) NOT NULL UNIQUE,
+    password   VARCHAR(255) NOT NULL,
+    verified   BOOLEAN,
+    created_at TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ  NOT NULL DEFAULT now()
 );
 
--- Define Role as an Enum type
-CREATE TYPE ROLE_TYPE AS ENUM ('ADMIN', 'LINGUIST', 'USER');
+-- Create indexes for user table
+CREATE INDEX created_at_index ON "user" (created_at);
+CREATE INDEX updated_at_index ON "user" (updated_at);
 
--- Create Role table with predefined roles
+-- Create Role table
 CREATE TABLE "role" (
-    id         UUID PRIMARY KEY     DEFAULT uuid_generate_v4(),
-    name       ROLE_TYPE   NOT NULL,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    id          UUID PRIMARY KEY      DEFAULT uuid_generate_v4(),
+    authority   VARCHAR(255) NOT NULL UNIQUE,
+    permission  PERMISSION,
+    language_id VARCHAR(3)   NOT NULL REFERENCES language (id),
+    created_at  TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    updated_at  TIMESTAMPTZ  NOT NULL DEFAULT now()
 );
 
--- Insert initial role data
-INSERT INTO "role" (name)
-VALUES ('ADMIN'), ('LINGUIST'), ('USER');
+-- Create indexes for role table
+CREATE INDEX role_created_at_index ON role (created_at);
+CREATE INDEX role_updated_at_index ON role (updated_at);
 
--- Create User_Role join table to manage many-to-many relationship
+-- Create user_role join table
 CREATE TABLE user_role (
-    user_id    UUID REFERENCES "user"(id),
-    role_id    UUID REFERENCES "role"(id),
+    user_id    UUID REFERENCES "user" (id),
+    role_id    UUID REFERENCES "role" (id),
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     PRIMARY KEY (user_id, role_id)
 );
+
+-- Create index for user_role table
+CREATE INDEX user_role_created_at_index ON user_role (created_at);
 
 -- Attach triggers to User and Role tables for updating 'updated_at'
 CREATE TRIGGER user_updated
