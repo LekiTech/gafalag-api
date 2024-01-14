@@ -7,7 +7,6 @@ import org.lekitech.gafalag.dto.v2.ExpressionResponseDto;
 import org.lekitech.gafalag.dto.v2.mapper.DictionaryMapper;
 import org.lekitech.gafalag.entity.v2.Expression;
 import org.lekitech.gafalag.entity.v2.ExpressionDetails;
-import org.lekitech.gafalag.entity.v2.ExpressionMatchDetails;
 import org.lekitech.gafalag.repository.v2.ExpressionRepositoryV2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -38,13 +37,13 @@ public class ExpressionServiceV2 {
      * Retrieves a page of search suggestions based on the provided expression, source language,
      * and pageable information.
      *
-     * @param exp      The expression to search for.
+     * @param spelling The expression to search for.
      * @param srcLang  The source language for the expression.
-     * @param pageable The pageable information for the search results.
-     * @return A Page of strings containing search suggestions.
+     * @param size     The limit of the suggestions.
+     * @return A List of strings containing search suggestions.
      */
-    public Page<String> searchSuggestions(String exp, String srcLang, Pageable pageable) {
-        return expressionRepo.fuzzySearchSpellingsListBySpellingAndSrcLang(exp, srcLang, pageable);
+    public List<String> searchSuggestions(String spelling, String srcLang, Long size) {
+        return expressionRepo.fuzzySearchSpellingsListBySpellingAndSrcLang(spelling, srcLang, size);
     }
 
     /**
@@ -57,6 +56,7 @@ public class ExpressionServiceV2 {
      * @param pageable The pageable information for the search results.
      * @return A Page of ExpressionResponseDto objects containing expression details.
      */
+    @Deprecated
     @Transactional(readOnly = true)
     public Page<ExpressionResponseDto> findExpressionsBySpellingAndSrcLang(String spelling,
                                                                            String srcLang,
@@ -66,10 +66,8 @@ public class ExpressionServiceV2 {
                 .fuzzySearchSExpressionsListBySpellingAndSrcLang(spelling, srcLang, pageable);
 
         final List<ExpressionResponseDto> dtos = entities.stream().map(expression -> {
-            final List<ExpressionMatchDetails> matchDetails = expression.getExpressionMatchDetails();
-            final List<ExpressionDetails> expressionDetails = matchDetails.stream()
-                    .map(expMatchDetails -> {
-                        val expDetail = expMatchDetails.getExpressionDetails();
+            final List<ExpressionDetails> expressionDetails = expression.getExpressionDetails().stream()
+                    .map(expDetail -> {
                         val filteredDefinitionDetailsByDistLang = expDetail.getDefinitionDetails()
                                 .stream().filter(
                                         defDetail -> defDetail.getLanguage().getId().equals(distLang)

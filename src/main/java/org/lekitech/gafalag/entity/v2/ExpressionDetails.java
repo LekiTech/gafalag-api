@@ -46,9 +46,6 @@ public class ExpressionDetails {
     //  - relations
 
     @OneToMany(mappedBy = "expressionDetails", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-    private List<ExpressionMatchDetails> expressionMatchDetails = new ArrayList<>();
-
-    @OneToMany(mappedBy = "expressionDetails", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private List<ExpressionExample> expressionExamples = new ArrayList<>();
 
     @OneToMany(mappedBy = "expressionDetails", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)

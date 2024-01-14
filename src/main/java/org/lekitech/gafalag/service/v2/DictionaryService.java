@@ -17,7 +17,6 @@ import org.lekitech.gafalag.entity.v2.ExampleTag;
 import org.lekitech.gafalag.entity.v2.Expression;
 import org.lekitech.gafalag.entity.v2.ExpressionDetails;
 import org.lekitech.gafalag.entity.v2.ExpressionExample;
-import org.lekitech.gafalag.entity.v2.ExpressionMatchDetails;
 import org.lekitech.gafalag.entity.v2.Language;
 import org.lekitech.gafalag.entity.v2.Source;
 import org.lekitech.gafalag.entity.v2.Tag;
@@ -162,10 +161,8 @@ public class DictionaryService {
             }
 
             expressionDetailsEntity.addDefinitionDetails(definitionDetailsEntities);
-            expressionDetailsEntity.getExpressionMatchDetails().add(
-                    new ExpressionMatchDetails(expressionEntity, expressionDetailsEntity)
-            );
             expressionDetailsEntities.add(expressionDetailsEntity);
+            expressionEntity.getExpressionDetails().add(expressionDetailsEntity);
         }
         return expressionDetailsEntities;
     }

@@ -38,18 +38,16 @@ public interface ExpressionRepositoryV2 extends JpaRepository<Expression, UUID> 
 
     @Query(value = """
             SELECT spelling
-            FROM expression e
-            WHERE e.language_id = :srcLang
+            FROM expression
+            WHERE language_id = :srcLang
             ORDER BY spelling <-> :spelling
+            LIMIT :size
             """,
-            countQuery = """
-                    SELECT count(*)
-                    FROM expression e
-                    WHERE e.language_id = :srcLang
-                    """,
             nativeQuery = true)
-    Page<String> fuzzySearchSpellingsListBySpellingAndSrcLang(@NonNull @Param("spelling") String spelling,
-                                                              @NonNull @Param("srcLang") String srcLang,
-                                                              Pageable pageable);
+    List<String> fuzzySearchSpellingsListBySpellingAndSrcLang(
+            @NonNull @Param("spelling") String spelling,
+            @NonNull @Param("srcLang") String srcLang,
+            Long size
+    );
 
 }
