@@ -483,12 +483,6 @@ VALUES ('lez', 'Lezgi', 'lz'),
 
 -- region AUTHENTICATION TABLES
 
--- Create enum type for permissions
-CREATE TYPE PERMISSION AS ENUM (
-    'EDIT',
-    'VIEW'
-    );
-
 -- Create User table with essential fields
 CREATE TABLE "user" (
     id         UUID PRIMARY KEY      DEFAULT uuid_generate_v4(),
@@ -502,22 +496,58 @@ CREATE TABLE "user" (
 );
 
 -- Create indexes for user table
-CREATE INDEX created_at_index ON "user" (created_at);
-CREATE INDEX updated_at_index ON "user" (updated_at);
+CREATE INDEX user_created_at_index ON "user" (created_at);
+CREATE INDEX user_updated_at_index ON "user" (updated_at);
+
+-- Enum for user rights
+CREATE TYPE USER_RIGHT AS ENUM (
+    'ADD',
+    'DELETE',
+    'EDIT',
+    'READ'
+    );
+
+-- Enum for components
+CREATE TYPE COMPONENT AS ENUM (
+    'USER',
+    'WRITTEN_SOURCE',
+    'EXPRESSION',
+    'LANGUAGE'
+    );
 
 -- Create Role table
 CREATE TABLE "role" (
-    id          UUID PRIMARY KEY      DEFAULT uuid_generate_v4(),
-    authority   VARCHAR(255) NOT NULL UNIQUE,
-    permission  PERMISSION,
-    language_id VARCHAR(3)   NOT NULL REFERENCES language (id),
-    created_at  TIMESTAMPTZ  NOT NULL DEFAULT now(),
-    updated_at  TIMESTAMPTZ  NOT NULL DEFAULT now()
+    id         UUID PRIMARY KEY      DEFAULT uuid_generate_v4(),
+    name       VARCHAR(255) NOT NULL UNIQUE,
+    created_at TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ  NOT NULL DEFAULT now()
 );
 
 -- Create indexes for role table
 CREATE INDEX role_created_at_index ON role (created_at);
 CREATE INDEX role_updated_at_index ON role (updated_at);
+
+CREATE TABLE permission (
+    id          UUID PRIMARY KEY    DEFAULT uuid_generate_v4(),
+    "right"     USER_RIGHT NOT NULL,
+    component   COMPONENT  NOT NULL,
+    language_id VARCHAR(3) REFERENCES language (id),
+    created_at  TIMESTAMP  NOT NULL DEFAULT now(),
+    CONSTRAINT right_component_language_index UNIQUE ("right", component, language_id)
+);
+
+-- Create indexes for permission table
+CREATE INDEX permission_created_at_index ON role (created_at);
+
+CREATE TABLE role_permission (
+    permission_id UUID REFERENCES permission (id),
+    role_id       UUID REFERENCES role (id),
+    created_at    TIMESTAMP NOT NULL DEFAULT now(),
+    PRIMARY KEY (permission_id, role_id)
+);
+
+-- Create indexes for role_permission table
+CREATE INDEX role_permission_created_at_index ON role (created_at);
 
 -- Create user_role join table
 CREATE TABLE user_role (
