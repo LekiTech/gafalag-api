@@ -38,46 +38,11 @@ public class ExpressionServiceV2 {
      * and pageable information.
      *
      * @param spelling The expression to search for.
-     * @param srcLang  The source language for the expression.
+     * @param expLang  The source language for the expression.
      * @param size     The limit of the suggestions.
      * @return A List of strings containing search suggestions.
      */
-    public List<String> searchSuggestions(String spelling, String srcLang, Long size) {
-        return expressionRepo.fuzzySearchSpellingsListBySpellingAndSrcLang(spelling, srcLang, size);
-    }
-
-    /**
-     * Finds expressions by spelling, source language, and destination language with fuzzy matching,
-     * and returns a Page of ExpressionResponseDto objects.
-     *
-     * @param spelling The spelling of the expression to search for.
-     * @param srcLang  The source language for the expression.
-     * @param distLang The destination language for the expression details.
-     * @param pageable The pageable information for the search results.
-     * @return A Page of ExpressionResponseDto objects containing expression details.
-     */
-    @Deprecated
-    @Transactional(readOnly = true)
-    public Page<ExpressionResponseDto> findExpressionsBySpellingAndSrcLang(String spelling,
-                                                                           String srcLang,
-                                                                           String distLang,
-                                                                           Pageable pageable) {
-        final Page<Expression> entities = expressionRepo
-                .fuzzySearchSExpressionsListBySpellingAndSrcLang(spelling, srcLang, pageable);
-
-        final List<ExpressionResponseDto> dtos = entities.stream().map(expression -> {
-            final List<ExpressionDetails> expressionDetails = expression.getExpressionDetails().stream()
-                    .map(expDetail -> {
-                        val filteredDefinitionDetailsByDistLang = expDetail.getDefinitionDetails()
-                                .stream().filter(
-                                        defDetail -> defDetail.getLanguage().getId().equals(distLang)
-                                ).toList();
-                        expDetail.setDefinitionDetails(filteredDefinitionDetailsByDistLang);
-                        return expDetail;
-                    }).toList();
-            return mapper.toDto(expression.getSpelling(), expressionDetails);
-        }).toList();
-
-        return new PageImpl<>(dtos, pageable, entities.getTotalElements());
+    public List<String> searchSuggestions(String spelling, String expLang, String defLang, Long size) {
+        return expressionRepo.fuzzySearchSpellingsListBySpellingAndExpLang(spelling, expLang, defLang, size);
     }
 }

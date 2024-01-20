@@ -20,33 +20,30 @@ public interface ExpressionRepositoryV2 extends JpaRepository<Expression, UUID> 
 
     List<Expression> findAllByLanguage(@NonNull Language language);
 
+    /*
+     * Filtering here not only on expression language but also on a definition language to get the actual suggestions that user would expect
+     * `EXISTS` subquery stops evaluating once it finds a match, rather than joining all matching rows, so we get better performance
+     */
     @Query(value = """
-            SELECT *
+            SELECT e.spelling
             FROM expression e
-            WHERE e.language_id = :srcLang
-            ORDER BY spelling <-> :spelling
-            """,
-            countQuery = """
-                    SELECT count(*)
-                    FROM expression e
-                    WHERE e.language_id = :srcLang
-                    """,
-            nativeQuery = true)
-    Page<Expression> fuzzySearchSExpressionsListBySpellingAndSrcLang(@NonNull @Param("spelling") String spelling,
-                                                                     @NonNull @Param("srcLang") String srcLang,
-                                                                     Pageable pageable);
-
-    @Query(value = """
-            SELECT spelling
-            FROM expression
-            WHERE language_id = :srcLang
-            ORDER BY spelling <-> :spelling
+            WHERE e.language_id = :expLang
+            AND EXISTS (
+               SELECT 1
+               FROM expression_match_details emd
+               JOIN expression_details ed ON emd.expression_details_id = ed.id
+               JOIN definition_details dd ON ed.id = dd.expression_details_id
+               WHERE emd.expression_id = e.id
+               AND dd.language_id = :defLang
+            )
+            ORDER BY e.spelling <-> :spelling
             LIMIT :size
             """,
             nativeQuery = true)
-    List<String> fuzzySearchSpellingsListBySpellingAndSrcLang(
+    List<String> fuzzySearchSpellingsListBySpellingAndExpLang(
             @NonNull @Param("spelling") String spelling,
-            @NonNull @Param("srcLang") String srcLang,
+            @NonNull @Param("expLang") String expLang,
+            @NonNull @Param("defLang") String defLang,
             Long size
     );
 
