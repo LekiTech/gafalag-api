@@ -44,7 +44,7 @@ public class Definition {
 
     // - relations
 
-    @OneToMany(mappedBy = "definition", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "definition", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private List<DefinitionTag> definitionTags = new ArrayList<>();
 
     public Definition(String value,
