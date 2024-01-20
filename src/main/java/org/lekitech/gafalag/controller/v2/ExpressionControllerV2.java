@@ -42,9 +42,10 @@ public class ExpressionControllerV2 {
     public ResponseEntity<List<String>> searchSuggestions(
             @RequestParam(name = "spelling") String spelling,
             @RequestParam(name = "expLang") String expLang,
+            @RequestParam(name = "defLang") String defLang,
             @RequestParam(name = "size") Long size) {
         try {
-            final List<String> suggestions = expService.searchSuggestions(spelling, expLang, size);
+            final List<String> suggestions = expService.searchSuggestions(spelling, expLang, defLang, size);
             return ResponseEntity.ok(suggestions);
         } catch (Exception e) {
             log.error("Error occurred while retrieving search suggestions: {}", e.getMessage(), e);
