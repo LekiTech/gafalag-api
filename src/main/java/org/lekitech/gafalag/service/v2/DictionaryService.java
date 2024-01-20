@@ -1,5 +1,6 @@
 package org.lekitech.gafalag.service.v2;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.lekitech.gafalag.dto.v2.DefinitionDetailsDto;
 import org.lekitech.gafalag.dto.v2.DefinitionDto;
@@ -17,7 +18,6 @@ import org.lekitech.gafalag.entity.v2.ExampleTag;
 import org.lekitech.gafalag.entity.v2.Expression;
 import org.lekitech.gafalag.entity.v2.ExpressionDetails;
 import org.lekitech.gafalag.entity.v2.ExpressionExample;
-import org.lekitech.gafalag.entity.v2.ExpressionMatchDetails;
 import org.lekitech.gafalag.entity.v2.Language;
 import org.lekitech.gafalag.entity.v2.Source;
 import org.lekitech.gafalag.entity.v2.Tag;
@@ -33,13 +33,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class DictionaryService {
 
     private final ExpressionRepositoryV2 expressionRepositoryV2;
@@ -48,20 +51,6 @@ public class DictionaryService {
     private final SourceRepositoryV2 sourceRepositoryV2;
     private final LanguageRepositoryV2 languageRepositoryV2;
     private final TagRepository tagRepositoryV2;
-
-    public DictionaryService(ExpressionRepositoryV2 expressionRepositoryV2,
-                             ExpressionDetailsRepositoryV2 expressionDetailsRepositoryV2,
-                             WrittenSourceRepository writtenSourceRepository,
-                             SourceRepositoryV2 sourceRepositoryV2,
-                             LanguageRepositoryV2 languageRepositoryV2,
-                             TagRepository tagRepositoryV2) {
-        this.expressionRepositoryV2 = expressionRepositoryV2;
-        this.expressionDetailsRepositoryV2 = expressionDetailsRepositoryV2;
-        this.writtenSourceRepository = writtenSourceRepository;
-        this.sourceRepositoryV2 = sourceRepositoryV2;
-        this.languageRepositoryV2 = languageRepositoryV2;
-        this.tagRepositoryV2 = tagRepositoryV2;
-    }
 
     @Transactional
     public void saveDictionary(DictionaryDto dto) {
@@ -145,9 +134,10 @@ public class DictionaryService {
                     source
             );
 
-            if (expressionDetailsDto.examples().isPresent()) {
+            final List<ExampleDto> examples = expressionDetailsDto.examples();
+            if (examples != null && !examples.isEmpty()) {
                 final List<ExpressionExample> expressionExampleEntities = createExpressionExampleList(
-                        expressionDetailsDto.examples().get(), expressionDetailsEntity, expLang, defLang
+                        examples, expressionDetailsEntity, expLang, defLang
                 );
                 expressionDetailsEntity.addExpressionExamples(expressionExampleEntities);
             }
@@ -161,10 +151,8 @@ public class DictionaryService {
             }
 
             expressionDetailsEntity.addDefinitionDetails(definitionDetailsEntities);
-            expressionDetailsEntity.getExpressionMatchDetails().add(
-                    new ExpressionMatchDetails(expressionEntity, expressionDetailsEntity)
-            );
             expressionDetailsEntities.add(expressionDetailsEntity);
+            expressionEntity.getExpressionDetails().add(expressionDetailsEntity);
         }
         return expressionDetailsEntities;
     }
@@ -177,9 +165,10 @@ public class DictionaryService {
         final List<Definition> definitionEntities = createDefinitionList(defDetail, definitionDetailEntity);
         definitionDetailEntity.addDefinitions(definitionEntities);
 
-        if (defDetail.examples().isPresent()) {
+        final List<ExampleDto> examples = defDetail.examples();
+        if (examples != null && !examples.isEmpty()) {
             final List<DefinitionExample> definitionExampleList = createDefinitionExampleList(
-                    defDetail.examples().get(),
+                    examples,
                     definitionDetailEntity,
                     expLang,
                     defLang
@@ -187,9 +176,10 @@ public class DictionaryService {
             definitionDetailEntity.addDefinitionExamples(definitionExampleList);
         }
 
-        if (defDetail.tags().isPresent()) {
+        final List<String> tags = defDetail.tags();
+        if (tags != null && !tags.isEmpty()) {
             final List<DefinitionDetailsTag> definitionDetailsTagEntities = createDefinitionDetailsTags(
-                    defDetail.tags().get(),
+                    tags,
                     definitionDetailEntity
             );
             definitionDetailEntity.addDefinitionDetailsTags(definitionDetailsTagEntities);
@@ -265,9 +255,10 @@ public class DictionaryService {
                 defLang,
                 exampleDto.raw()
         );
-        if (exampleDto.tags().isPresent()) {
+        final List<String> tags = exampleDto.tags();
+        if (tags != null && !tags.isEmpty()) {
             final List<ExampleTag> exampleTagEntities = createExampleTags(
-                    exampleDto.tags().get(),
+                    tags,
                     exampleEntity
             );
             exampleEntity.addExampleTags(exampleTagEntities);
@@ -299,9 +290,10 @@ public class DictionaryService {
                     definition.value(),
                     definitionDetailEntity
             );
-            if (definition.tags().isPresent()) {
+            final List<String> tags = definition.tags();
+            if (tags != null && !tags.isEmpty()) {
                 final List<DefinitionTag> definitionTagList = createDefinitionTagList(
-                        definition.tags().get(),
+                        tags,
                         definitionEntity
                 );
                 definitionEntity.addDefinitionTags(definitionTagList);
@@ -313,7 +305,7 @@ public class DictionaryService {
 
     private List<DefinitionTag> createDefinitionTagList(List<String> definitionTags,
                                                         Definition definitionEntity) {
-        final List<DefinitionTag> definitionTagEntities = new ArrayList<>();
+        final Set<DefinitionTag> definitionTagEntities = new HashSet<>();
 
         for (final String definitionTag : definitionTags) {
             final Tag tagEntity = getOrCreateTag(definitionTag);
@@ -323,7 +315,7 @@ public class DictionaryService {
             );
             definitionTagEntities.add(definitionTagEntity);
         }
-        return definitionTagEntities;
+        return definitionTagEntities.stream().toList();
     }
 
     private Tag getOrCreateTag(String tagAbbreviation) {
