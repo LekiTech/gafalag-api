@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.lekitech.gafalag.dto.v2.ExpressionAndSimilar;
+import org.lekitech.gafalag.dto.v2.ExpressionResponseDto;
 import org.lekitech.gafalag.dto.v2.SimilarDto;
 import org.lekitech.gafalag.dto.v2.mapper.DictionaryMapper;
 import org.lekitech.gafalag.entity.v2.Expression;
@@ -61,10 +62,9 @@ public class ExpressionServiceV2 {
                         expDetails.setDefinitionDetails(filteredDefinitionDetails);
                         return expDetails;
                     }).toList();
-            return new ExpressionAndSimilar(
-                    mapper.toDto(expression.getSpelling(), expressionDetails),
-                    searchSuggestions(expression.getSpelling(), expression.getLanguage().getId(), defLang, size)
-            );
+            final ExpressionResponseDto expressionResponseDto = mapper.toDto(expression.getSpelling(), expressionDetails);
+            final List<SimilarDto> similarDtos = searchSuggestions(expression.getSpelling(), expression.getLanguage().getId(), defLang, size);
+            return new ExpressionAndSimilar(expressionResponseDto, similarDtos);
         } else {
             throw new IllegalArgumentException();
         }
