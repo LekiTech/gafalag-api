@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class SourceService {
 
     private final SourceRepository sourceRepository;

@@ -2,15 +2,14 @@ package org.lekitech.gafalag.controller.v2;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.lekitech.gafalag.dto.v2.ExpressionAndSuggestions;
 import org.lekitech.gafalag.service.v2.ExpressionServiceV2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * The `ExpressionControllerV2` class serves as the controller for managing and handling
@@ -52,6 +51,22 @@ public class ExpressionControllerV2 {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body(List.of());
+        }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getExpressionByIdAndSuggestions(
+            @PathVariable UUID id,
+            @RequestParam(name = "defLang") String defLang,
+            @RequestParam(name = "size", defaultValue = "10") Long size) {
+        try {
+            final ExpressionAndSuggestions expAndSuggestions = expService.getExpressionByIdAndSuggestions(id, defLang, size);
+            return ResponseEntity.ok(expAndSuggestions);
+        } catch (Exception e) {
+            log.error("Error occurred while retrieving search suggestions: {}", e.getMessage(), e);
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .build();
         }
     }
 }

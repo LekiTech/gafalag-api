@@ -20,7 +20,7 @@ import java.util.*;
 @Slf4j
 @Service
 @Transactional
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class ExpressionService {
 
     private final ExpressionRepository repository;
