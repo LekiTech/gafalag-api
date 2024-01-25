@@ -2,7 +2,8 @@ package org.lekitech.gafalag.controller.v2;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.lekitech.gafalag.dto.v2.ExpressionAndSuggestions;
+import org.lekitech.gafalag.dto.v2.ExpressionAndSimilar;
+import org.lekitech.gafalag.dto.v2.SimilarDto;
 import org.lekitech.gafalag.service.v2.ExpressionServiceV2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,13 +39,13 @@ public class ExpressionControllerV2 {
      * @return A ResponseEntity containing a List of search suggestions as strings.
      */
     @GetMapping(path = "/search/suggestions")
-    public ResponseEntity<List<String>> searchSuggestions(
+    public ResponseEntity<List<SimilarDto>> searchSuggestions(
             @RequestParam(name = "spelling") String spelling,
             @RequestParam(name = "expLang") String expLang,
             @RequestParam(name = "defLang") String defLang,
             @RequestParam(name = "size") Long size) {
         try {
-            final List<String> suggestions = expService.searchSuggestions(spelling, expLang, defLang, size);
+            final List<SimilarDto> suggestions = expService.searchSuggestions(spelling, expLang, defLang, size);
             return ResponseEntity.ok(suggestions);
         } catch (Exception e) {
             log.error("Error occurred while retrieving search suggestions: {}", e.getMessage(), e);
@@ -60,10 +61,10 @@ public class ExpressionControllerV2 {
             @RequestParam(name = "defLang") String defLang,
             @RequestParam(name = "size", defaultValue = "10") Long size) {
         try {
-            final ExpressionAndSuggestions expAndSuggestions = expService.getExpressionByIdAndSuggestions(id, defLang, size);
+            final ExpressionAndSimilar expAndSuggestions = expService.getExpressionByIdAndSuggestions(id, defLang, size);
             return ResponseEntity.ok(expAndSuggestions);
         } catch (Exception e) {
-            log.error("Error occurred while retrieving search suggestions: {}", e.getMessage(), e);
+            log.error("Error occurred while retrieving search expression and suggestions: {}", e.getMessage(), e);
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
                     .build();

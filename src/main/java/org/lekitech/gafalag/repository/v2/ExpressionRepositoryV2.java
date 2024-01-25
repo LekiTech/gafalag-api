@@ -25,7 +25,7 @@ public interface ExpressionRepositoryV2 extends JpaRepository<Expression, UUID> 
      * `EXISTS` subquery stops evaluating once it finds a match, rather than joining all matching rows, so we get better performance
      */
     @Query(value = """
-            SELECT e.spelling
+            SELECT e.id, e.spelling
             FROM expression e
             WHERE e.language_id = :expLang
             AND EXISTS (
@@ -40,7 +40,7 @@ public interface ExpressionRepositoryV2 extends JpaRepository<Expression, UUID> 
             LIMIT :size
             """,
             nativeQuery = true)
-    List<String> fuzzySearchSpellingsListBySpellingAndExpLang(
+    List<Expression> fuzzySearchSpellingsListBySpellingAndExpLang(
             @NonNull @Param("spelling") String spelling,
             @NonNull @Param("expLang") String expLang,
             @NonNull @Param("defLang") String defLang,
