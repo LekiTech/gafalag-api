@@ -56,15 +56,15 @@ public class ExpressionControllerV2 {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getExpressionByIdAndSuggestions(
+    public ResponseEntity<ExpressionAndSimilar> getExpressionByIdAndSimilar(
             @PathVariable UUID id,
             @RequestParam(name = "defLang") String defLang,
             @RequestParam(name = "size", defaultValue = "10") Long size) {
         try {
-            final ExpressionAndSimilar expAndSuggestions = expService.getExpressionByIdAndSuggestions(id, defLang, size);
-            return ResponseEntity.ok(expAndSuggestions);
+            final ExpressionAndSimilar expAndSimilar = expService.getExpressionByIdAndSimilar(id, defLang, size);
+            return ResponseEntity.ok(expAndSimilar);
         } catch (Exception e) {
-            log.error("Error occurred while retrieving search expression and suggestions: {}", e.getMessage(), e);
+            log.error("Error occurred while retrieving search expression and similar: {}", e.getMessage(), e);
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
                     .build();

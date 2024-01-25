@@ -10,6 +10,7 @@ import org.lekitech.gafalag.entity.v2.Expression;
 import org.lekitech.gafalag.entity.v2.ExpressionDetails;
 import org.lekitech.gafalag.repository.v2.ExpressionRepositoryV2;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -47,7 +48,8 @@ public class ExpressionServiceV2 {
         return mapper.toDto(expressions);
     }
 
-    public ExpressionAndSimilar getExpressionByIdAndSuggestions(UUID id, String defLang, Long size) {
+    @Transactional
+    public ExpressionAndSimilar getExpressionByIdAndSimilar(UUID id, String defLang, Long size) {
         final Optional<Expression> expOptional = expressionRepo.findById(id);
         if (expOptional.isPresent()) {
             final Expression expression = expOptional.get();
