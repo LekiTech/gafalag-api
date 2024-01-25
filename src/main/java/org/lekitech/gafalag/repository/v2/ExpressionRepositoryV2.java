@@ -25,7 +25,7 @@ public interface ExpressionRepositoryV2 extends JpaRepository<Expression, UUID> 
      * `EXISTS` subquery stops evaluating once it finds a match, rather than joining all matching rows, so we get better performance
      */
     @Query(value = """
-            SELECT e.id, e.spelling
+            SELECT *
             FROM expression e
             WHERE e.language_id = :expLang
             AND EXISTS (
