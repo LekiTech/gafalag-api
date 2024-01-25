@@ -1,4 +1,4 @@
-package org.lekitech.gafalag.util;
+package org.lekitech.gafalag.utils;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

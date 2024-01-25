@@ -5,11 +5,12 @@ import org.lekitech.gafalag.dto.security.LoginResponseDto;
 import org.lekitech.gafalag.dto.security.UserDto;
 import org.lekitech.gafalag.dto.security.mapper.SecurityMapper;
 import org.lekitech.gafalag.entity.v2.Language;
+import org.lekitech.gafalag.entity.v2.security.Permission;
 import org.lekitech.gafalag.entity.v2.security.Role;
 import org.lekitech.gafalag.entity.v2.security.User;
 import org.lekitech.gafalag.exception.security.UserAlreadyExistsException;
 import org.lekitech.gafalag.repository.v2.LanguageRepositoryV2;
-import org.lekitech.gafalag.repository.v2.security.RoleRepository;
+import org.lekitech.gafalag.repository.v2.security.PermissionRepository;
 import org.lekitech.gafalag.repository.v2.security.UserRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -35,15 +36,15 @@ import java.util.Set;
 public class AuthenticationService {
 
     private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
+    private final PermissionRepository permissionRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final TokenService tokenService;
     private final LanguageRepositoryV2 languageRepositoryV2;
     private final SecurityMapper securityMapper;
 
-    public static final String INITIAL_AUTHORITY = "USER";
-    public static final Role.Permission INITIAL_PERMISSION = Role.Permission.VIEW;
+    public static final Permission.Right INITIAL_RIGHT = Permission.Right.READ;
+    public static final Permission.Component INITIAL_COMPONENT = Permission.Component.EXPRESSION;
 
     /**
      * Registers a new user in the system with the provided details.
@@ -58,6 +59,7 @@ public class AuthenticationService {
      */
     public UserDto registerUser(String firstName,
                                 String lastName,
+                                String lang,
                                 String email,
                                 String password) {
         if (userRepository.existsByEmail(email)) {
@@ -66,10 +68,11 @@ public class AuthenticationService {
 
         try {
             final String encodedPassword = passwordEncoder.encode(password);
-            final Language language = languageRepositoryV2
-                    .getById("lez"); //TODO urgently need to resolve
 
-            final Role userRole = getOrCreate(INITIAL_AUTHORITY, language, INITIAL_PERMISSION);
+            final Language language = languageRepositoryV2.getById(lang);
+            final Permission rolePermission = getOrCreate(INITIAL_RIGHT, INITIAL_COMPONENT, language);
+            final Role userRole = new Role();
+            userRole.getPermissions().add(rolePermission);
 
             final Set<Role> authorities = new HashSet<>();
             authorities.add(userRole);
@@ -111,17 +114,9 @@ public class AuthenticationService {
     }
 
 
-    /**
-     * Retrieves an existing role or creates a new one based on the given parameters.
-     *
-     * @param authority  The name of the authority.
-     * @param lang       The language associated with the role.
-     * @param permission The permission associated with the role.
-     * @return A Role entity.
-     */
-    private Role getOrCreate(String authority, Language lang, Role.Permission permission) {
-        final Optional<Role> optional = roleRepository.findByAuthorityAndLanguage(authority, lang);
-        return optional.orElseGet(() -> roleRepository.save(new Role(authority, lang, permission)));
+    private Permission getOrCreate(Permission.Right right, Permission.Component component, Language lang) {
+        final Optional<Permission> optional = permissionRepository.findByRightAndComponentAndLanguage(right, component, lang);
+        return optional.orElseGet(() -> permissionRepository.save(new Permission(right, component, lang)));
     }
 
 }

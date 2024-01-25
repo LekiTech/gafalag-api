@@ -1,4 +1,4 @@
-package org.lekitech.gafalag.util;
+package org.lekitech.gafalag.utils;
 
 import lombok.extern.slf4j.Slf4j;
 

@@ -5,22 +5,22 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.lekitech.gafalag.entity.v2.Language;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.OneToOne;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import java.sql.Timestamp;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -37,24 +37,23 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @Table(name = "role")
-@EqualsAndHashCode(of = {"id", "authority", "language"})
+@EqualsAndHashCode(of = {"id", "name", "permissions"})
 public class Role implements GrantedAuthority {
 
     @Id
     @GeneratedValue
     private UUID id;
 
-    @Column(name = "authority", unique = true)
-    private String authority;
+    @Column(name = "name", unique = true)
+    private String name;
 
-    /**
-     * Enum representing the permission level of the role.
-     * Available permissions include EDIT and VIEW.
-     */
-    @Enumerated(EnumType.STRING)
-    @Type(type = "org.lekitech.gafalag.entity.v2.typemapping.EnumTypePostgreSql")
-    @Column(name = "permission")
-    private Permission permission;
+    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "role_permission",
+            joinColumns = @JoinColumn(name = "role_id"),
+            inverseJoinColumns = @JoinColumn(name = "permission_id")
+    )
+    private Set<Permission> permissions;
 
     @CreationTimestamp
     @Column(name = "created_at")
@@ -64,37 +63,9 @@ public class Role implements GrantedAuthority {
     @Column(name = "updated_at")
     private Timestamp updatedAt;
 
-    /**
-     * Represents the language associated with the role.
-     */
-    @OneToOne(fetch = FetchType.LAZY)
-    private Language language;
-
-    /**
-     * Constructs a new Role with specified details.
-     *
-     * @param authority  Unique name representing the role.
-     * @param language   Language associated with the role.
-     * @param permission Permission level of the role.
-     */
-    public Role(String authority, Language language, Permission permission) {
-        this.authority = authority;
-        this.language = language;
-        this.permission = permission;
-    }
-
-    /**
-     * Enum type for defining role permissions.
-     * EDIT allows for editing capabilities, while VIEW is more restrictive.
-     */
-    public enum Permission {
-        EDIT,
-        VIEW
-    }
-
     @Override
     public String getAuthority() {
-        return authority;
+        return name;
     }
 
 }
