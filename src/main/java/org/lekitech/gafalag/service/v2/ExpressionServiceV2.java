@@ -55,10 +55,10 @@ public class ExpressionServiceV2 {
             final Expression expression = expOptional.get();
             final List<ExpressionDetails> expressionDetails = expression.getExpressionDetails()
                     .stream().map(expDetails -> {
-                        val defDetails = expDetails.getDefinitionDetails().stream().filter(
+                        val filteredDefinitionDetails = expDetails.getDefinitionDetails().stream().filter(
                                 definitionDetails -> definitionDetails.getLanguage().getId().equals(defLang)
                         ).toList();
-                        expDetails.setDefinitionDetails(defDetails);
+                        expDetails.setDefinitionDetails(filteredDefinitionDetails);
                         return expDetails;
                     }).toList();
             return new ExpressionAndSimilar(
