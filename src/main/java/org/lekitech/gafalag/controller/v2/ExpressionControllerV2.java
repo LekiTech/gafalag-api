@@ -57,7 +57,7 @@ public class ExpressionControllerV2 {
 
     @GetMapping("/{id}")
     public ResponseEntity<ExpressionAndSimilar> getExpressionByIdAndSimilar(
-            @PathVariable UUID id,
+            @PathVariable(name = "id") UUID id,
             @RequestParam(name = "defLang") String defLang,
             @RequestParam(name = "size", defaultValue = "10") Long size) {
         try {
@@ -65,9 +65,7 @@ public class ExpressionControllerV2 {
             return ResponseEntity.ok(expAndSimilar);
         } catch (Exception e) {
             log.error("Error occurred while retrieving search expression and similar: {}", e.getMessage(), e);
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .build();
+            return ResponseEntity.notFound().build();
         }
     }
 }
