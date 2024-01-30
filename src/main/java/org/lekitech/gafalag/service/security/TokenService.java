@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -31,7 +30,7 @@ public class TokenService {
     /**
      * Generates a JWT token for the given authentication object.
      *
-     * @param auth The Authentication object containing the user's details and authorities.
+     * @param auth The Authentication object containing the user's details and roles.
      * @return A JWT token as a String.
      * @throws JwtException if there is an error during the token generation process.
      */

@@ -1,8 +1,9 @@
 package org.lekitech.gafalag.controller.security;
 
 import lombok.RequiredArgsConstructor;
-import org.lekitech.gafalag.dto.security.LoginResponseDto;
-import org.lekitech.gafalag.dto.security.UserDto;
+import org.lekitech.gafalag.dto.security.AuthResponseDto;
+import org.lekitech.gafalag.dto.security.UserLoginDto;
+import org.lekitech.gafalag.dto.security.UserRegisterDto;
 import org.lekitech.gafalag.service.security.AuthenticationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,38 +29,32 @@ public class AuthenticationController {
     private final AuthenticationService authenticationService;
 
     /**
-     * Registers a new user into the system.
+     * Endpoint for registering a new user.
      *
-     * <p>This method accepts a {@link UserDto} object containing user details,
-     * registers the user, and returns the created user data.
-     * The user's password is encrypted before storing in the database.</p>
-     *
-     * @param dto Data Transfer Object containing user registration information.
-     * @return A {@link ResponseEntity} containing the registered {@link UserDto}
-     * with a status of {@link HttpStatus#CREATED}.
+     * @param registerDto The {@link UserRegisterDto} containing user registration information.
+     * @return A {@link ResponseEntity} with an {@link AuthResponseDto} representing the registered user.
      */
     @PostMapping("/register")
-    public ResponseEntity<UserDto> registerUser(@RequestBody UserDto dto) {
-        final UserDto registeredUser = authenticationService
-                .registerUser(dto.firstName(), dto.lastName(), dto.email(), dto.password());
+    public ResponseEntity<AuthResponseDto> registerUser(@RequestBody UserRegisterDto registerDto) {
+        final AuthResponseDto registeredUser = authenticationService.registerUser(
+                registerDto.firstName(),
+                registerDto.lastName(),
+                registerDto.email(),
+                registerDto.password()
+        );
         return ResponseEntity.status(HttpStatus.CREATED).body(registeredUser);
     }
 
     /**
-     * Authenticates a user and generates a login token.
+     * Endpoint for user login.
      *
-     * <p>This method accepts a {@link UserDto} object containing user login credentials,
-     * authenticates the user, and returns a {@link LoginResponseDto} containing
-     * a JWT token and user details.</p>
-     *
-     * @param dto Data Transfer Object containing user login credentials.
-     * @return A {@link ResponseEntity} containing the {@link LoginResponseDto}
-     * with an authentication token and a status of {@link HttpStatus#OK}.
+     * @param loginDto The {@link UserLoginDto} containing user login information.
+     * @return A {@link ResponseEntity} with an {@link AuthResponseDto} representing the authenticated user.
      */
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDto> loginUser(@RequestBody UserDto dto) {
-        final LoginResponseDto response = authenticationService
-                .loginUser(dto.email(), dto.password());
+    public ResponseEntity<AuthResponseDto> loginUser(@RequestBody UserLoginDto loginDto) {
+        final AuthResponseDto response = authenticationService
+                .loginUser(loginDto.email(), loginDto.password());
         return ResponseEntity.ok(response);
     }
 }

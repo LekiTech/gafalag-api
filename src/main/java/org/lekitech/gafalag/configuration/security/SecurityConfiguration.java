@@ -79,9 +79,7 @@ public class SecurityConfiguration {
         httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> {
-                    auth.regexMatchers("/auth/.*").permitAll();
-                    auth.regexMatchers("/admin/.*").hasRole("ADMIN");
-                    auth.regexMatchers("/user/.*").hasAnyRole("ADMIN", "USER");
+                    auth.regexMatchers(".*").permitAll();
                     auth.anyRequest().authenticated();
                 });
 
@@ -119,8 +117,8 @@ public class SecurityConfiguration {
     }
 
     /**
-     * Configures a {@link JwtAuthenticationConverter} for extracting user authorities from JWT claims.
-     * Sets up a {@link JwtGrantedAuthoritiesConverter} to map 'roles' claims to authorities, prefixing them with 'ROLE_'.
+     * Configures a {@link JwtAuthenticationConverter} for extracting user roles from JWT claims.
+     * Sets up a {@link JwtGrantedAuthoritiesConverter} to map 'roles' claims to roles, prefixing them with 'ROLE_'.
      *
      * @return A configured JwtAuthenticationConverter.
      */

@@ -26,9 +26,9 @@ import java.util.UUID;
 /**
  * Entity representing a role in the security context of the application.
  * This class implements {@link GrantedAuthority} from Spring Security, enabling it
- * to represent an authority granted to a {@link UserDetails}.
+ * to represent a name granted to a {@link UserDetails}.
  *
- * <p>A role is characterized by its unique authority, associated language, and permissions.</p>
+ * <p>A role is characterized by its unique name, associated language, and permissions.</p>
  *
  * @see GrantedAuthority
  */

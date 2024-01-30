@@ -5,39 +5,29 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * Data Transfer Object (DTO) for User entity.
- * This DTO is used for transferring user data across different layers of the application,
- * particularly between the service layer and the API endpoints.
+ * Data Transfer Object (DTO) for representing user information.
+ * This DTO encapsulates details about a user, including their unique identifier, name, email,
+ * verification status, associated roles, and timestamps indicating creation and last update.
  *
- * <p>It encapsulates user-related information such as personal details, authentication data,
- * and assigned roles or authorities.</p>
+ * <p>It is commonly used to transfer user-related data between different layers of an application,
+ * such as between the frontend and backend or within different services.</p>
  *
- * @param id                    Unique identifier of the user.
- * @param firstName             First name of the user.
- * @param lastName              Last name of the user.
- * @param email                 Email address of the user, used as the primary identifier for login.
- * @param password              Encrypted password of the user.
- * @param verified              Boolean flag indicating whether the user's email is verified.
- * @param authorities           Set of roles or authorities assigned to the user.
- * @param createdAt             Timestamp when the user was created.
- * @param updatedAt             Timestamp when the user was last updated.
- * @param enabled               Boolean flag indicating whether the user account is enabled.
- * @param accountNonExpired     Boolean flag indicating whether the user account is non-expired.
- * @param accountNonLocked      Boolean flag indicating whether the user account is non-locked.
- * @param credentialsNonExpired Boolean flag indicating whether the user's credentials are non-expired.
+ * @param id        The unique identifier (UUID) of the user.
+ * @param firstName The first name of the user.
+ * @param lastName  The last name of the user.
+ * @param email     The email address of the user.
+ * @param verified  A boolean indicating whether the user's email has been verified.
+ * @param roles     A set of {@link RoleDto} objects representing the roles associated with the user.
+ * @param createdAt A timestamp indicating when the user was created.
+ * @param updatedAt A timestamp indicating when the user was last updated.
  */
 public record UserDto(
         UUID id,
         String firstName,
         String lastName,
         String email,
-        String password,
         Boolean verified,
-        Set<RoleDto> authorities,
+        Set<RoleDto> roles,
         Timestamp createdAt,
-        Timestamp updatedAt,
-        Boolean enabled,
-        Boolean accountNonExpired,
-        Boolean accountNonLocked,
-        Boolean credentialsNonExpired
+        Timestamp updatedAt
 ) { }

@@ -1,22 +1,23 @@
 package org.lekitech.gafalag.dto.security;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
- * Data Transfer Object (DTO) for the Role entity.
- * This DTO is utilized to transfer role-related data between different layers of the application,
- * especially between the service layer and the controllers.
+ * Data Transfer Object (DTO) for representing roles.
+ * This DTO encapsulates information about a role, such as its unique identifier, name, and a list
+ * of associated permissions.
  *
- * <p>It encapsulates details about a role, including its authority, permission level, and associated language.</p>
+ * <p>Roles are often used in the context of role-based access control (RBAC) to define sets of
+ * permissions or rights that are granted to users or entities within an application.</p>
  *
- * @param id         The unique identifier of the role.
- * @param authority  The name representing the role, typically used for identifying the role in security contexts.
- * @param permission The level of permission granted by this role, such as 'EDIT' or 'VIEW'.
- * @param language   The identifier of the language associated with this role, indicating the scope or context where the role is applicable.
+ * @param id          The unique identifier (UUID) of the role.
+ * @param name        The name or title of the role.
+ * @param permissions A list of {@link PermissionDto} objects representing the permissions
+ *                    associated with the role.
  */
 public record RoleDto(
         UUID id,
-        String authority,
-        String permission,
-        String language
+        String name,
+        List<PermissionDto> permissions
 ) { }

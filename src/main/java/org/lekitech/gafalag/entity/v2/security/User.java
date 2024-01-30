@@ -19,6 +19,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import java.sql.Timestamp;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -27,7 +28,7 @@ import java.util.UUID;
  * This class implements {@link UserDetails} from Spring Security to integrate with
  * the authentication and authorization mechanisms.
  *
- * <p>It includes information like the user's name, email, password, and roles (authorities),
+ * <p>It includes information like the user's name, email, password, and roles (roles),
  * as well as timestamps for creation and updates.</p>
  *
  * @see UserDetails
@@ -75,7 +76,7 @@ public class User implements UserDetails {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    private Set<Role> authorities;
+    private Set<Role> authorities = new HashSet<>();
 
     /**
      * Constructs a new User with specified details.
@@ -84,18 +85,15 @@ public class User implements UserDetails {
      * @param lastName    Last name of the user.
      * @param email       Email of the user, used as the username in the authentication process.
      * @param password    Password of the user for authentication.
-     * @param authorities Set of roles or authorities assigned to the user.
      */
     public User(String firstName,
                 String lastName,
                 String email,
-                String password,
-                Set<Role> authorities) {
+                String password) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.password = password;
-        this.authorities = authorities;
         this.verified = false;
     }
 
