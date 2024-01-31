@@ -54,17 +54,8 @@ public class ExpressionServiceV2 {
         final Optional<Expression> expOptional = expressionRepo.findById(id);
         if (expOptional.isPresent()) {
             final Expression expression = expOptional.get();
-            final List<ExpressionDetails> expressionDetails = expression.getExpressionDetails()
-                    .stream().map(expDetails -> {
-                        val filteredDefinitionDetails = expDetails.getDefinitionDetails().stream().filter(
-                                definitionDetails -> definitionDetails.getLanguage().getId().equals(defLang)
-                        ).toList();
-                        expDetails.setDefinitionDetails(filteredDefinitionDetails);
-                        return expDetails;
-                    }).toList();
-            final ExpressionResponseDto expressionResponseDto = mapper.toDto(expression.getSpelling(), expressionDetails);
             final List<SimilarDto> similarDtos = searchSuggestions(expression.getSpelling(), expression.getLanguage().getId(), defLang, size);
-            return new ExpressionAndSimilar(expressionResponseDto, similarDtos);
+            return new ExpressionAndSimilar(getExpressionResponseDto(defLang, expression), similarDtos);
         } else {
             throw new IllegalArgumentException();
         }
@@ -75,18 +66,21 @@ public class ExpressionServiceV2 {
         final Optional<Expression> expOptional = expressionRepo.findExpressionBySpellingAndLanguageAndDefLanguage(spelling, expLang, defLang);
         if (expOptional.isPresent()) {
             final Expression expression = expOptional.get();
-            final List<ExpressionDetails> expressionDetails = expression.getExpressionDetails()
-                    .stream().map(expDetails -> {
-                        val filteredDefinitionDetails = expDetails.getDefinitionDetails().stream().filter(
-                                definitionDetails -> definitionDetails.getLanguage().getId().equals(defLang)
-                        ).toList();
-                        expDetails.setDefinitionDetails(filteredDefinitionDetails);
-                        return expDetails;
-                    }).toList();
-            final ExpressionResponseDto expressionResponseDto = mapper.toDto(expression.getSpelling(), expressionDetails);
-            return expressionResponseDto;
+            return getExpressionResponseDto(defLang, expression);
         } else {
             throw new IllegalArgumentException();
         }
+    }
+
+    private ExpressionResponseDto getExpressionResponseDto(String defLang, Expression expression) {
+        final List<ExpressionDetails> expressionDetails = expression.getExpressionDetails()
+                .stream().map(expDetails -> {
+                    val filteredDefinitionDetails = expDetails.getDefinitionDetails().stream().filter(
+                            definitionDetails -> definitionDetails.getLanguage().getId().equals(defLang)
+                    ).toList();
+                    expDetails.setDefinitionDetails(filteredDefinitionDetails);
+                    return expDetails;
+                }).toList();
+        return mapper.toDto(expression.getSpelling(), expressionDetails);
     }
 }
