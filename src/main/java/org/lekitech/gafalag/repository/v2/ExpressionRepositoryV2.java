@@ -44,7 +44,8 @@ public interface ExpressionRepositoryV2 extends JpaRepository<Expression, UUID> 
             @NonNull @Param("spelling") String spelling,
             @NonNull @Param("expLang") String expLang,
             @NonNull @Param("defLang") String defLang,
-            Long size
+            Integer size
     );
 
+    Expression findExpressionBySpellingAndLanguageId(String spelling, String defLang);
 }

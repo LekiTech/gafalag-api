@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.Max;
 import java.util.List;
 import java.util.UUID;
 
@@ -43,7 +44,7 @@ public class ExpressionControllerV2 {
             @RequestParam(name = "spelling") String spelling,
             @RequestParam(name = "expLang") String expLang,
             @RequestParam(name = "defLang") String defLang,
-            @RequestParam(name = "size") Long size) {
+            @RequestParam(name = "size") Integer size) {
         try {
             final List<SimilarDto> suggestions = expService.searchSuggestions(spelling, expLang, defLang, size);
             return ResponseEntity.ok(suggestions);
@@ -59,7 +60,7 @@ public class ExpressionControllerV2 {
     public ResponseEntity<ExpressionAndSimilar> getExpressionByIdAndSimilar(
             @PathVariable(name = "id") UUID id,
             @RequestParam(name = "defLang") String defLang,
-            @RequestParam(name = "size", defaultValue = "10") Long size) {
+            @RequestParam(name = "similarCount", defaultValue = "10") @Max(50) Integer size) {
         try {
             final ExpressionAndSimilar expAndSimilar = expService.getExpressionByIdAndSimilar(id, defLang, size);
             return ResponseEntity.ok(expAndSimilar);

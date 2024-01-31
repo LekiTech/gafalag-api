@@ -43,16 +43,17 @@ public class ExpressionServiceV2 {
      * @param size     The limit of the suggestions.
      * @return A List of strings containing search suggestions.
      */
-    public List<SimilarDto> searchSuggestions(String spelling, String expLang, String defLang, Long size) {
+    public List<SimilarDto> searchSuggestions(String spelling, String expLang, String defLang, Integer size) {
         final List<Expression> expressions =
                 expressionRepo.fuzzySearchSpellingsListBySpellingAndExpLang(spelling, expLang, defLang, size);
         return mapper.toDto(expressions);
     }
 
     @Transactional
-    public ExpressionAndSimilar getExpressionByIdAndSimilar(UUID id, String defLang, Long size) {
+    public ExpressionAndSimilar getExpressionByIdAndSimilar(UUID id, String defLang, Integer size) {
         final Optional<Expression> expOptional = expressionRepo.findById(id);
         if (expOptional.isPresent()) {
+/*                Expression -> UUID id, String spelling, String language  */
             final Expression expression = expOptional.get();
             final List<ExpressionDetails> expressionDetails = expression.getExpressionDetails()
                     .stream().map(expDetails -> {
