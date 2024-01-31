@@ -3,8 +3,6 @@ name: Deploy to Staging
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
   # Allows to run this workflow manually from the Actions tab
   workflow_dispatch:
 
@@ -78,4 +76,3 @@ jobs:
               --gafalag.db.url=${{ secrets.DIGITALOCEAN_DB_URL }} \
               --gafalag.db.username=${{ secrets.DIGITALOCEAN_DB_USERNAME }} \
               --gafalag.db.password=${{ secrets.DIGITALOCEAN_DB_PASSWORD }}
-
