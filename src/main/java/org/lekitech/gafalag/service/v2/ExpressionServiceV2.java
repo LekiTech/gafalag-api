@@ -53,7 +53,6 @@ public class ExpressionServiceV2 {
     public ExpressionAndSimilar getExpressionByIdAndSimilar(UUID id, String defLang, Integer size) {
         final Optional<Expression> expOptional = expressionRepo.findById(id);
         if (expOptional.isPresent()) {
-/*                Expression -> UUID id, String spelling, String language  */
             final Expression expression = expOptional.get();
             final List<ExpressionDetails> expressionDetails = expression.getExpressionDetails()
                     .stream().map(expDetails -> {
@@ -66,6 +65,26 @@ public class ExpressionServiceV2 {
             final ExpressionResponseDto expressionResponseDto = mapper.toDto(expression.getSpelling(), expressionDetails);
             final List<SimilarDto> similarDtos = searchSuggestions(expression.getSpelling(), expression.getLanguage().getId(), defLang, size);
             return new ExpressionAndSimilar(expressionResponseDto, similarDtos);
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    @Transactional
+    public ExpressionResponseDto getExpressionBySpellingAndExpLangAndDefLang(String spelling, String expLang, String defLang) {
+        final Optional<Expression> expOptional = expressionRepo.findExpressionBySpellingAndLanguageAndDefLanguage(spelling, expLang, defLang);
+        if (expOptional.isPresent()) {
+            final Expression expression = expOptional.get();
+            final List<ExpressionDetails> expressionDetails = expression.getExpressionDetails()
+                    .stream().map(expDetails -> {
+                        val filteredDefinitionDetails = expDetails.getDefinitionDetails().stream().filter(
+                                definitionDetails -> definitionDetails.getLanguage().getId().equals(defLang)
+                        ).toList();
+                        expDetails.setDefinitionDetails(filteredDefinitionDetails);
+                        return expDetails;
+                    }).toList();
+            final ExpressionResponseDto expressionResponseDto = mapper.toDto(expression.getSpelling(), expressionDetails);
+            return expressionResponseDto;
         } else {
             throw new IllegalArgumentException();
         }
