@@ -3,7 +3,6 @@ package org.lekitech.gafalag.controller.v2;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.lekitech.gafalag.dto.v2.ExpressionAndSimilar;
-import org.lekitech.gafalag.dto.v2.ExpressionResponseDto;
 import org.lekitech.gafalag.dto.v2.SimilarDto;
 import org.lekitech.gafalag.service.v2.ExpressionServiceV2;
 import org.springframework.http.HttpStatus;
@@ -63,6 +62,7 @@ public class ExpressionControllerV2 {
             @RequestParam(name = "defLang") String defLang,
             @RequestParam(name = "similarCount", defaultValue = "10") @Max(50) Integer size) {
         try {
+            if (size > 50) throw new IllegalArgumentException("similarCount cannot be greater than 50");
             final ExpressionAndSimilar expAndSimilar = expService.getExpressionByIdAndSimilar(id, defLang, size);
             return ResponseEntity.ok(expAndSimilar);
         } catch (Exception e) {
@@ -72,17 +72,18 @@ public class ExpressionControllerV2 {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<ExpressionResponseDto> searchExpressionBySpellingAndExpLangAndDefLang(
+    public ResponseEntity<ExpressionAndSimilar> searchExpressionBySpellingAndExpLangAndDefLang(
             @RequestParam(name = "spelling") String spelling,
             @RequestParam(name = "expLang") String expLang,
-            @RequestParam(name = "defLang") String defLang
-    ) {
+            @RequestParam(name = "defLang") String defLang,
+            @RequestParam(name = "similarCount", defaultValue = "10") @Max(50) Integer size) {
         try {
-            final ExpressionResponseDto expression = expService.getExpressionBySpellingAndExpLangAndDefLang(spelling, expLang, defLang);
+            if (size > 50) throw new IllegalArgumentException("similarCount cannot be greater than 50");
+            final ExpressionAndSimilar expression = expService.getExpressionBySpellingAndSimilarAndExpLangAndDefLang(spelling, expLang, defLang, size);
             return ResponseEntity.ok(expression);
         } catch (Exception e) {
             log.error("Error occurred while retrieving search expression and similar: {}", e.getMessage(), e);
-            return ResponseEntity.notFound().build();
+            return null;
         }
     }
 }

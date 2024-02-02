@@ -54,25 +54,24 @@ public class ExpressionServiceV2 {
         final Optional<Expression> expOptional = expressionRepo.findById(id);
         if (expOptional.isPresent()) {
             final Expression expression = expOptional.get();
-            final List<SimilarDto> similarDtos = searchSuggestions(expression.getSpelling(), expression.getLanguage().getId(), defLang, size);
-            return new ExpressionAndSimilar(getExpressionResponseDto(defLang, expression), similarDtos);
+            return getExpressionAndSimilar(expression, defLang, size);
         } else {
             throw new IllegalArgumentException();
         }
     }
 
     @Transactional
-    public ExpressionResponseDto getExpressionBySpellingAndExpLangAndDefLang(String spelling, String expLang, String defLang) {
+    public ExpressionAndSimilar getExpressionBySpellingAndSimilarAndExpLangAndDefLang(String spelling, String expLang, String defLang, Integer size) {
         final Optional<Expression> expOptional = expressionRepo.findExpressionBySpellingAndLanguageAndDefLanguage(spelling, expLang, defLang);
         if (expOptional.isPresent()) {
             final Expression expression = expOptional.get();
-            return getExpressionResponseDto(defLang, expression);
+            return getExpressionAndSimilar(expression, defLang, size);
         } else {
             throw new IllegalArgumentException();
         }
     }
 
-    private ExpressionResponseDto getExpressionResponseDto(String defLang, Expression expression) {
+    private ExpressionAndSimilar getExpressionAndSimilar(Expression expression, String defLang, Integer size) {
         final List<ExpressionDetails> expressionDetails = expression.getExpressionDetails()
                 .stream().map(expDetails -> {
                     val filteredDefinitionDetails = expDetails.getDefinitionDetails().stream().filter(
@@ -81,6 +80,8 @@ public class ExpressionServiceV2 {
                     expDetails.setDefinitionDetails(filteredDefinitionDetails);
                     return expDetails;
                 }).toList();
-        return mapper.toDto(expression.getSpelling(), expressionDetails);
+        final ExpressionResponseDto expressionResponseDto = mapper.toDto(expression.getSpelling(), expressionDetails);
+        final List<SimilarDto> similarDtos = searchSuggestions(expression.getSpelling(), expression.getLanguage().getId(), defLang, size);
+        return new ExpressionAndSimilar(expressionResponseDto, similarDtos);
     }
 }
