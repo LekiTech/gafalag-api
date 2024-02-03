@@ -61,13 +61,17 @@ public class ExpressionServiceV2 {
     }
 
     @Transactional
-    public ExpressionAndSimilar getExpressionBySpellingAndSimilarAndExpLangAndDefLang(String spelling, String expLang, String defLang, Integer size) {
+    public ExpressionAndSimilar getExpressionBySpellingAndSimilarAndExpLangAndDefLang(String spelling,
+                                                                                      String expLang,
+                                                                                      String defLang,
+                                                                                      Integer size) {
         final Optional<Expression> expOptional = expressionRepo.findExpressionBySpellingAndLanguageAndDefLanguage(spelling, expLang, defLang);
         if (expOptional.isPresent()) {
             final Expression expression = expOptional.get();
             return getExpressionAndSimilar(expression, defLang, size);
         } else {
-            throw new IllegalArgumentException();
+            final List<SimilarDto> similarDtos = searchSuggestions(spelling, expLang, defLang, size);
+            return new ExpressionAndSimilar(null, similarDtos);
         }
     }
 

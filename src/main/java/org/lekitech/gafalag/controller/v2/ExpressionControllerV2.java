@@ -9,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.constraints.Max;
 import java.util.List;
 import java.util.UUID;
 
@@ -60,7 +59,7 @@ public class ExpressionControllerV2 {
     public ResponseEntity<ExpressionAndSimilar> getExpressionByIdAndSimilar(
             @PathVariable(name = "id") UUID id,
             @RequestParam(name = "defLang") String defLang,
-            @RequestParam(name = "similarCount", defaultValue = "10") @Max(50) Integer size) {
+            @RequestParam(name = "similarCount", defaultValue = "10") Integer size) {
         try {
             if (size > 50) throw new IllegalArgumentException("similarCount cannot be greater than 50");
             final ExpressionAndSimilar expAndSimilar = expService.getExpressionByIdAndSimilar(id, defLang, size);
@@ -76,14 +75,14 @@ public class ExpressionControllerV2 {
             @RequestParam(name = "spelling") String spelling,
             @RequestParam(name = "expLang") String expLang,
             @RequestParam(name = "defLang") String defLang,
-            @RequestParam(name = "similarCount", defaultValue = "10") @Max(50) Integer size) {
+            @RequestParam(name = "similarCount", defaultValue = "10") Integer size) {
         try {
             if (size > 50) throw new IllegalArgumentException("similarCount cannot be greater than 50");
             final ExpressionAndSimilar expression = expService.getExpressionBySpellingAndSimilarAndExpLangAndDefLang(spelling, expLang, defLang, size);
             return ResponseEntity.ok(expression);
         } catch (Exception e) {
             log.error("Error occurred while retrieving search expression and similar: {}", e.getMessage(), e);
-            return null;
+            return ResponseEntity.internalServerError().build();
         }
     }
 }
