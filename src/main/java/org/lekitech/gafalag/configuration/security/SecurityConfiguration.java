@@ -8,7 +8,6 @@ import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import lombok.RequiredArgsConstructor;
 import org.lekitech.gafalag.service.security.RsaKeyService;
-import org.lekitech.gafalag.utils.RsaKeyProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.lang.NonNull;
@@ -95,7 +94,7 @@ public class SecurityConfiguration {
 
     /**
      * Creates a {@link JwtDecoder} bean for decoding JWT tokens.
-     * This decoder uses the public key from {@link RsaKeyProperties}.
+     * This decoder uses the public key from {@link RsaKeyService}.
      *
      * @return A NimbusJwtDecoder instance.
      */
@@ -106,7 +105,7 @@ public class SecurityConfiguration {
 
     /**
      * Creates a {@link JwtEncoder} bean for encoding JWT tokens.
-     * This encoder uses RSA keys defined in {@link RsaKeyProperties}.
+     * This encoder uses RSA keys defined in {@link RsaKeyService}.
      *
      * @return A NimbusJwtEncoder instance.
      */
