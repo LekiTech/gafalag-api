@@ -14,6 +14,7 @@ import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.Set;
@@ -50,6 +51,7 @@ public class TokenService {
                     .issuer("self")
                     .issuedAt(now)
                     .subject(userId)
+                    .expiresAt(now.plus(Duration.ofHours(1)))
                     .claim("roles", roles) /* Custom claim for roles */
                     .build();
 
