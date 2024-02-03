@@ -38,14 +38,14 @@ public class KeyConfiguration {
      * The RSA private key, encoded as a Base64 string.
      * This key is necessary for operations such as digital signing.
      */
-    @Value("${RSA_PRIVATE_KEY}")
+    @Value("${rsa.private.key}")
     private String privateKeyBase64;
 
     /**
      * The RSA public key, encoded as a Base64 string.
      * This key can be used for operations like data encryption and signature verification.
      */
-    @Value("${RSA_PUBLIC_KEY}")
+    @Value("${rsa.public.key}")
     private String publicKeyBase64;
 
 }
