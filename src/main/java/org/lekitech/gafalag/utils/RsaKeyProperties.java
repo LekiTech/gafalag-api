@@ -20,6 +20,7 @@ import java.security.interfaces.RSAPublicKey;
 @Setter
 @Component
 @RequiredArgsConstructor
+@Deprecated
 public class RsaKeyProperties {
 
     private final RSAPublicKey publicKey;
