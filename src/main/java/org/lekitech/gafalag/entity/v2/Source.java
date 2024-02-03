@@ -54,7 +54,7 @@ public class Source {
 
     public enum Type {
         WRITTEN,
-        SOURCE
+        USER
     }
 
 }
