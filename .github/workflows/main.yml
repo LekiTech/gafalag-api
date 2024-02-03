@@ -74,6 +74,8 @@ jobs:
               --restart always \
               -p 0.0.0.0:80:8080 \
               --name gafalag-api \
+              -e RSA_PRIVATE_KEY="${{ secrets.RSA_PRIVATE_KEY }}" \
+              -e RSA_PUBLIC_KEY="${{ secrets.RSA_PUBLIC_KEY }}" \
               registry.digitalocean.com/gafalag/gafalag-api:latest \
               --gafalag.db.url=${{ secrets.DIGITALOCEAN_DB_URL }} \
               --gafalag.db.username=${{ secrets.DIGITALOCEAN_DB_USERNAME }} \

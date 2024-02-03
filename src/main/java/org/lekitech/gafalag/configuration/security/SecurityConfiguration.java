@@ -7,6 +7,7 @@ import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import lombok.RequiredArgsConstructor;
+import org.lekitech.gafalag.service.security.RsaKeyService;
 import org.lekitech.gafalag.utils.RsaKeyProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -38,7 +39,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @RequiredArgsConstructor
 public class SecurityConfiguration {
 
-    private final RsaKeyProperties keys;
+    private final RsaKeyService keyService;
 
     /**
      * Creates a {@link PasswordEncoder} bean that uses the BCrypt hashing algorithm.
@@ -100,7 +101,7 @@ public class SecurityConfiguration {
      */
     @Bean
     public JwtDecoder jwtDecoder() {
-        return NimbusJwtDecoder.withPublicKey(keys.getPublicKey()).build();
+        return NimbusJwtDecoder.withPublicKey(keyService.getPublicKey()).build();
     }
 
     /**
@@ -111,7 +112,7 @@ public class SecurityConfiguration {
      */
     @Bean
     public JwtEncoder jwtEncoder() {
-        final JWK jwk = new RSAKey.Builder(keys.getPublicKey()).privateKey(keys.getPrivateKey()).build();
+        final JWK jwk = new RSAKey.Builder(keyService.getPublicKey()).privateKey(keyService.getPrivateKey()).build();
         final JWKSource<SecurityContext> jwkSource = new ImmutableJWKSet<>(new JWKSet(jwk));
         return new NimbusJwtEncoder(jwkSource);
     }

@@ -10,6 +10,7 @@ import java.security.KeyPairGenerator;
  * This class provides a method to generate a RSA key pair, which can be used for JWT signing and verification.
  */
 @Slf4j
+@Deprecated
 public class KeyGeneratorUtility {
 
     /**
