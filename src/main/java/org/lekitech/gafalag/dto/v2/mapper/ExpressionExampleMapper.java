@@ -8,6 +8,7 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring", uses = TagsMapper.class)
 interface ExpressionExampleMapper {
 
+    @Mapping(source = "expressionExample.example.id", target = "id")
     @Mapping(source = "expressionExample.example.raw", target = "raw")
     @Mapping(source = "expressionExample.example.srcLanguage.id", target = "src")
     @Mapping(source = "expressionExample.example.translation", target = "trl")

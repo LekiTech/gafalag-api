@@ -2,15 +2,15 @@ package org.lekitech.gafalag.controller.v2;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.lekitech.gafalag.dto.v2.ExpressionAndSimilar;
+import org.lekitech.gafalag.dto.v2.SimilarDto;
 import org.lekitech.gafalag.service.v2.ExpressionServiceV2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * The `ExpressionControllerV2` class serves as the controller for managing and handling
@@ -39,19 +39,50 @@ public class ExpressionControllerV2 {
      * @return A ResponseEntity containing a List of search suggestions as strings.
      */
     @GetMapping(path = "/search/suggestions")
-    public ResponseEntity<List<String>> searchSuggestions(
+    public ResponseEntity<List<SimilarDto>> searchSuggestions(
             @RequestParam(name = "spelling") String spelling,
             @RequestParam(name = "expLang") String expLang,
             @RequestParam(name = "defLang") String defLang,
-            @RequestParam(name = "size") Long size) {
+            @RequestParam(name = "size") Integer size) {
         try {
-            final List<String> suggestions = expService.searchSuggestions(spelling, expLang, defLang, size);
+            final List<SimilarDto> suggestions = expService.searchSuggestions(spelling, expLang, defLang, size);
             return ResponseEntity.ok(suggestions);
         } catch (Exception e) {
             log.error("Error occurred while retrieving search suggestions: {}", e.getMessage(), e);
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body(List.of());
+        }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ExpressionAndSimilar> getExpressionByIdAndSimilar(
+            @PathVariable(name = "id") UUID id,
+            @RequestParam(name = "defLang") String defLang,
+            @RequestParam(name = "similarCount", defaultValue = "10") Integer size) {
+        try {
+            if (size > 50) throw new IllegalArgumentException("similarCount cannot be greater than 50");
+            final ExpressionAndSimilar expAndSimilar = expService.getExpressionByIdAndSimilar(id, defLang, size);
+            return ResponseEntity.ok(expAndSimilar);
+        } catch (Exception e) {
+            log.error("Error occurred while retrieving search expression and similar: {}", e.getMessage(), e);
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<ExpressionAndSimilar> searchExpressionBySpellingAndExpLangAndDefLang(
+            @RequestParam(name = "spelling") String spelling,
+            @RequestParam(name = "expLang") String expLang,
+            @RequestParam(name = "defLang") String defLang,
+            @RequestParam(name = "similarCount", defaultValue = "10") Integer size) {
+        try {
+            if (size > 50) throw new IllegalArgumentException("similarCount cannot be greater than 50");
+            final ExpressionAndSimilar expression = expService.getExpressionBySpellingAndSimilarAndExpLangAndDefLang(spelling, expLang, defLang, size);
+            return ResponseEntity.ok(expression);
+        } catch (Exception e) {
+            log.error("Error occurred while retrieving search expression and similar: {}", e.getMessage(), e);
+            return ResponseEntity.internalServerError().build();
         }
     }
 }

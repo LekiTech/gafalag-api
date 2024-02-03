@@ -21,7 +21,7 @@ import java.io.IOException;
 @Slf4j
 @RestController
 @RequestMapping(path = "v2/dictionary")
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class DictionaryController {
 
     private final DictionaryService dictionaryService;
