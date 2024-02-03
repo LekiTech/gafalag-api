@@ -80,7 +80,7 @@ public class ExpressionServiceV2 {
                     expDetails.setDefinitionDetails(filteredDefinitionDetails);
                     return expDetails;
                 }).toList();
-        final ExpressionResponseDto expressionResponseDto = mapper.toDto(expression.getSpelling(), expressionDetails);
+        final ExpressionResponseDto expressionResponseDto = mapper.toDto(expression.getId(), expression.getSpelling(), expressionDetails);
         final List<SimilarDto> similarDtos = searchSuggestions(expression.getSpelling(), expression.getLanguage().getId(), defLang, size);
         return new ExpressionAndSimilar(expressionResponseDto, similarDtos);
     }

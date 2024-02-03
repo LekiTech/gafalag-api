@@ -1,6 +1,7 @@
 package org.lekitech.gafalag.dto.v2;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * It represents the whole definition of a word for the following cases:
@@ -10,12 +11,14 @@ import java.util.List;
  *      <li> Expressions with Roman numerals, so definitions under each numeral have their own ExpressionDetails object. </li>
  * </ul>
  *
+ * @param id
  * @param gr                grammatical forms of the expression.
  * @param inflection
  * @param definitionDetails {@link DefinitionDetailsDto}
  * @param examples          {@link ExampleDto}
  */
 public record ExpressionDetailsDto(
+        UUID id,
         String gr,
         String inflection,
         List<DefinitionDetailsDto> definitionDetails,
