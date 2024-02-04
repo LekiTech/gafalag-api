@@ -10,7 +10,7 @@ interface DefinitionExampleMapper {
 
     @Mapping(source = "definitionExample.example.id", target = "id")
     @Mapping(source = "definitionExample.example.raw", target = "raw")
-    @Mapping(source = "definitionExample.example.srcLanguage.id", target = "src")
+    @Mapping(source = "definitionExample.example.source", target = "src")
     @Mapping(source = "definitionExample.example.translation", target = "trl")
     @Mapping(source = "definitionExample.example.exampleTags", target = "tags")
     ExampleDto mapToDto(DefinitionExample definitionExample);

@@ -77,8 +77,10 @@ public interface ExpressionRepositoryV2 extends JpaRepository<Expression, UUID> 
             ORDER BY e.created_at
             LIMIT 1 OFFSET 
             mod(
-            CAST(:currentDate AS DATE) - DATE '1930-04-27', 
-            (SELECT COUNT(*) FROM expression e WHERE e.language_id = 'lez')
+            -- CURRENT DATE - REFERENCE DATE (used Shtulski rebellion as reference)
+                CAST(:currentDate AS DATE) - DATE '1930-04-27', 
+            -- Count all Lezgi expressions to ensure that upper offset limit matches amount of expressions
+                (SELECT COUNT(*) FROM expression e WHERE e.language_id = 'lez')
             )
             """,
             nativeQuery = true)
