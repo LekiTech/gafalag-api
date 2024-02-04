@@ -76,7 +76,10 @@ public interface ExpressionRepositoryV2 extends JpaRepository<Expression, UUID> 
             WHERE e.language_id = 'lez'
             ORDER BY e.created_at
             LIMIT 1 OFFSET 
-            mod(CAST(:currentDate AS DATE) - DATE '1930-04-27', 20000)
+            mod(
+            CAST(:currentDate AS DATE) - DATE '1930-04-27', 
+            (SELECT COUNT(*) FROM expression e WHERE e.language_id = 'lez')
+            )
             """,
             nativeQuery = true)
     Optional<Expression> findExpressionByCurrentDate(@NonNull @Param("currentDate") String currentDate);
