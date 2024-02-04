@@ -3,6 +3,7 @@ package org.lekitech.gafalag.controller.v2;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.lekitech.gafalag.dto.v2.ExpressionAndSimilar;
+import org.lekitech.gafalag.dto.v2.ExpressionResponseDto;
 import org.lekitech.gafalag.dto.v2.SimilarDto;
 import org.lekitech.gafalag.service.v2.ExpressionServiceV2;
 import org.springframework.http.HttpStatus;
@@ -83,6 +84,17 @@ public class ExpressionControllerV2 {
         } catch (Exception e) {
             log.error("Error occurred while retrieving search expression and similar: {}", e.getMessage(), e);
             return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @GetMapping("/day")
+    public ResponseEntity<ExpressionResponseDto> getWordOfTheDay(@RequestParam(name = "currentDate") String currentDate) {
+        try {
+            final ExpressionResponseDto expression = expService.getExpressionOfTheDay(currentDate);
+            return ResponseEntity.ok(expression);
+        } catch (Exception e) {
+            log.error("getWordOfTheDay: ", e.getMessage(), e);
+            return ResponseEntity.notFound().build();
         }
     }
 }

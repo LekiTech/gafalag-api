@@ -10,7 +10,7 @@ interface ExpressionExampleMapper {
 
     @Mapping(source = "expressionExample.example.id", target = "id")
     @Mapping(source = "expressionExample.example.raw", target = "raw")
-    @Mapping(source = "expressionExample.example.srcLanguage.id", target = "src")
+    @Mapping(source = "expressionExample.example.source", target = "src")
     @Mapping(source = "expressionExample.example.translation", target = "trl")
     @Mapping(source = "expressionExample.example.exampleTags", target = "tags")
     ExampleDto mapToDto(ExpressionExample expressionExample);
