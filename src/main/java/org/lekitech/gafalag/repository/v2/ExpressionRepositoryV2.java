@@ -11,6 +11,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -68,4 +69,15 @@ public interface ExpressionRepositoryV2 extends JpaRepository<Expression, UUID> 
             @NonNull @Param("expLang") String expLang,
             @NonNull @Param("defLang") String defLang
     );
+
+    @Query(value = """
+            SELECT * 
+            FROM expression e 
+            WHERE e.language_id = 'lez'
+            ORDER BY e.created_at
+            LIMIT 1 OFFSET 
+            mod(CAST(:currentDate AS DATE) - DATE '1930-04-27', 20000)
+            """,
+            nativeQuery = true)
+    Optional<Expression> findExpressionByCurrentDate(@NonNull @Param("currentDate") String currentDate);
 }

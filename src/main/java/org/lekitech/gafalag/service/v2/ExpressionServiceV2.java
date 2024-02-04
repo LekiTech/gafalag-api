@@ -88,4 +88,14 @@ public class ExpressionServiceV2 {
         final List<SimilarDto> similarDtos = searchSuggestions(expression.getSpelling(), expression.getLanguage().getId(), defLang, size);
         return new ExpressionAndSimilar(expressionResponseDto, similarDtos);
     }
+
+    @Transactional
+    public ExpressionResponseDto getExpressionOfTheDay(String currentDate) {
+        final Optional<Expression> expressionOpt = expressionRepo.findExpressionByCurrentDate(currentDate);
+        if (expressionOpt.isPresent()) {
+            final Expression expression = expressionOpt.get();
+            return mapper.toDto(expression.getId(), expression.getSpelling(), expression.getExpressionDetails());
+        }
+        return null;
+    }
 }
