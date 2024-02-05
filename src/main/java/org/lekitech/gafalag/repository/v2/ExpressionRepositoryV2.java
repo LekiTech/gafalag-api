@@ -30,13 +30,26 @@ public interface ExpressionRepositoryV2 extends JpaRepository<Expression, UUID> 
             SELECT *
             FROM expression e
             WHERE e.language_id = :expLang
-            AND EXISTS (
-               SELECT 1
-               FROM expression_match_details emd
-               JOIN expression_details ed ON emd.expression_details_id = ed.id
-               JOIN definition_details dd ON ed.id = dd.expression_details_id
-               WHERE emd.expression_id = e.id
-               AND dd.language_id = :defLang
+            AND (
+                EXISTS (
+                -- Search for matches of `defLang` in `DefinitionDetails`
+                   SELECT 1
+                   FROM expression_match_details emd
+                   JOIN expression_details ed ON emd.expression_details_id = ed.id
+                   JOIN definition_details dd ON ed.id = dd.expression_details_id
+                   WHERE emd.expression_id = e.id
+                   AND dd.language_id = :defLang
+                )
+                OR EXISTS (
+                -- Search for matches of `defLang` to "translation language" in `Example` through `ExpressionExample` relation
+                   SELECT 1
+                   FROM expression_example ee
+                   JOIN example ex ON ee.example_id = ex.id
+                   JOIN expression_details ed ON ee.expression_details_id = ed.id
+                   JOIN expression_match_details emd ON ed.id = emd.expression_details_id
+                   WHERE emd.expression_id = e.id
+                   AND ex.trl_lang_id = :defLang
+                )
             )
             ORDER BY e.spelling <-> :spelling
             LIMIT :size
@@ -52,15 +65,29 @@ public interface ExpressionRepositoryV2 extends JpaRepository<Expression, UUID> 
     @Query(value = """
             SELECT *
             FROM expression e
+            -- ILIKE is used for case insensitive search
             WHERE e.spelling ILIKE :spelling
             AND e.language_id = :expLang
-            AND EXISTS (
-               SELECT 1
-               FROM expression_match_details emd
-               JOIN expression_details ed ON emd.expression_details_id = ed.id
-               JOIN definition_details dd ON ed.id = dd.expression_details_id
-               WHERE emd.expression_id = e.id
-               AND dd.language_id = :defLang
+            AND (
+                EXISTS (
+                -- Search for matches of `defLang` in `DefinitionDetails`
+                   SELECT 1
+                   FROM expression_match_details emd
+                   JOIN expression_details ed ON emd.expression_details_id = ed.id
+                   JOIN definition_details dd ON ed.id = dd.expression_details_id
+                   WHERE emd.expression_id = e.id
+                   AND dd.language_id = :defLang
+                )
+                OR EXISTS (
+                -- Search for matches of `defLang` to "translation language" in `Example` through `ExpressionExample` relation
+                   SELECT 1
+                   FROM expression_example ee
+                   JOIN example ex ON ee.example_id = ex.id
+                   JOIN expression_details ed ON ee.expression_details_id = ed.id
+                   JOIN expression_match_details emd ON ed.id = emd.expression_details_id
+                   WHERE emd.expression_id = e.id
+                   AND ex.trl_lang_id = :defLang
+                )
             )
             """,
             nativeQuery = true)
