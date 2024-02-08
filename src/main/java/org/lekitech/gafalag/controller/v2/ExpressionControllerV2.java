@@ -2,6 +2,7 @@ package org.lekitech.gafalag.controller.v2;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.lekitech.gafalag.dto.v2.ExpressionAndExampleDto;
 import org.lekitech.gafalag.dto.v2.ExpressionAndSimilar;
 import org.lekitech.gafalag.dto.v2.ExpressionResponseDto;
 import org.lekitech.gafalag.dto.v2.SimilarDto;
@@ -94,6 +95,18 @@ public class ExpressionControllerV2 {
             return ResponseEntity.ok(expression);
         } catch (Exception e) {
             log.error("getWordOfTheDay: ", e.getMessage(), e);
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/search/examples")
+    public ResponseEntity<List<ExpressionAndExampleDto>> getExamplesByExpression(
+            @RequestParam(name = "expression") String expression) {
+        try {
+            final List<ExpressionAndExampleDto> expressionAndExample = expService.getExpressionAndExample(expression);
+            return ResponseEntity.ok(expressionAndExample);
+        } catch (Exception e) {
+            log.error("getExamplesByExpression: ", e.getMessage(), e);
             return ResponseEntity.notFound().build();
         }
     }

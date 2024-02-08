@@ -3,19 +3,16 @@ package org.lekitech.gafalag.service.v2;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.lekitech.gafalag.dto.v2.ExpressionAndSimilar;
-import org.lekitech.gafalag.dto.v2.ExpressionResponseDto;
-import org.lekitech.gafalag.dto.v2.SimilarDto;
+import org.lekitech.gafalag.dto.v2.*;
 import org.lekitech.gafalag.dto.v2.mapper.DictionaryMapper;
-import org.lekitech.gafalag.entity.v2.Expression;
-import org.lekitech.gafalag.entity.v2.ExpressionDetails;
+import org.lekitech.gafalag.entity.v2.*;
+import org.lekitech.gafalag.repository.v2.ExampleProjection;
+import org.lekitech.gafalag.repository.v2.ExampleRepositoryV2;
 import org.lekitech.gafalag.repository.v2.ExpressionRepositoryV2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * The `ExpressionServiceV2` class provides methods to interact with expressions and their details
@@ -33,6 +30,7 @@ public class ExpressionServiceV2 {
     /* Dependencies */
     private final DictionaryMapper mapper;
     private final ExpressionRepositoryV2 expressionRepo;
+    private final ExampleRepositoryV2 exampleRepo;
 
     /**
      * Retrieves a page of search suggestions based on the provided expression, source language,
@@ -97,5 +95,30 @@ public class ExpressionServiceV2 {
             return mapper.toDto(expression.getId(), expression.getSpelling(), expression.getExpressionDetails());
         }
         return null;
+    }
+
+    @Transactional
+    public List<ExpressionAndExampleDto> getExpressionAndExample(String expression) {
+        final List<ExampleProjection> exampleProjection = exampleRepo.findExpressionAndExample(expression);
+        final List<ExpressionAndExampleDto> result = new ArrayList<>();
+        boolean found = false;
+        for (ExampleProjection expProjection : exampleProjection) {
+            ExampleDto example = mapper.toDto(expProjection);
+            for (ExpressionAndExampleDto expAndExample : result) {
+                if (expProjection.getExpressionSpelling().equals(expAndExample.spelling())) {
+                    expAndExample.examples().add(example);
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                ExpressionAndExampleDto expressionAndExample = mapper.mapToDto(
+                        expProjection.getExpressionId(),
+                        expProjection.getExpressionSpelling(),
+                        new ArrayList<>(List.of(example)));
+                result.add(expressionAndExample);
+            }
+        }
+        return result;
     }
 }
