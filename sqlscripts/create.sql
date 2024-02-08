@@ -442,6 +442,8 @@ EXECUTE PROCEDURE update_updated_at_column();
 -- region INDEXES
 CREATE INDEX exp_gin_idx ON expression USING gin (spelling gin_trgm_ops);
 
+CREATE INDEX example_raw_gin_idx ON example USING GIN (to_tsvector('simple', raw));
+
 CREATE UNIQUE INDEX expression_idx ON expression (spelling, language_id);
 -- endregion
 

@@ -28,7 +28,7 @@ public interface ExampleRepositoryV2 extends JpaRepository<Example, UUID> {
                JOIN definition_details dd ON de.definition_details_id = dd.id
                JOIN expression_match_details emd ON dd.expression_details_id = emd.expression_details_id
                JOIN expression expr ON emd.expression_id = expr.id
-               WHERE ex.source ILIKE CONCAT('%', :exp, '%')
+               WHERE to_tsvector('simple', ex."raw") @@ plainto_tsquery('simple', :exp)
                
               UNION
               
@@ -46,7 +46,7 @@ public interface ExampleRepositoryV2 extends JpaRepository<Example, UUID> {
                JOIN expression_example ee ON ex.id = ee.example_id
                JOIN expression_match_details emd ON ee.expression_details_id = emd.expression_details_id
                JOIN expression expr ON emd.expression_id = expr.id
-               WHERE ex.source ILIKE CONCAT('%', :exp, '%')
+               WHERE to_tsvector('simple', ex."raw") @@ plainto_tsquery('simple', :exp)
             """,
             nativeQuery = true)
     List<ExampleProjection> findExpressionAndExample(@NonNull @Param("exp") String exp);

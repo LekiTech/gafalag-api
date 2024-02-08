@@ -9,6 +9,7 @@ import org.lekitech.gafalag.entity.v2.*;
 import org.lekitech.gafalag.repository.v2.ExampleProjection;
 import org.lekitech.gafalag.repository.v2.ExampleRepositoryV2;
 import org.lekitech.gafalag.repository.v2.ExpressionRepositoryV2;
+import org.lekitech.gafalag.utils.SearchStringNormalizer;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,8 +43,12 @@ public class ExpressionServiceV2 {
      * @return A List of strings containing search suggestions.
      */
     public List<SimilarDto> searchSuggestions(String spelling, String expLang, String defLang, Integer size) {
-        final List<Expression> expressions =
-                expressionRepo.fuzzySearchSpellingsListBySpellingAndExpLang(spelling, expLang, defLang, size);
+        final List<Expression> expressions = expressionRepo.fuzzySearchSpellingsListBySpellingAndExpLang(
+                new SearchStringNormalizer().replaceVerticalBar(spelling),
+                expLang,
+                defLang,
+                size
+        );
         return mapper.toDto(expressions);
     }
 
@@ -63,7 +68,11 @@ public class ExpressionServiceV2 {
                                                                                       String expLang,
                                                                                       String defLang,
                                                                                       Integer size) {
-        final Optional<Expression> expOptional = expressionRepo.findExpressionBySpellingAndLanguageAndDefLanguage(spelling, expLang, defLang);
+        final Optional<Expression> expOptional = expressionRepo.findExpressionBySpellingAndLanguageAndDefLanguage(
+                new SearchStringNormalizer().replaceVerticalBar(spelling),
+                expLang,
+                defLang
+        );
         if (expOptional.isPresent()) {
             final Expression expression = expOptional.get();
             return getExpressionAndSimilar(expression, defLang, size);
@@ -99,7 +108,8 @@ public class ExpressionServiceV2 {
 
     @Transactional
     public List<ExpressionAndExampleDto> getExpressionAndExample(String expression) {
-        final List<ExampleProjection> exampleProjection = exampleRepo.findExpressionAndExample(expression);
+        final List<ExampleProjection> exampleProjection =
+                exampleRepo.findExpressionAndExample(new SearchStringNormalizer().replaceVerticalBar(expression));
         final List<ExpressionAndExampleDto> result = new ArrayList<>();
         boolean found = false;
         for (ExampleProjection expProjection : exampleProjection) {
