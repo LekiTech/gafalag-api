@@ -1,13 +1,14 @@
 package org.lekitech.gafalag.utils;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 public class SearchStringNormalizer {
 
-    public String replaceVerticalBar(String line) {
-        Pattern pattern = Pattern.compile("([кптцчКПТЦЧ][i1lӏ|!])");
-        Matcher matcher = pattern.matcher(line);
-        return matcher.replaceAll(m -> m.group().replace('!', 'I').replace('1', 'I'));
+    /**
+     * This method can be static because it is a "pure function"
+     * and does not change the "state" outside its scope.
+     * @param line
+     * @return
+     */
+    public static String replaceVerticalBar(String line) {
+        return line.replaceAll("(?<=[кптцчКПТЦЧ])[i1lӏ|!]", "I");
     }
 }

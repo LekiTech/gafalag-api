@@ -9,11 +9,13 @@ import org.lekitech.gafalag.entity.v2.*;
 import org.lekitech.gafalag.repository.v2.ExampleProjection;
 import org.lekitech.gafalag.repository.v2.ExampleRepositoryV2;
 import org.lekitech.gafalag.repository.v2.ExpressionRepositoryV2;
-import org.lekitech.gafalag.utils.SearchStringNormalizer;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static org.lekitech.gafalag.utils.SearchStringNormalizer.replaceVerticalBar;
 
 /**
  * The `ExpressionServiceV2` class provides methods to interact with expressions and their details
@@ -44,7 +46,7 @@ public class ExpressionServiceV2 {
      */
     public List<SimilarDto> searchSuggestions(String spelling, String expLang, String defLang, Integer size) {
         final List<Expression> expressions = expressionRepo.fuzzySearchSpellingsListBySpellingAndExpLang(
-                new SearchStringNormalizer().replaceVerticalBar(spelling),
+                replaceVerticalBar(spelling),
                 expLang,
                 defLang,
                 size
@@ -69,7 +71,7 @@ public class ExpressionServiceV2 {
                                                                                       String defLang,
                                                                                       Integer size) {
         final Optional<Expression> expOptional = expressionRepo.findExpressionBySpellingAndLanguageAndDefLanguage(
-                new SearchStringNormalizer().replaceVerticalBar(spelling),
+                replaceVerticalBar(spelling),
                 expLang,
                 defLang
         );
@@ -108,27 +110,23 @@ public class ExpressionServiceV2 {
 
     @Transactional
     public List<ExpressionAndExampleDto> getExpressionAndExample(String expression) {
-        final List<ExampleProjection> exampleProjection =
-                exampleRepo.findExpressionAndExample(new SearchStringNormalizer().replaceVerticalBar(expression));
-        final List<ExpressionAndExampleDto> result = new ArrayList<>();
-        boolean found = false;
-        for (ExampleProjection expProjection : exampleProjection) {
-            ExampleDto example = mapper.toDto(expProjection);
-            for (ExpressionAndExampleDto expAndExample : result) {
-                if (expProjection.getExpressionSpelling().equals(expAndExample.spelling())) {
-                    expAndExample.examples().add(example);
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                ExpressionAndExampleDto expressionAndExample = mapper.mapToDto(
-                        expProjection.getExpressionId(),
-                        expProjection.getExpressionSpelling(),
-                        new ArrayList<>(List.of(example)));
-                result.add(expressionAndExample);
-            }
+        List<ExampleProjection> exampleProjection = exampleRepo.findExpressionAndExample(replaceVerticalBar(expression));
+        record TempExpression(UUID id, String spelling) {
         }
-        return result;
+        return exampleProjection.stream().map(expPrj -> {
+                            ExampleDto value = mapper.toDto(expPrj);
+                            TempExpression key = new TempExpression(expPrj.getExpressionId(), expPrj.getExpressionSpelling());
+                            return Map.entry(key, value);
+                        }
+                ).collect(Collectors.groupingBy(
+                        Map.Entry::getKey,
+                        Collectors.mapping(Map.Entry::getValue,
+                                Collectors.toList())))
+                .entrySet().stream().map(entry -> new ExpressionAndExampleDto(
+                                entry.getKey().id,
+                                entry.getKey().spelling,
+                                new ArrayList<>(entry.getValue())
+                        )
+                ).collect(Collectors.toList());
     }
 }
