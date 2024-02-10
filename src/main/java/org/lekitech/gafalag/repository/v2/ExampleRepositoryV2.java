@@ -15,39 +15,39 @@ public interface ExampleRepositoryV2 extends JpaRepository<Example, UUID> {
 
     @Query(value = """
             SELECT
-                  CAST(expr.id as varchar) AS "expressionId",
-                  expr.spelling AS "expressionSpelling",
-                  CAST(ex.id as varchar) AS id,
-                  ex."source" AS "source",
-                  ex."translation" AS "translation",
-                  ex.src_lang_id AS "srcLangId",
-                  ex.trl_lang_id AS "trlLangId",
-                  ex.raw AS raw
-              FROM example ex
-               JOIN definition_example de ON ex.id = de.example_id
-               JOIN definition_details dd ON de.definition_details_id = dd.id
-               JOIN expression_match_details emd ON dd.expression_details_id = emd.expression_details_id
-               JOIN expression expr ON emd.expression_id = expr.id
-               WHERE to_tsvector('simple', ex."raw") @@ plainto_tsquery('simple', :exp)
-               
-              UNION
-              
-              -- Second Path: example -> expression_example -> expression_match_details -> expression
-              SELECT
-                  CAST(expr.id as varchar) AS "expressionId",
-                  expr.spelling AS "expressionSpelling",
-                  CAST(ex.id as varchar) AS id,
-                  ex."source" AS "source",
-                  ex."translation" AS "translation",
-                  ex.src_lang_id AS "srcLangId",
-                  ex.trl_lang_id AS "trlLangId",
-                  ex.raw AS raw
-              FROM example ex
-               JOIN expression_example ee ON ex.id = ee.example_id
-               JOIN expression_match_details emd ON ee.expression_details_id = emd.expression_details_id
-               JOIN expression expr ON emd.expression_id = expr.id
-               WHERE to_tsvector('simple', ex."raw") @@ plainto_tsquery('simple', :exp)
+                 CAST(expr.id as varchar) AS "expressionId",
+                 expr.spelling AS "expressionSpelling",
+                 CAST(ex.id as varchar) AS id,
+                 ex."source" AS "source",
+                 ex."translation" AS "translation",
+                 ex.src_lang_id AS "srcLangId",
+                 ex.trl_lang_id AS "trlLangId",
+                 ex.raw AS raw
+             FROM example ex
+              JOIN definition_example de ON ex.id = de.example_id
+              JOIN definition_details dd ON de.definition_details_id = dd.id
+              JOIN expression_match_details emd ON dd.expression_details_id = emd.expression_details_id
+              JOIN expression expr ON emd.expression_id = expr.id
+              WHERE to_tsvector('simple', ex."raw") @@ to_tsquery('simple', :ss || ':*') OR ex."raw" ILIKE '%' || :ss || '%'
+
+             UNION
+
+             -- Second Path: example -> expression_example -> expression_match_details -> expression
+             SELECT
+                 CAST(expr.id as varchar) AS "expressionId",
+                 expr.spelling AS "expressionSpelling",
+                 CAST(ex.id as varchar) AS id,
+                 ex."source" AS "source",
+                 ex."translation" AS "translation",
+                 ex.src_lang_id AS "srcLangId",
+                 ex.trl_lang_id AS "trlLangId",
+                 ex.raw AS raw
+             FROM example ex
+              JOIN expression_example ee ON ex.id = ee.example_id
+              JOIN expression_match_details emd ON ee.expression_details_id = emd.expression_details_id
+              JOIN expression expr ON emd.expression_id = expr.id
+              WHERE to_tsvector('simple', ex."raw") @@ to_tsquery('simple', :ss || ':*') OR ex."raw" ILIKE '%' || :ss || '%'
             """,
             nativeQuery = true)
-    List<ExampleProjection> findExpressionAndExample(@NonNull @Param("exp") String exp);
+    List<ExampleProjection> findExpressionAndExample(@NonNull @Param("ss") String ss);
 }

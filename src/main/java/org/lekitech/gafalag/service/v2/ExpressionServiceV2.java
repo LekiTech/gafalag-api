@@ -55,7 +55,7 @@ public class ExpressionServiceV2 {
     }
 
     @Transactional
-    public ExpressionAndSimilar getExpressionByIdAndSimilar(UUID id, String defLang, Integer size) {
+    public ExpressionAndSimilar getExpressionById(UUID id, String defLang, Integer size) {
         final Optional<Expression> expOptional = expressionRepo.findById(id);
         if (expOptional.isPresent()) {
             final Expression expression = expOptional.get();
@@ -109,8 +109,8 @@ public class ExpressionServiceV2 {
     }
 
     @Transactional
-    public List<ExpressionAndExampleDto> getExpressionAndExample(String expression) {
-        List<ExampleProjection> exampleProjection = exampleRepo.findExpressionAndExample(replaceVerticalBar(expression));
+    public List<ExpressionAndExampleDto> getExpressionAndExample(String searchString) {
+        List<ExampleProjection> exampleProjection = exampleRepo.findExpressionAndExample(replaceVerticalBar(searchString));
         record TempExpression(UUID id, String spelling) {
         }
         return exampleProjection.stream().map(expPrj -> {
