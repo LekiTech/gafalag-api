@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.lekitech.gafalag.utils.SearchStringNormalizer.replaceVerticalBar;
+import static org.lekitech.gafalag.utils.SearchStringNormalizer.normalizeString;
 
 /**
  * The `ExpressionServiceV2` class provides methods to interact with expressions and their details
@@ -46,7 +46,7 @@ public class ExpressionServiceV2 {
      */
     public List<SimilarDto> searchSuggestions(String spelling, String expLang, String defLang, Integer size) {
         final List<Expression> expressions = expressionRepo.fuzzySearchSpellingsListBySpellingAndExpLang(
-                replaceVerticalBar(spelling),
+                normalizeString(spelling),
                 expLang,
                 defLang,
                 size
@@ -71,7 +71,7 @@ public class ExpressionServiceV2 {
                                                                                       String defLang,
                                                                                       Integer size) {
         final Optional<Expression> expOptional = expressionRepo.findExpressionBySpellingAndLanguageAndDefLanguage(
-                replaceVerticalBar(spelling),
+                normalizeString(spelling),
                 expLang,
                 defLang
         );
@@ -110,7 +110,7 @@ public class ExpressionServiceV2 {
 
     @Transactional
     public List<ExpressionAndExampleDto> getExpressionAndExample(String searchString) {
-        List<ExampleProjection> exampleProjection = exampleRepo.findExpressionAndExample(replaceVerticalBar(searchString));
+        List<ExampleProjection> exampleProjection = exampleRepo.findExpressionAndExample(normalizeString(searchString));
         record TempExpression(UUID id, String spelling) {
         }
         return exampleProjection.stream().map(expPrj -> {

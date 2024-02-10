@@ -28,7 +28,7 @@ public interface ExampleRepositoryV2 extends JpaRepository<Example, UUID> {
               JOIN definition_details dd ON de.definition_details_id = dd.id
               JOIN expression_match_details emd ON dd.expression_details_id = emd.expression_details_id
               JOIN expression expr ON emd.expression_id = expr.id
-              WHERE to_tsvector('simple', ex."raw") @@ to_tsquery('simple', :ss || ':*') OR ex."raw" ILIKE '%' || :ss || '%'
+              WHERE to_tsvector('simple', ex."raw") @@ to_tsquery('simple', replace(:ss, ' ', ' & ') || ':*') OR ex."raw" ILIKE '%' || :ss || '%'
 
              UNION
 
@@ -46,7 +46,7 @@ public interface ExampleRepositoryV2 extends JpaRepository<Example, UUID> {
               JOIN expression_example ee ON ex.id = ee.example_id
               JOIN expression_match_details emd ON ee.expression_details_id = emd.expression_details_id
               JOIN expression expr ON emd.expression_id = expr.id
-              WHERE to_tsvector('simple', ex."raw") @@ to_tsquery('simple', :ss || ':*') OR ex."raw" ILIKE '%' || :ss || '%'
+              WHERE to_tsvector('simple', ex."raw") @@ to_tsquery('simple', replace(:ss, ' ', ' & ') || ':*') OR ex."raw" ILIKE '%' || :ss || '%'
             """,
             nativeQuery = true)
     List<ExampleProjection> findExpressionAndExample(@NonNull @Param("ss") String ss);

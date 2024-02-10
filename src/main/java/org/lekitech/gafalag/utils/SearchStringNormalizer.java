@@ -11,4 +11,17 @@ public class SearchStringNormalizer {
     public static String replaceVerticalBar(String line) {
         return line.replaceAll("(?<=[кптцчКПТЦЧ])[i1lӏ|!]", "I");
     }
+
+    /**
+     * Remove all unnecessary spaces from string.
+     * @param line
+     * @return
+     */
+    public static String trimSpaces(String line) {
+        return line.replaceAll("[ ]+", " ").trim();
+    }
+
+    public static String normalizeString(String line) {
+        return replaceVerticalBar(trimSpaces(line));
+    }
 }
