@@ -3,19 +3,19 @@ package org.lekitech.gafalag.service.v2;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.lekitech.gafalag.dto.v2.ExpressionAndSimilar;
-import org.lekitech.gafalag.dto.v2.ExpressionResponseDto;
-import org.lekitech.gafalag.dto.v2.SimilarDto;
+import org.lekitech.gafalag.dto.v2.*;
 import org.lekitech.gafalag.dto.v2.mapper.DictionaryMapper;
-import org.lekitech.gafalag.entity.v2.Expression;
-import org.lekitech.gafalag.entity.v2.ExpressionDetails;
+import org.lekitech.gafalag.entity.v2.*;
+import org.lekitech.gafalag.repository.v2.ExampleProjection;
+import org.lekitech.gafalag.repository.v2.ExampleRepositoryV2;
 import org.lekitech.gafalag.repository.v2.ExpressionRepositoryV2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static org.lekitech.gafalag.utils.SearchStringNormalizer.normalizeString;
 
 /**
  * The `ExpressionServiceV2` class provides methods to interact with expressions and their details
@@ -33,6 +33,7 @@ public class ExpressionServiceV2 {
     /* Dependencies */
     private final DictionaryMapper mapper;
     private final ExpressionRepositoryV2 expressionRepo;
+    private final ExampleRepositoryV2 exampleRepo;
 
     /**
      * Retrieves a page of search suggestions based on the provided expression, source language,
@@ -44,13 +45,17 @@ public class ExpressionServiceV2 {
      * @return A List of strings containing search suggestions.
      */
     public List<SimilarDto> searchSuggestions(String spelling, String expLang, String defLang, Integer size) {
-        final List<Expression> expressions =
-                expressionRepo.fuzzySearchSpellingsListBySpellingAndExpLang(spelling, expLang, defLang, size);
+        final List<Expression> expressions = expressionRepo.fuzzySearchSpellingsListBySpellingAndExpLang(
+                normalizeString(spelling),
+                expLang,
+                defLang,
+                size
+        );
         return mapper.toDto(expressions);
     }
 
     @Transactional
-    public ExpressionAndSimilar getExpressionByIdAndSimilar(UUID id, String defLang, Integer size) {
+    public ExpressionAndSimilar getExpressionById(UUID id, String defLang, Integer size) {
         final Optional<Expression> expOptional = expressionRepo.findById(id);
         if (expOptional.isPresent()) {
             final Expression expression = expOptional.get();
@@ -65,7 +70,11 @@ public class ExpressionServiceV2 {
                                                                                       String expLang,
                                                                                       String defLang,
                                                                                       Integer size) {
-        final Optional<Expression> expOptional = expressionRepo.findExpressionBySpellingAndLanguageAndDefLanguage(spelling, expLang, defLang);
+        final Optional<Expression> expOptional = expressionRepo.findExpressionBySpellingAndLanguageAndDefLanguage(
+                normalizeString(spelling),
+                expLang,
+                defLang
+        );
         if (expOptional.isPresent()) {
             final Expression expression = expOptional.get();
             return getExpressionAndSimilar(expression, defLang, size);
@@ -97,5 +106,27 @@ public class ExpressionServiceV2 {
             return mapper.toDto(expression.getId(), expression.getSpelling(), expression.getExpressionDetails());
         }
         return null;
+    }
+
+    @Transactional
+    public List<ExpressionAndExampleDto> getExpressionAndExample(String searchString) {
+        List<ExampleProjection> exampleProjection = exampleRepo.findExpressionAndExample(normalizeString(searchString));
+        record TempExpression(UUID id, String spelling) {
+        }
+        return exampleProjection.stream().map(expPrj -> {
+                            ExampleDto value = mapper.toDto(expPrj);
+                            TempExpression key = new TempExpression(expPrj.getExpressionId(), expPrj.getExpressionSpelling());
+                            return Map.entry(key, value);
+                        }
+                ).collect(Collectors.groupingBy(
+                        Map.Entry::getKey,
+                        Collectors.mapping(Map.Entry::getValue,
+                                Collectors.toList())))
+                .entrySet().stream().map(entry -> new ExpressionAndExampleDto(
+                                entry.getKey().id,
+                                entry.getKey().spelling,
+                                new ArrayList<>(entry.getValue())
+                        )
+                ).collect(Collectors.toList());
     }
 }

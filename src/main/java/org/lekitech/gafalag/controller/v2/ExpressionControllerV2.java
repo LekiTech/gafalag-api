@@ -2,6 +2,7 @@ package org.lekitech.gafalag.controller.v2;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.lekitech.gafalag.dto.v2.ExpressionAndExampleDto;
 import org.lekitech.gafalag.dto.v2.ExpressionAndSimilar;
 import org.lekitech.gafalag.dto.v2.ExpressionResponseDto;
 import org.lekitech.gafalag.dto.v2.SimilarDto;
@@ -57,13 +58,15 @@ public class ExpressionControllerV2 {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ExpressionAndSimilar> getExpressionByIdAndSimilar(
+    public ResponseEntity<ExpressionAndSimilar> getExpressionById(
             @PathVariable(name = "id") UUID id,
             @RequestParam(name = "defLang") String defLang,
             @RequestParam(name = "similarCount", defaultValue = "10") Integer size) {
         try {
-            if (size > 50) throw new IllegalArgumentException("similarCount cannot be greater than 50");
-            final ExpressionAndSimilar expAndSimilar = expService.getExpressionByIdAndSimilar(id, defLang, size);
+            if (size > 50) {
+                throw new IllegalArgumentException("similarCount cannot be greater than 50");
+            }
+            final ExpressionAndSimilar expAndSimilar = expService.getExpressionById(id, defLang, size);
             return ResponseEntity.ok(expAndSimilar);
         } catch (Exception e) {
             log.error("Error occurred while retrieving search expression and similar: {}", e.getMessage(), e);
@@ -78,7 +81,9 @@ public class ExpressionControllerV2 {
             @RequestParam(name = "defLang") String defLang,
             @RequestParam(name = "similarCount", defaultValue = "10") Integer size) {
         try {
-            if (size > 50) throw new IllegalArgumentException("similarCount cannot be greater than 50");
+            if (size > 50) {
+                throw new IllegalArgumentException("similarCount cannot be greater than 50");
+            }
             final ExpressionAndSimilar expression = expService.getExpressionBySpellingAndSimilarAndExpLangAndDefLang(spelling, expLang, defLang, size);
             return ResponseEntity.ok(expression);
         } catch (Exception e) {
@@ -94,6 +99,18 @@ public class ExpressionControllerV2 {
             return ResponseEntity.ok(expression);
         } catch (Exception e) {
             log.error("getWordOfTheDay: ", e.getMessage(), e);
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/search/examples")
+    public ResponseEntity<List<ExpressionAndExampleDto>> findExamplesBySearchString(
+            @RequestParam(name = "searchString") String searchString) {
+        try {
+            final List<ExpressionAndExampleDto> expressionAndExample = expService.getExpressionAndExample(searchString);
+            return ResponseEntity.ok(expressionAndExample);
+        } catch (Exception e) {
+            log.error("getExamplesByExpression: ", e.getMessage(), e);
             return ResponseEntity.notFound().build();
         }
     }
