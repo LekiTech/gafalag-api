@@ -6,15 +6,19 @@ import lombok.val;
 import org.lekitech.gafalag.dto.v2.*;
 import org.lekitech.gafalag.dto.v2.mapper.DictionaryMapper;
 import org.lekitech.gafalag.entity.v2.*;
-import org.lekitech.gafalag.repository.v2.ExampleProjection;
+import org.lekitech.gafalag.exception.ExpressionNotFound;
+import org.lekitech.gafalag.projection.ExampleProjection;
 import org.lekitech.gafalag.repository.v2.ExampleRepositoryV2;
 import org.lekitech.gafalag.repository.v2.ExpressionRepositoryV2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Date;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toList;
 import static org.lekitech.gafalag.utils.SearchStringNormalizer.normalizeString;
 
 /**
@@ -100,33 +104,99 @@ public class ExpressionServiceV2 {
 
     @Transactional
     public ExpressionResponseDto getExpressionOfTheDay(String currentDate) {
-        final Optional<Expression> expressionOpt = expressionRepo.findExpressionByCurrentDate(currentDate);
-        if (expressionOpt.isPresent()) {
-            final Expression expression = expressionOpt.get();
-            return mapper.toDto(expression.getId(), expression.getSpelling(), expression.getExpressionDetails());
+        try {
+            final Optional<Expression> expressionOpt = expressionRepo.findExpressionByCurrentDate(Date.valueOf(currentDate));
+            if (expressionOpt.isPresent()) {
+                final Expression expression = expressionOpt.get();
+                return mapper.toDto(expression.getId(), expression.getSpelling(), expression.getExpressionDetails());
+            }
+            return null;
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Incorrect date");
         }
-        return null;
     }
 
     @Transactional
-    public List<ExpressionAndExampleDto> getExpressionAndExample(String searchString) {
-        List<ExampleProjection> exampleProjection = exampleRepo.findExpressionAndExample(normalizeString(searchString));
+    public List<ExpressionAndExampleDto> getExpressionAndExample(String searchString) throws ExpressionNotFound {
+        final List<ExampleProjection> exampleProjection = exampleRepo.findExpressionAndExample(normalizeString(searchString));
+        if (exampleProjection.isEmpty()) {
+            throw new ExpressionNotFound("Not found: " + searchString);
+        }
         record TempExpression(UUID id, String spelling) {
         }
         return exampleProjection.stream().map(expPrj -> {
-                            ExampleDto value = mapper.toDto(expPrj);
                             TempExpression key = new TempExpression(expPrj.getExpressionId(), expPrj.getExpressionSpelling());
+                            ExampleDto value = mapper.toDto(expPrj);
                             return Map.entry(key, value);
                         }
                 ).collect(Collectors.groupingBy(
                         Map.Entry::getKey,
                         Collectors.mapping(Map.Entry::getValue,
-                                Collectors.toList())))
+                                toList())))
                 .entrySet().stream().map(entry -> new ExpressionAndExampleDto(
                                 entry.getKey().id,
                                 entry.getKey().spelling,
                                 new ArrayList<>(entry.getValue())
                         )
-                ).collect(Collectors.toList());
+                ).collect(toList());
     }
+
+    @Transactional
+    public List<ExpressionResponseDto> getExpressionsByTagAndDefLang(String tag, String defLang) {
+        final List<Expression> expressions = expressionRepo.findExpressionsByTagAndDefLang(tag, defLang);
+        return expressions.stream()
+                .map(expression -> {
+                    final List<ExpressionDetails> expressionDetails = expression.getExpressionDetails();
+                    ExpressionExample filteredExpressionExamples = expressionDetails.stream()
+                            .flatMap(expDetails -> expDetails.getExpressionExamples().stream())
+                            .filter(expExample -> expExample.getExample().getExampleTags()
+                                    .stream()
+                                    .anyMatch(exampleTag -> exampleTag.getExampleTagId().getTagAbbr().equals(tag)))
+                            .findFirst()
+                            .orElse(null);
+                    DefinitionDetails filteredDefinitionDetails = expressionDetails.stream()
+                            .flatMap(expDetails -> expDetails.getDefinitionDetails().stream())
+                            .filter(defDetails -> defDetails.getDefinitionDetailsTags().stream()
+                                    .anyMatch(defDetailsTag -> defDetailsTag.getDefinitionDetailsTagId().getTagAbbr().equals(tag))
+                            )
+                            .findFirst().orElse(null);
+                    Definition filteredDefinition = expressionDetails.stream()
+                            .flatMap(expDetails -> expDetails.getDefinitionDetails().stream())
+                            .flatMap(defDetails -> defDetails.getDefinitions().stream())
+                            .filter(definition -> definition.getDefinitionTags()
+                                    .stream()
+                                    .anyMatch(definitionTag -> definitionTag.getDefinitionTagId().getTagAbbr().equals(tag)))
+                            .findFirst()
+                            .orElse(null);
+                    DefinitionExample filteredDefinitionExamples = expressionDetails.stream()
+                            .flatMap(expDetails -> expDetails.getDefinitionDetails().stream())
+                            .flatMap(defDetails -> defDetails.getDefinitionExamples().stream())
+                            .filter(example -> example.getExample().getExampleTags()
+                                    .stream()
+                                    .anyMatch(exampleTag -> exampleTag.getExampleTagId().getTagAbbr().equals(tag)))
+                            .findFirst()
+                            .orElse(null);
+                   /*
+                    List<ExpressionDetails> filteredExpressionDetails = getFilteredExpressionDetails(
+                            expressionDetails,
+                            filteredExpressionExamples,
+                            filteredDefinitionDetails,
+                            filteredDefinition,
+                            filteredDefinitionExamples
+                    );
+                    expression.setExpressionDetails(filteredExpressionDetails);
+
+                    */
+                    return mapper.toDto(expression.getId(), expression.getSpelling(), expression.getExpressionDetails());
+                }).collect(Collectors.toList());
+    }
+
+//    private List<ExpressionDetails> getFilteredExpressionDetails(List<ExpressionDetails> expressionDetails,
+//                                                                 ExpressionExample filteredExpressionExamples,
+//                                                                 DefinitionDetails filteredDefinitionDetails,
+//                                                                 Definition filteredDefinition,
+//                                                                 DefinitionExample filteredDefinitionExamples) {
+//
+//        return expressionDetails.stream().map()
+//    }
 }

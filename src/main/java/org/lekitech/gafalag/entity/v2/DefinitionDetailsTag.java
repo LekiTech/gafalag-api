@@ -47,6 +47,7 @@ public class DefinitionDetailsTag {
     @EqualsAndHashCode(of = {"tagAbbr", "definitionDetailsId"})
     public static class DefinitionDetailsTagId implements Serializable {
 
+        @Getter
         @Column(name = "tag_abbr")
         private String tagAbbr;
 

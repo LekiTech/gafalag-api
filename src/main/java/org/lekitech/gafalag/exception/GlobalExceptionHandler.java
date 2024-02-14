@@ -69,4 +69,18 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body("An error occurred: " + e.getMessage());
     }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException e) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body("An error occurred: " + e.getMessage());
+    }
+
+    @ExceptionHandler(ExpressionNotFound.class)
+    public ResponseEntity<String> handleIllegalArgumentException(ExpressionNotFound e) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body("An error occurred: " + e.getMessage());
+    }
 }

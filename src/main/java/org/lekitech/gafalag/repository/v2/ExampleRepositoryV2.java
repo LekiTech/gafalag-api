@@ -1,6 +1,7 @@
 package org.lekitech.gafalag.repository.v2;
 
 import org.lekitech.gafalag.entity.v2.Example;
+import org.lekitech.gafalag.projection.ExampleProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
