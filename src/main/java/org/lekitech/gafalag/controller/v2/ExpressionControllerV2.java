@@ -3,7 +3,7 @@ package org.lekitech.gafalag.controller.v2;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.lekitech.gafalag.dto.v2.*;
-import org.lekitech.gafalag.entity.v2.Expression;
+import org.lekitech.gafalag.exception.ExpressionNotFound;
 import org.lekitech.gafalag.service.v2.ExpressionServiceV2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -100,15 +100,12 @@ public class ExpressionControllerV2 {
     }
 
     @GetMapping("/search/tags")
-    public ResponseEntity<List<ExpressionResponseDto>> findExpressionsByTagAndDefLang(
-            @RequestParam(name = "tags") String tag,
-            @RequestParam(name = "defLang") String defLang) {
-        try {
-            final List<ExpressionResponseDto> expressions = expService.getExpressionsByTagAndDefLang(tag, defLang);
-            return ResponseEntity.ok(expressions);
-        } catch (Exception e) {
-            log.error("findExpressionsByTagAndDefLang: {}", e.getMessage(), e);
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<List<FoundByTagDto>> findExpressionsByTagAndLang(
+            @RequestParam(name = "tag") String tag,
+            @RequestParam(name = "lang") String lang,
+            @RequestParam(name = "size") Integer size,
+            @RequestParam(name = "page") Integer page) throws ExpressionNotFound {
+        final List<FoundByTagDto> expressions = expService.getExpressionsByTagAndLang(tag, lang, size, page);
+        return ResponseEntity.ok(expressions);
     }
 }

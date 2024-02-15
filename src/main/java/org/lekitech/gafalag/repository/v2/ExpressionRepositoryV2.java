@@ -121,7 +121,7 @@ public interface ExpressionRepositoryV2 extends JpaRepository<Expression, UUID> 
                      JOIN definition_details dd ON dd.expression_details_id = ed.id
                      JOIN definition_details_tag ddt ON dd.id = ddt.definition_details_id
             WHERE ddt.tag_abbr = :tag
-              AND expr.language_id = :defLang
+              AND expr.language_id = :lang
 
             UNION
 
@@ -134,7 +134,7 @@ public interface ExpressionRepositoryV2 extends JpaRepository<Expression, UUID> 
                      JOIN definition d ON dd.id = d.definition_details_id
                      JOIN definition_tag dt ON d.id = dt.definition_id
             WHERE dt.tag_abbr = :tag
-              AND expr.language_id = :defLang
+              AND expr.language_id = :lang
 
             UNION
 
@@ -148,7 +148,7 @@ public interface ExpressionRepositoryV2 extends JpaRepository<Expression, UUID> 
                      JOIN example ex ON de.example_id = ex.id
                      JOIN example_tag et ON et.example_id = ex.id
             WHERE et.tag_abbr = :tag
-              AND expr.language_id = :defLang
+              AND expr.language_id = :lang
 
             UNION
 
@@ -161,9 +161,14 @@ public interface ExpressionRepositoryV2 extends JpaRepository<Expression, UUID> 
                      JOIN example ex ON ex.id = ee.example_id
                      JOIN example_tag et ON et.example_id = ex.id
             WHERE et.tag_abbr = :tag
-              AND expr.language_id = :defLang
+              AND expr.language_id = :lang
+            ORDER BY spelling
+            LIMIT :size
+            OFFSET :size * :page - :size
                         """,
             nativeQuery = true)
-    List<Expression> findExpressionsByTagAndDefLang(@NonNull @Param("tag") String tag,
-                                                    @NonNull @Param("defLang") String defLang);
+    List<Expression> findExpressionsByTagAndLang(@NonNull @Param("tag") String tag,
+                                                 @NonNull @Param("lang") String lang,
+                                                 @NonNull @Param("size") Integer size,
+                                                 @NonNull @Param("page") Integer page);
 }

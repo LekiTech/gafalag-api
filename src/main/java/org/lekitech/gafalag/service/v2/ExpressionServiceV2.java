@@ -15,8 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Date;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 import static org.lekitech.gafalag.utils.SearchStringNormalizer.normalizeString;
@@ -141,62 +141,147 @@ public class ExpressionServiceV2 {
                 ).collect(toList());
     }
 
+
     @Transactional
-    public List<ExpressionResponseDto> getExpressionsByTagAndDefLang(String tag, String defLang) {
-        final List<Expression> expressions = expressionRepo.findExpressionsByTagAndDefLang(tag, defLang);
+    public List<FoundByTagDto> getExpressionsByTagAndLang(String tag, String lang, Integer size, Integer page) throws ExpressionNotFound {
+        final List<Expression> expressions = expressionRepo.findExpressionsByTagAndLang(tag, lang, size, page);
+        if (expressions.isEmpty()) {
+            throw new ExpressionNotFound("No expressions for the tag '" + tag + "' and the language '" + lang + "' were found!");
+        }
         return expressions.stream()
                 .map(expression -> {
-                    final List<ExpressionDetails> expressionDetails = expression.getExpressionDetails();
-                    ExpressionExample filteredExpressionExamples = expressionDetails.stream()
-                            .flatMap(expDetails -> expDetails.getExpressionExamples().stream())
-                            .filter(expExample -> expExample.getExample().getExampleTags()
-                                    .stream()
-                                    .anyMatch(exampleTag -> exampleTag.getExampleTagId().getTagAbbr().equals(tag)))
-                            .findFirst()
-                            .orElse(null);
-                    DefinitionDetails filteredDefinitionDetails = expressionDetails.stream()
+                    final FoundByTagDto.ShortExampleDto expressionExample = findFirstExpressionExampleByTag(expression.getExpressionDetails(), tag);
+                    if (expressionExample != null) {
+                        return new FoundByTagDto(
+                                expression.getId().toString(),
+                                expression.getSpelling(),
+                                expression.getLanguage().getId(),
+                                null,
+                                expressionExample);
+                    }
+                    final List<DefinitionDetails> definitionDetails = expression.getExpressionDetails().stream()
                             .flatMap(expDetails -> expDetails.getDefinitionDetails().stream())
-                            .filter(defDetails -> defDetails.getDefinitionDetailsTags().stream()
-                                    .anyMatch(defDetailsTag -> defDetailsTag.getDefinitionDetailsTagId().getTagAbbr().equals(tag))
-                            )
-                            .findFirst().orElse(null);
-                    Definition filteredDefinition = expressionDetails.stream()
-                            .flatMap(expDetails -> expDetails.getDefinitionDetails().stream())
-                            .flatMap(defDetails -> defDetails.getDefinitions().stream())
-                            .filter(definition -> definition.getDefinitionTags()
-                                    .stream()
-                                    .anyMatch(definitionTag -> definitionTag.getDefinitionTagId().getTagAbbr().equals(tag)))
-                            .findFirst()
-                            .orElse(null);
-                    DefinitionExample filteredDefinitionExamples = expressionDetails.stream()
-                            .flatMap(expDetails -> expDetails.getDefinitionDetails().stream())
-                            .flatMap(defDetails -> defDetails.getDefinitionExamples().stream())
-                            .filter(example -> example.getExample().getExampleTags()
-                                    .stream()
-                                    .anyMatch(exampleTag -> exampleTag.getExampleTagId().getTagAbbr().equals(tag)))
-                            .findFirst()
-                            .orElse(null);
-                   /*
-                    List<ExpressionDetails> filteredExpressionDetails = getFilteredExpressionDetails(
-                            expressionDetails,
-                            filteredExpressionExamples,
-                            filteredDefinitionDetails,
-                            filteredDefinition,
-                            filteredDefinitionExamples
-                    );
-                    expression.setExpressionDetails(filteredExpressionDetails);
-
-                    */
-                    return mapper.toDto(expression.getId(), expression.getSpelling(), expression.getExpressionDetails());
+                            .toList();
+                    final FoundByTagDto.ShortDefinitionDto shortDefinition = findFirstDefinitionByTag(definitionDetails, tag);
+                    if (shortDefinition != null) {
+                        return new FoundByTagDto(
+                                expression.getId().toString(),
+                                expression.getSpelling(),
+                                expression.getLanguage().getId(),
+                                shortDefinition,
+                                null);
+                    }
+                    final FoundByTagDto.ShortExampleDto definitionExample = findFirstDefinitionExampleByTag(definitionDetails, tag);
+                    if (definitionExample != null) {
+                        return new FoundByTagDto(
+                                expression.getId().toString(),
+                                expression.getSpelling(),
+                                expression.getLanguage().getId(),
+                                null,
+                                definitionExample);
+                    }
+                    return null;
                 }).collect(Collectors.toList());
     }
 
-//    private List<ExpressionDetails> getFilteredExpressionDetails(List<ExpressionDetails> expressionDetails,
-//                                                                 ExpressionExample filteredExpressionExamples,
-//                                                                 DefinitionDetails filteredDefinitionDetails,
-//                                                                 Definition filteredDefinition,
-//                                                                 DefinitionExample filteredDefinitionExamples) {
-//
-//        return expressionDetails.stream().map()
-//    }
+    private FoundByTagDto.ShortExampleDto findFirstExpressionExampleByTag(List<ExpressionDetails> expressionDetails, String tag) {
+        ExpressionExample filteredExpressionExamples = expressionDetails.stream()
+                .flatMap(expDetails -> expDetails.getExpressionExamples().stream())
+                .filter(expExample -> expExample.getExample().getExampleTags()
+                        .stream()
+                        .anyMatch(exampleTag -> exampleTag.getExampleTagId().getTagAbbr().equals(tag)))
+                .findFirst()
+                .orElse(null);
+        if (filteredExpressionExamples != null) {
+            Example example = filteredExpressionExamples.getExample();
+            List<String> allTags = example.getExampleTags().stream().map(expTags -> expTags.getExampleTagId().getTagAbbr()).toList();
+            return new FoundByTagDto.ShortExampleDto(example.getSource(), example.getTranslation(), allTags);
+        }
+        return null;
+    }
+
+    private FoundByTagDto.ShortDefinitionDto findFirstDefinitionByTag(List<DefinitionDetails> definitionDetails, String tag) {
+        // Find first definition details that contains provided tag
+        DefinitionDetails filteredDefinitionDetails = definitionDetails.stream()
+                .filter(defDetails -> defDetails.getDefinitionDetailsTags().stream()
+                        .anyMatch(defDetailsTag -> defDetailsTag.getDefinitionDetailsTagId().getTagAbbr().equals(tag))
+                )
+                .findFirst()
+                .orElse(null);
+        if (filteredDefinitionDetails != null) {
+            var definitionDetailsTags = filteredDefinitionDetails.getDefinitionDetailsTags().stream()
+                    .map(ddt -> ddt.getDefinitionDetailsTagId().getTagAbbr());
+            var foundDefinition = filteredDefinitionDetails.getDefinitions().stream()
+                    .findFirst()
+                    .orElse(null);
+            if (foundDefinition != null) {
+                var definitionTags = foundDefinition.getDefinitionTags().stream()
+                        .map(ddt -> ddt.getDefinitionTagId().getTagAbbr());
+                List<String> allTags = Stream.concat(definitionDetailsTags, definitionTags).toList();
+                return new FoundByTagDto.ShortDefinitionDto(foundDefinition.getValue(), allTags);
+            }
+        }
+        // Find first definition that contains provided tag
+        Definition foundDefinition = definitionDetails.stream()
+                .flatMap(defDetails -> defDetails.getDefinitions().stream())
+                .filter(definition -> definition.getDefinitionTags()
+                        .stream()
+                        .anyMatch(definitionTag -> definitionTag.getDefinitionTagId().getTagAbbr().equals(tag)))
+                .findFirst()
+                .orElse(null);
+        if (foundDefinition != null) {
+            List<String> definitionTags = foundDefinition.getDefinitionTags().stream()
+                    .map(ddt -> ddt.getDefinitionTagId().getTagAbbr())
+                    .toList();
+            return new FoundByTagDto.ShortDefinitionDto(foundDefinition.getValue(), definitionTags);
+        }
+        return null;
+    }
+
+    private FoundByTagDto.ShortExampleDto findFirstDefinitionExampleByTag(List<DefinitionDetails> definitionDetails, String tag) {
+        DefinitionDetails filteredDefinitionDetails = definitionDetails.stream()
+                .filter(defDetails -> defDetails.getDefinitionDetailsTags().stream()
+                        .anyMatch(defDetailsTag -> defDetailsTag.getDefinitionDetailsTagId().getTagAbbr().equals(tag)))
+                .findFirst()
+                .orElse(null);
+        if (filteredDefinitionDetails != null
+                && (filteredDefinitionDetails.getDefinitions() == null || filteredDefinitionDetails.getDefinitions().isEmpty())) {
+            DefinitionExample filteredDefinitionExamples = filteredDefinitionDetails.getDefinitionExamples().stream()
+                    .filter(example -> example.getExample().getExampleTags()
+                            .stream()
+                            .anyMatch(exampleTag -> exampleTag.getExampleTagId().getTagAbbr().equals(tag)))
+                    .findFirst()
+                    .orElse(null);
+            if (filteredDefinitionExamples != null) {
+                var definitionDetailsTags = filteredDefinitionDetails.getDefinitionDetailsTags().stream()
+                        .map(defDetailsTag -> defDetailsTag.getDefinitionDetailsTagId().getTagAbbr());
+                var exampleTags = filteredDefinitionExamples.getExample().getExampleTags().stream()
+                        .map(defExampleTag -> defExampleTag.getExampleTagId().getTagAbbr());
+                List<String> allTags = Stream.concat(definitionDetailsTags, exampleTags).toList();
+                return new FoundByTagDto.ShortExampleDto(
+                        filteredDefinitionExamples.getExample().getSource(),
+                        filteredDefinitionExamples.getExample().getTranslation(),
+                        allTags
+                );
+            }
+        }
+        DefinitionExample filteredDefinitionExample = definitionDetails.stream()
+                .flatMap(defDetail -> defDetail.getDefinitionExamples().stream())
+                .filter(example -> example.getExample().getExampleTags()
+                        .stream()
+                        .anyMatch(exampleTag -> exampleTag.getExampleTagId().getTagAbbr().equals(tag)))
+                .findFirst()
+                .orElse(null);
+        if (filteredDefinitionExample != null) {
+            List<String> exampleTags = filteredDefinitionExample.getExample().getExampleTags().stream()
+                    .map(expTag -> expTag.getExampleTagId().getTagAbbr())
+                    .toList();
+            return new FoundByTagDto.ShortExampleDto(
+                    filteredDefinitionExample.getExample().getSource(),
+                    filteredDefinitionExample.getExample().getTranslation(),
+                    exampleTags
+            );
+        }
+        return null;
+    }
 }
