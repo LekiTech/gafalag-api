@@ -1,4 +1,4 @@
-package org.lekitech.gafalag.repository.v2;
+package org.lekitech.gafalag.projection;
 
 import java.util.UUID;
 

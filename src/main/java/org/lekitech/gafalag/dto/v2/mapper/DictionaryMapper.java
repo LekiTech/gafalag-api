@@ -1,9 +1,8 @@
 package org.lekitech.gafalag.dto.v2.mapper;
 
 import org.lekitech.gafalag.dto.v2.*;
-import org.lekitech.gafalag.entity.v2.Expression;
-import org.lekitech.gafalag.entity.v2.ExpressionDetails;
-import org.lekitech.gafalag.repository.v2.ExampleProjection;
+import org.lekitech.gafalag.entity.v2.*;
+import org.lekitech.gafalag.projection.ExampleProjection;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

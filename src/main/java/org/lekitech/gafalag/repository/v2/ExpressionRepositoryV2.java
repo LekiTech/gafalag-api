@@ -9,6 +9,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -102,11 +103,72 @@ public interface ExpressionRepositoryV2 extends JpaRepository<Expression, UUID> 
             LIMIT 1 OFFSET 
             mod(
             -- CURRENT DATE - REFERENCE DATE (used Shtulski rebellion as reference)
-                CAST(:currentDate AS DATE) - DATE '1930-04-27', 
+                :currentDate - DATE '1930-04-27', 
             -- Count all Lezgi expressions to ensure that upper offset limit matches amount of expressions
                 (SELECT COUNT(*) FROM expression e WHERE e.language_id = 'lez')
             )
             """,
             nativeQuery = true)
-    Optional<Expression> findExpressionByCurrentDate(@NonNull @Param("currentDate") String currentDate);
+    Optional<Expression> findExpressionByCurrentDate(@NonNull @Param("currentDate") Date currentDate);
+
+
+    @Query(value = """
+            -- SELECT на поиск tag на уровне definition_details
+            SELECT expr.*
+            FROM expression expr
+                     JOIN expression_match_details emd ON emd.expression_id = expr.id
+                     JOIN expression_details ed ON ed.id = emd.expression_details_id
+                     JOIN definition_details dd ON dd.expression_details_id = ed.id
+                     JOIN definition_details_tag ddt ON dd.id = ddt.definition_details_id
+            WHERE ddt.tag_abbr = :tag
+              AND expr.language_id = :lang
+
+            UNION
+
+            -- SELECT на поиск tag внутри definition
+            SELECT expr.*
+            FROM expression expr
+                     JOIN expression_match_details emd ON emd.expression_id = expr.id
+                     JOIN expression_details ed ON ed.id = emd.expression_details_id
+                     JOIN definition_details dd ON dd.expression_details_id = ed.id
+                     JOIN definition d ON dd.id = d.definition_details_id
+                     JOIN definition_tag dt ON d.id = dt.definition_id
+            WHERE dt.tag_abbr = :tag
+              AND expr.language_id = :lang
+
+            UNION
+
+            --  SELECT на поиск tag в example внутри definition
+            SELECT expr.*
+            FROM expression expr
+                     JOIN expression_match_details emd ON emd.expression_id = expr.id
+                     JOIN expression_details ed ON ed.id = emd.expression_details_id
+                     JOIN definition_details dd ON dd.expression_details_id = ed.id
+                     JOIN definition_example de ON dd.id = de.definition_details_id
+                     JOIN example ex ON de.example_id = ex.id
+                     JOIN example_tag et ON et.example_id = ex.id
+            WHERE et.tag_abbr = :tag
+              AND expr.language_id = :lang
+
+            UNION
+
+            -- SELECT на поиск tag на example внутри expression_details
+            SELECT expr.*
+            FROM expression expr
+                     JOIN expression_match_details emd ON emd.expression_id = expr.id
+                     JOIN expression_details ed ON ed.id = emd.expression_details_id
+                     JOIN expression_example ee ON ee.expression_details_id = ed.id
+                     JOIN example ex ON ex.id = ee.example_id
+                     JOIN example_tag et ON et.example_id = ex.id
+            WHERE et.tag_abbr = :tag
+              AND expr.language_id = :lang
+            ORDER BY spelling
+            LIMIT :size
+            OFFSET :size * :page - :size
+                        """,
+            nativeQuery = true)
+    List<Expression> findExpressionsByTagAndLang(@NonNull @Param("tag") String tag,
+                                                 @NonNull @Param("lang") String lang,
+                                                 @NonNull @Param("size") Integer size,
+                                                 @NonNull @Param("page") Integer page);
 }

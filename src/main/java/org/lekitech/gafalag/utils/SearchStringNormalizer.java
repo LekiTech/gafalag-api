@@ -18,7 +18,7 @@ public class SearchStringNormalizer {
      * @return
      */
     public static String trimSpaces(String line) {
-        return line.replaceAll("[ ]+", " ").trim();
+        return line.replaceAll("\\s+", " ").trim();
     }
 
     public static String normalizeString(String line) {
