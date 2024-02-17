@@ -112,12 +112,16 @@ public class ExpressionServiceV2 {
             }
             return null;
         } catch (IllegalArgumentException e) {
+            /* This IllegalArgumentException is thrown to indicate an error comment for clarity of the problem encountered. */
             throw new IllegalArgumentException("Incorrect date");
         }
     }
 
     @Transactional
     public List<ExpressionAndExampleDto> getExpressionAndExample(String searchString) throws ExpressionNotFound {
+        if (searchString == null || searchString.isBlank()) {
+            throw new IllegalArgumentException("Incorrect search string format");
+        }
         final List<ExampleProjection> exampleProjection = exampleRepo.findExpressionAndExample(normalizeString(searchString));
         if (exampleProjection.isEmpty()) {
             throw new ExpressionNotFound("Not found: " + searchString);
@@ -141,7 +145,6 @@ public class ExpressionServiceV2 {
                 ).collect(toList());
     }
 
-
     @Transactional
     public List<FoundByTagDto> getExpressionsByTagAndLang(String tag, String lang, Integer size, Integer page) throws ExpressionNotFound {
         final List<Expression> expressions = expressionRepo.findExpressionsByTagAndLang(tag, lang, size, page);
@@ -152,33 +155,18 @@ public class ExpressionServiceV2 {
                 .map(expression -> {
                     final FoundByTagDto.ShortExampleDto expressionExample = findFirstExpressionExampleByTag(expression.getExpressionDetails(), tag);
                     if (expressionExample != null) {
-                        return new FoundByTagDto(
-                                expression.getId().toString(),
-                                expression.getSpelling(),
-                                expression.getLanguage().getId(),
-                                null,
-                                expressionExample);
+                        return new FoundByTagDto(expression, expressionExample);
                     }
                     final List<DefinitionDetails> definitionDetails = expression.getExpressionDetails().stream()
                             .flatMap(expDetails -> expDetails.getDefinitionDetails().stream())
                             .toList();
                     final FoundByTagDto.ShortDefinitionDto shortDefinition = findFirstDefinitionByTag(definitionDetails, tag);
                     if (shortDefinition != null) {
-                        return new FoundByTagDto(
-                                expression.getId().toString(),
-                                expression.getSpelling(),
-                                expression.getLanguage().getId(),
-                                shortDefinition,
-                                null);
+                        return new FoundByTagDto(expression, shortDefinition);
                     }
                     final FoundByTagDto.ShortExampleDto definitionExample = findFirstDefinitionExampleByTag(definitionDetails, tag);
                     if (definitionExample != null) {
-                        return new FoundByTagDto(
-                                expression.getId().toString(),
-                                expression.getSpelling(),
-                                expression.getLanguage().getId(),
-                                null,
-                                definitionExample);
+                        return new FoundByTagDto(expression, definitionExample);
                     }
                     return null;
                 }).collect(Collectors.toList());
