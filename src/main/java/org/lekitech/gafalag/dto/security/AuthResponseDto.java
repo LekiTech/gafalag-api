@@ -14,5 +14,6 @@ package org.lekitech.gafalag.dto.security;
  */
 public record AuthResponseDto(
         UserDto user,
-        String accessToken
+        String accessToken,
+        String refreshToken //TODO JavaDoc
 ) { }
