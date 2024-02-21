@@ -2,6 +2,7 @@ package org.lekitech.gafalag.dto.v2.mapper;
 
 import org.lekitech.gafalag.dto.v2.*;
 import org.lekitech.gafalag.entity.v2.*;
+import org.lekitech.gafalag.projection.DefinitionProjection;
 import org.lekitech.gafalag.projection.ExampleProjection;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -25,8 +26,8 @@ public interface DictionaryMapper {
     @Mapping(source = "translation", target = "trl")
     ExampleDto toDto(ExampleProjection example);
 
-    @Mapping(source = "id", target = "id")
-    @Mapping(source = "spelling", target = "spelling")
-    @Mapping(source = "examples", target = "examples")
-    ExpressionAndExampleDto mapToDto(UUID id, String spelling, List<ExampleDto> examples);
+    @Mapping(source = "definitionId", target = "id")
+    @Mapping(source = "definitionValue", target = "value")
+    @Mapping(source = "tags", target = "tags")
+    DefinitionDto toDto(DefinitionProjection definitionProjection);
 }
