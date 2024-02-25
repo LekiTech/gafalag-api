@@ -44,7 +44,7 @@ public interface DefinitionRepositoryV2 extends JpaRepository<Definition, UUID> 
                      JOIN definition_details dd ON dd.expression_details_id = ed.id
                      JOIN definition d ON d.definition_details_id = dd.id
                      LEFT JOIN definition_tag dt ON dt.definition_id = d.id
-            WHERE expr.language_id = :expLang
+            WHERE expr.language_id = :expLang -- todo искать нужно по defLang
                 AND to_tsvector('simple', d."value") @@ to_tsquery('simple', replace(:searchString, ' ', ' & ') || ':*')
                OR d."value" ILIKE '%' || :searchString || '%'
             ORDER BY spelling

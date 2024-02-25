@@ -59,8 +59,8 @@ public interface ExampleRepositoryV2 extends JpaRepository<Example, UUID> {
             FROM example ex
                      JOIN expression_example ee ON ex.id = ee.example_id
                      JOIN expression_match_details emd ON ee.expression_details_id = emd.expression_details_id
-                     JOIN expression exp ON emd.expression_id = exp.id
-            WHERE language_id = :expLang
+                     JOIN expression exp ON emd.expression_id = exp.id 
+            WHERE language_id = :expLang -- todo exLang (в javadoc объяснить что значит exLang) если ищу русское слово, то либо ex.src_lang_id должен быть 'rus', либо ex.trl_lang_id = 'rus'
                 AND to_tsvector('simple', ex."raw") @@ to_tsquery('simple', replace(:searchString, ' ', ' & ') || ':*')
                OR ex."raw" ILIKE '%' || :searchString || '%'
             ORDER BY "expressionSpelling"

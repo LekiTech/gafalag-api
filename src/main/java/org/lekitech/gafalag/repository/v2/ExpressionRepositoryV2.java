@@ -52,14 +52,14 @@ public interface ExpressionRepositoryV2 extends JpaRepository<Expression, UUID> 
                 )
             )
             ORDER BY e.spelling <-> :spelling
-            LIMIT :similarCount
+            LIMIT :size
             """,
             nativeQuery = true)
     List<Expression> fuzzySearchSpellingsListBySpellingAndExpLang(
             @NonNull @Param("spelling") String spelling,
             @NonNull @Param("expLang") String expLang,
             @NonNull @Param("defLang") String defLang,
-            Integer similarCount
+            Integer size
     );
 
 

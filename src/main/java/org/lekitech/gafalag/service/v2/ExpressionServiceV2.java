@@ -49,15 +49,15 @@ public class ExpressionServiceV2 {
      *
      * @param spelling     The expression to search for.
      * @param expLang      The source language for the expression.
-     * @param similarCount The limit of the suggestions.
+     * @param size The limit of the suggestions.
      * @return a List of strings containing search suggestions.
      */
-    public List<SimilarDto> getSuggestions(String spelling, String expLang, String defLang, Integer similarCount) {
+    public List<SimilarDto> getSuggestions(String spelling, String expLang, String defLang, Integer size) {
         final List<Expression> expressions = expressionRepo.fuzzySearchSpellingsListBySpellingAndExpLang(
                 normalizeString(spelling),
                 expLang,
                 defLang,
-                similarCount
+                size
         );
         return mapper.toDto(expressions);
     }

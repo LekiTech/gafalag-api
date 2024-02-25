@@ -28,6 +28,5 @@ public interface DictionaryMapper {
 
     @Mapping(source = "definitionId", target = "id")
     @Mapping(source = "definitionValue", target = "value")
-    @Mapping(source = "tags", target = "tags")
     DefinitionDto toDto(DefinitionProjection definitionProjection);
 }

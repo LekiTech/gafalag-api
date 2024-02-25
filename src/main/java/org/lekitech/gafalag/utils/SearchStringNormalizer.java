@@ -8,6 +8,8 @@ public class SearchStringNormalizer {
      * if they are preceded by any of the following characters:
      * "к", "п", "т", "ц", "ч", "К", "П", "Т", "Ц" or "Ч".
      * <p>
+     * This method is intended for the Lezgi language only.
+     * <p>
      * This method can be static because it is a "pure function"
      * and does not change the "state" outside its scope.
      *
