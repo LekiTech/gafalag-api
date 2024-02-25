@@ -47,9 +47,9 @@ public class ExpressionServiceV2 {
      * Retrieves a page of search suggestions based on the provided expression, source language,
      * and pageable information.
      *
-     * @param spelling     The expression to search for.
-     * @param expLang      The source language for the expression.
-     * @param size The limit of the suggestions.
+     * @param spelling The expression to search for.
+     * @param expLang  The source language for the expression.
+     * @param size     The limit of the suggestions.
      * @return a List of strings containing search suggestions.
      */
     public List<SimilarDto> getSuggestions(String spelling, String expLang, String defLang, Integer size) {
@@ -161,23 +161,29 @@ public class ExpressionServiceV2 {
     }
 
     /**
-     * Checks the search string, page size, and current page parameters to see if they match.
+     * Checks the search string, language, page size, and current page parameters to see if they match.
      *
      * @param searchString The search string to be validated.
+     * @param lang         The language to be validated.
      * @param pageSize     The page size to be validated.
      * @param currentPage  The current page number to be validated.
      * @throws IllegalArgumentException  if the search string is null or empty.
      * @throws IndexOutOfBoundsException if the page size is invalid or exceeds the maximum allowed value,
      *                                   or if the current page number exceeds the maximum allowed value.
      */
-    private void validOfSearchStrAndCurrentPage(String searchString, Integer pageSize, Integer currentPage) {
+    private Integer inputValidation(String searchString, String lang, Integer pageSize, Integer currentPage) {
         if (searchString == null || searchString.isBlank()) {
             throw new IllegalArgumentException("Incorrect search string format.");
+        } else if (lang == null || lang.isBlank()) {
+            throw new IllegalArgumentException("Incorrect language format.");
         } else if (pageSize <= 0 || pageSize > 50) {
             throw new IndexOutOfBoundsException("Incorrect page size format or page size exceeds maximum.");
         } else if (currentPage >= 99999) {
             throw new IndexOutOfBoundsException("Page exceeds maximum.");
+        } else if (currentPage < 0) {
+            return 0;
         }
+        return currentPage;
     }
 
     /**
@@ -185,7 +191,7 @@ public class ExpressionServiceV2 {
      * expression language, and pagination parameters.
      *
      * @param searchString The string to search for within expressions.
-     * @param expLang      The language of the expressions to filter by.
+     * @param exLang       The language of the 'example source' or 'example translation'.
      * @param pageSize     The size of each page in the pagination.
      * @param currentPage  The current page number of the pagination.
      * @return a {@link PaginationResponseDto} with {@link ExpressionAndExampleDto} object.
@@ -196,15 +202,12 @@ public class ExpressionServiceV2 {
      */
     @Transactional
     public PaginationResponseDto<ExampleProjection, ExpressionAndExampleDto> getExpressionsAndExamples(String searchString,
-                                                                                                       String expLang,
+                                                                                                       String exLang,
                                                                                                        Integer pageSize,
                                                                                                        Integer currentPage) throws ExpressionNotFound {
-        validOfSearchStrAndCurrentPage(searchString, pageSize, currentPage);
-        if (currentPage < 0) {
-            currentPage = 0;
-        }
+        currentPage = inputValidation(searchString, exLang, pageSize, currentPage);
         final Page<ExampleProjection> exampleProjectionPage
-                = exampleRepo.findExpressionAndExample(normalizeString(searchString), expLang, PageRequest.of(currentPage, pageSize));
+                = exampleRepo.findExpressionAndExample(normalizeString(searchString), exLang, PageRequest.of(currentPage, pageSize));
         final List<ExampleProjection> exampleProjections = exampleProjectionPage.getContent();
         if (exampleProjections.isEmpty()) {
             throw new ExpressionNotFound("Not found: " + searchString);
@@ -224,7 +227,7 @@ public class ExpressionServiceV2 {
      * expression language, and pagination parameters.
      *
      * @param searchString The string to search for within expressions.
-     * @param expLang      The language of the expressions to filter by.
+     * @param defLang      The language of the definition to filter by.
      * @param pageSize     The size of each page in the pagination.
      * @param currentPage  The current page number of the pagination.
      * @return a {@link PaginationResponseDto} with {@link ExpressionAndDefinitionDto} object.
@@ -235,15 +238,12 @@ public class ExpressionServiceV2 {
      */
     @Transactional
     public PaginationResponseDto<DefinitionProjection, ExpressionAndDefinitionDto> getExpressionsAndDefinitions(String searchString,
-                                                                                                                String expLang,
+                                                                                                                String defLang,
                                                                                                                 Integer pageSize,
                                                                                                                 Integer currentPage) throws ExpressionNotFound {
-        validOfSearchStrAndCurrentPage(searchString, pageSize, currentPage);
-        if (currentPage < 0) {
-            currentPage = 0;
-        }
+        currentPage = inputValidation(searchString, defLang, pageSize, currentPage);
         final Page<DefinitionProjection> defProjectionPage
-                = definitionRepo.findExpressionsAndDefinitions(normalizeString(searchString), expLang, PageRequest.of(currentPage, pageSize));
+                = definitionRepo.findExpressionsAndDefinitions(normalizeString(searchString), defLang, PageRequest.of(currentPage, pageSize));
         final List<DefinitionProjection> definitionProjections = defProjectionPage.getContent();
         if (definitionProjections.isEmpty()) {
             throw new ExpressionNotFound("Not found: " + searchString);
@@ -277,10 +277,7 @@ public class ExpressionServiceV2 {
                                                                                                String expLang,
                                                                                                Integer pageSize,
                                                                                                Integer currentPage) throws ExpressionNotFound {
-        validOfSearchStrAndCurrentPage(tag, pageSize, currentPage);
-        if (currentPage < 0) {
-            currentPage = 0;
-        }
+        currentPage = inputValidation(tag, expLang, pageSize, currentPage);
         final Page<Expression> expressionsPage
                 = expressionRepo.findExpressionsByTagAndExpLang(tag, expLang, PageRequest.of(currentPage, pageSize));
         final List<Expression> expressions = expressionsPage.getContent();

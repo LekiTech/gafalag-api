@@ -13,5 +13,5 @@ public interface DefinitionProjection {
 
     String getDefinitionValue();
 
-    List<String> getTags();
+    List<String> getDefinitionTags();
 }

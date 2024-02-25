@@ -20,7 +20,7 @@ public interface ExampleRepositoryV2 extends JpaRepository<Example, UUID> {
      * This method performs a search for expressions and examples matching the given search string and expression language.
      *
      * @param searchString The string to search for within example raw text.
-     * @param expLang      The language of the expressions to search within.
+     * @param exLang       The language of the 'example source' or 'example translation'.
      * @param pageable     Pagination information for the query results.
      * @return a {@link Page} containing {@link ExampleProjection} objects representing the expressions and examples found.
      * @throws IllegalArgumentException if the searchString or expLang parameter is null.
@@ -43,11 +43,12 @@ public interface ExampleRepositoryV2 extends JpaRepository<Example, UUID> {
                      JOIN definition_details dd ON de.definition_details_id = dd.id
                      JOIN expression_match_details emd ON dd.expression_details_id = emd.expression_details_id
                      JOIN expression exp ON emd.expression_id = exp.id
-            WHERE to_tsvector('simple', ex."raw") @@ to_tsquery('simple', replace(:searchString, ' ', ' & ') || ':*')
-               OR ex."raw" ILIKE '%' || :searchString || '%'
+            WHERE (ex.src_lang_id = :exLang OR ex.trl_lang_id = :exLang)
+              AND (to_tsvector('simple', ex."raw") @@ to_tsquery('simple', replace(:searchString, ' ', ' & ') || ':*')
+                OR ex."raw" ILIKE '%' || :searchString || '%')
                         
             UNION
-            -- Second Path: example -> expression_example -> expression_match_details -> expression
+                        
             SELECT CAST(exp.id as varchar) AS "expressionId",
                    exp.spelling            AS "expressionSpelling",
                    CAST(ex.id as varchar)  AS id,
@@ -59,34 +60,49 @@ public interface ExampleRepositoryV2 extends JpaRepository<Example, UUID> {
             FROM example ex
                      JOIN expression_example ee ON ex.id = ee.example_id
                      JOIN expression_match_details emd ON ee.expression_details_id = emd.expression_details_id
-                     JOIN expression exp ON emd.expression_id = exp.id 
-            WHERE language_id = :expLang -- todo exLang (в javadoc объяснить что значит exLang) если ищу русское слово, то либо ex.src_lang_id должен быть 'rus', либо ex.trl_lang_id = 'rus'
-                AND to_tsvector('simple', ex."raw") @@ to_tsquery('simple', replace(:searchString, ' ', ' & ') || ':*')
-               OR ex."raw" ILIKE '%' || :searchString || '%'
+                     JOIN expression exp ON emd.expression_id = exp.id
+            WHERE (ex.src_lang_id = :exLang OR ex.trl_lang_id = :exLang)
+              AND (to_tsvector('simple', ex."raw") @@ to_tsquery('simple', replace(:searchString, ' ', ' & ') || ':*')
+                OR ex."raw" ILIKE '%' || :searchString || '%')
             ORDER BY "expressionSpelling"
             """,
             countQuery = """
                     SELECT count(*)
-                    FROM (SELECT exp.spelling AS "expressionSpelling"
+                    FROM (SELECT CAST(exp.id as varchar) AS "expressionId",
+                                 exp.spelling            AS "expressionSpelling",
+                                 CAST(ex.id as varchar)  AS id,
+                                 ex."source"             AS "source",
+                                 ex."translation"        AS "translation",
+                                 ex.src_lang_id          AS "srcLangId",
+                                 ex.trl_lang_id          AS "trlLangId",
+                                 ex.raw                  AS raw
                           FROM example ex
                                    JOIN definition_example de ON ex.id = de.example_id
                                    JOIN definition_details dd ON de.definition_details_id = dd.id
                                    JOIN expression_match_details emd ON dd.expression_details_id = emd.expression_details_id
                                    JOIN expression exp ON emd.expression_id = exp.id
-                          WHERE to_tsvector('simple', ex."raw") @@ to_tsquery('simple', replace(:searchString, ' ', ' & ') || ':*')
-                             OR ex."raw" ILIKE '%' || :searchString || '%'
+                          WHERE (ex.src_lang_id = :exLang OR ex.trl_lang_id = :exLang)
+                            AND (to_tsvector('simple', ex."raw") @@ to_tsquery('simple', replace(:searchString, ' ', ' & ') || ':*')
+                              OR ex."raw" ILIKE '%' || :searchString || '%')
                           UNION
-                          SELECT exp.spelling AS "expressionSpelling"
+                          SELECT CAST(exp.id as varchar) AS "expressionId",
+                                 exp.spelling            AS "expressionSpelling",
+                                 CAST(ex.id as varchar)  AS id,
+                                 ex."source"             AS "source",
+                                 ex."translation"        AS "translation",
+                                 ex.src_lang_id          AS "srcLangId",
+                                 ex.trl_lang_id          AS "trlLangId",
+                                 ex.raw                  AS raw
                           FROM example ex
                                    JOIN expression_example ee ON ex.id = ee.example_id
                                    JOIN expression_match_details emd ON ee.expression_details_id = emd.expression_details_id
                                    JOIN expression exp ON emd.expression_id = exp.id
-                          WHERE language_id = :expLang
-                              AND to_tsvector('simple', ex."raw") @@ to_tsquery('simple', replace(:searchString, ' ', ' & ') || ':*')
-                             OR ex."raw" ILIKE '%' || :searchString || '%') AS result
+                          WHERE (ex.src_lang_id = :exLang OR ex.trl_lang_id = :exLang)
+                            AND (to_tsvector('simple', ex."raw") @@ to_tsquery('simple', replace(:searchString, ' ', ' & ') || ':*')
+                              OR ex."raw" ILIKE '%' || :searchString || '%')) AS result
                     """,
             nativeQuery = true)
     Page<ExampleProjection> findExpressionAndExample(@NonNull @Param("searchString") String searchString,
-                                                     @NonNull @Param("expLang") String expLang,
+                                                     @NonNull @Param("exLang") String exLang,
                                                      Pageable pageable);
 }

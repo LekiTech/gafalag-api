@@ -128,7 +128,7 @@ public class ExpressionControllerV2 {
      * and the expression language searched for.
      *
      * @param searchString The search string to match examples.
-     * @param expLang      The language of the expressions.
+     * @param exLang       The language of the 'example source' or 'example translation'.
      * @param pageSize     The number of examples per page (default is 10).
      * @param currentPage  The current page number (default is 0).
      * @return a ResponseEntity object containing a PaginationResponseDto with ExpressionAndExampleDto data.
@@ -136,11 +136,11 @@ public class ExpressionControllerV2 {
     @GetMapping("/search/examples")
     public ResponseEntity<PaginationResponseDto<ExampleProjection, ExpressionAndExampleDto>> findExamplesBySearchString(
             @RequestParam(name = "searchString") String searchString,
-            @RequestParam(name = "expLang") String expLang,
+            @RequestParam(name = "exLang") String exLang,
             @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
             @RequestParam(name = "currentPage", defaultValue = "0") Integer currentPage) throws Exception {
         final PaginationResponseDto<ExampleProjection, ExpressionAndExampleDto> paginationResponse
-                = expService.getExpressionsAndExamples(searchString, expLang, pageSize, currentPage);
+                = expService.getExpressionsAndExamples(searchString, exLang, pageSize, currentPage);
         return ResponseEntity.ok(paginationResponse);
     }
 
@@ -149,7 +149,7 @@ public class ExpressionControllerV2 {
      * and expression language.
      *
      * @param searchString The search string to search definitions.
-     * @param expLang      The language of the expressions.
+     * @param defLang      The language of the definition.
      * @param pageSize     The number of examples per page (default is 10).
      * @param currentPage  The current page number (default is 0).
      * @return a ResponseEntity object containing a PaginationResponseDto with ExpressionAndDefinitionDto data.
@@ -157,11 +157,11 @@ public class ExpressionControllerV2 {
     @GetMapping("/search/definitions")
     public ResponseEntity<PaginationResponseDto<DefinitionProjection, ExpressionAndDefinitionDto>> searchExpressionAndDefinitionsBySearchString(
             @RequestParam(name = "searchString") String searchString,
-            @RequestParam(name = "expLang") String expLang,
+            @RequestParam(name = "defLang") String defLang,
             @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
             @RequestParam(name = "currentPage", defaultValue = "0") Integer currentPage) throws Exception {
         final PaginationResponseDto<DefinitionProjection, ExpressionAndDefinitionDto> paginationResponse
-                = expService.getExpressionsAndDefinitions(searchString, expLang, pageSize, currentPage);
+                = expService.getExpressionsAndDefinitions(searchString, defLang, pageSize, currentPage);
         return ResponseEntity.ok(paginationResponse);
     }
 

@@ -21,7 +21,7 @@ public interface DefinitionRepositoryV2 extends JpaRepository<Definition, UUID> 
      * the given search string and expression language.
      *
      * @param searchString The string to search for within definition values.
-     * @param expLang      The language of the expressions to search within.
+     * @param defLang      The language of the definition to search within.
      * @param pageable     Pagination information for the query results.
      * @return a {@link Page} containing {@link DefinitionProjection} objects representing the expressions
      * and their associated definitions found.
@@ -33,36 +33,36 @@ public interface DefinitionRepositoryV2 extends JpaRepository<Definition, UUID> 
      *                                  and their associated definitions found, including the expression ID, spelling, definition ID, value, and tags.
      */
     @Query(value = """
-            SELECT CAST(expr.id AS varchar) AS "expressionId",
-                   expr.spelling            AS "expressionSpelling",
-                   CAST(d.id as varchar)    AS "definitionId",
-                   d.value                  AS "definitionValue",
-                   dt.tag_abbr              AS "definitionTags"
-            FROM expression expr
-                     JOIN expression_match_details emd ON emd.expression_id = expr.id
+            SELECT CAST(exp.id AS varchar) AS "expressionId",
+                   exp.spelling            AS "expressionSpelling",
+                   CAST(d.id as varchar)   AS "definitionId",
+                   d.value                 AS "definitionValue",
+                   dt.tag_abbr             AS "definitionTags"
+            FROM expression exp
+                     JOIN expression_match_details emd ON emd.expression_id = exp.id
                      JOIN expression_details ed ON ed.id = emd.expression_details_id
                      JOIN definition_details dd ON dd.expression_details_id = ed.id
                      JOIN definition d ON d.definition_details_id = dd.id
                      LEFT JOIN definition_tag dt ON dt.definition_id = d.id
-            WHERE expr.language_id = :expLang -- todo искать нужно по defLang
-                AND to_tsvector('simple', d."value") @@ to_tsquery('simple', replace(:searchString, ' ', ' & ') || ':*')
-               OR d."value" ILIKE '%' || :searchString || '%'
+            WHERE dd.language_id = :defLang
+              AND (to_tsvector('simple', d."value") @@ to_tsquery('simple', replace(:searchString, ' ', ' & ') || ':*')
+                OR d."value" ILIKE '%' || :searchString || '%')
             ORDER BY spelling
             """,
             countQuery = """
                     SELECT count(*)
-                    FROM expression expr
-                             JOIN expression_match_details emd ON emd.expression_id = expr.id
+                    FROM expression exp
+                             JOIN expression_match_details emd ON emd.expression_id = exp.id
                              JOIN expression_details ed ON ed.id = emd.expression_details_id
                              JOIN definition_details dd ON dd.expression_details_id = ed.id
                              JOIN definition d ON d.definition_details_id = dd.id
                              LEFT JOIN definition_tag dt ON dt.definition_id = d.id
-                    WHERE expr.language_id = :expLang
-                        AND to_tsvector('simple', d."value") @@ to_tsquery('simple', replace(:searchString, ' ', ' & ') || ':*')
-                       OR d."value" ILIKE '%' || :searchString || '%'
+                    WHERE dd.language_id = :defLang
+                      AND (to_tsvector('simple', d."value") @@ to_tsquery('simple', replace(:searchString, ' ', ' & ') || ':*')
+                        OR d."value" ILIKE '%' || :searchString || '%')
                     """,
             nativeQuery = true)
     Page<DefinitionProjection> findExpressionsAndDefinitions(@NonNull @Param("searchString") String searchString,
-                                                             @NonNull @Param("expLang") String expLang,
+                                                             @NonNull @Param("defLang") String defLang,
                                                              Pageable pageable);
 }
