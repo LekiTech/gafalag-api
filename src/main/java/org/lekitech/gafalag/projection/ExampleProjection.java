@@ -1,5 +1,6 @@
 package org.lekitech.gafalag.projection;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface ExampleProjection {
@@ -8,7 +9,7 @@ public interface ExampleProjection {
 
     String getExpressionSpelling();
 
-    UUID getId();
+    UUID getExampleId();
 
     String getSource();
 
@@ -19,4 +20,6 @@ public interface ExampleProjection {
     String getTrlLangId();
 
     String getRaw();
+
+    List<String> getExampleTags();
 }

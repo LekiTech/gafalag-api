@@ -188,15 +188,16 @@ public class ExpressionServiceV2 {
 
     /**
      * The method returns a paginated list of {@link ExpressionAndExampleDto} based on the search string,
-     * expression language, and pagination parameters.
+     * expression language, and pagination parameters. And it's also possible to filter by tag.
      *
      * @param searchString The string to search for within expressions.
      * @param exLang       The language of the 'example source' or 'example translation'.
      * @param pageSize     The size of each page in the pagination.
      * @param currentPage  The current page number of the pagination.
+     * @param tag          The tag to search for (default is null).
      * @return a {@link PaginationResponseDto} with {@link ExpressionAndExampleDto} object.
      * @throws ExpressionNotFound        if no expressions matching the search criteria are found.
-     * @throws IllegalArgumentException  if the search string is null or empty.
+     * @throws IllegalArgumentException  if the search string or lang is null or empty.
      * @throws IndexOutOfBoundsException if the page size is less than 0 or greater than 50,
      *                                   or if the current page number is greater than and equal to 99_999.
      */
@@ -204,10 +205,11 @@ public class ExpressionServiceV2 {
     public PaginationResponseDto<ExampleProjection, ExpressionAndExampleDto> getExpressionsAndExamples(String searchString,
                                                                                                        String exLang,
                                                                                                        Integer pageSize,
-                                                                                                       Integer currentPage) throws ExpressionNotFound {
+                                                                                                       Integer currentPage,
+                                                                                                       String tag) throws ExpressionNotFound {
         currentPage = inputValidation(searchString, exLang, pageSize, currentPage);
         final Page<ExampleProjection> exampleProjectionPage
-                = exampleRepo.findExpressionAndExample(normalizeString(searchString), exLang, PageRequest.of(currentPage, pageSize));
+                = exampleRepo.findExpressionAndExample(normalizeString(searchString), exLang, PageRequest.of(currentPage, pageSize), tag);
         final List<ExampleProjection> exampleProjections = exampleProjectionPage.getContent();
         if (exampleProjections.isEmpty()) {
             throw new ExpressionNotFound("Not found: " + searchString);
@@ -224,15 +226,16 @@ public class ExpressionServiceV2 {
 
     /**
      * The method returns a paginated list of {@link ExpressionAndDefinitionDto} based on the search string,
-     * expression language, and pagination parameters.
+     * expression language, and pagination parameters. And it's also possible to filter by tag.
      *
      * @param searchString The string to search for within expressions.
      * @param defLang      The language of the definition to filter by.
      * @param pageSize     The size of each page in the pagination.
      * @param currentPage  The current page number of the pagination.
+     * @param tag          The tag to search for (default is null).
      * @return a {@link PaginationResponseDto} with {@link ExpressionAndDefinitionDto} object.
      * @throws ExpressionNotFound        if no expressions matching the search criteria are found.
-     * @throws IllegalArgumentException  if the search string is null or empty.
+     * @throws IllegalArgumentException  if the search string or lang is null or empty.
      * @throws IndexOutOfBoundsException if the page size is less than 0 or greater than 50,
      *                                   or if the current page number is greater than and equal to 99_999.
      */
@@ -240,10 +243,11 @@ public class ExpressionServiceV2 {
     public PaginationResponseDto<DefinitionProjection, ExpressionAndDefinitionDto> getExpressionsAndDefinitions(String searchString,
                                                                                                                 String defLang,
                                                                                                                 Integer pageSize,
-                                                                                                                Integer currentPage) throws ExpressionNotFound {
+                                                                                                                Integer currentPage,
+                                                                                                                String tag) throws ExpressionNotFound {
         currentPage = inputValidation(searchString, defLang, pageSize, currentPage);
         final Page<DefinitionProjection> defProjectionPage
-                = definitionRepo.findExpressionsAndDefinitions(normalizeString(searchString), defLang, PageRequest.of(currentPage, pageSize));
+                = definitionRepo.findExpressionsAndDefinitions(normalizeString(searchString), defLang, PageRequest.of(currentPage, pageSize), tag);
         final List<DefinitionProjection> definitionProjections = defProjectionPage.getContent();
         if (definitionProjections.isEmpty()) {
             throw new ExpressionNotFound("Not found: " + searchString);
@@ -268,7 +272,7 @@ public class ExpressionServiceV2 {
      * @param currentPage The current page number of the pagination.
      * @return a {@link PaginationResponseDto} with {@link ExpressionByTagDto} object.
      * @throws ExpressionNotFound        if no expressions matching the search criteria are found.
-     * @throws IllegalArgumentException  if the tag is null or empty.
+     * @throws IllegalArgumentException  if the tag or lang is null or empty.
      * @throws IndexOutOfBoundsException if the page size is less than 0 or greater than 50,
      *                                   or if the current page number is greater than and equal to 99_999.
      */

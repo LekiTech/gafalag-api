@@ -20,10 +20,11 @@ public interface DictionaryMapper {
 
     List<SimilarDto> toDto(List<Expression> expressions);
 
-    @Mapping(source = "id", target = "id")
+    @Mapping(source = "exampleId", target = "id")
     @Mapping(source = "raw", target = "raw")
     @Mapping(source = "source", target = "src")
     @Mapping(source = "translation", target = "trl")
+    @Mapping(source = "exampleTags", target = "tags")
     ExampleDto toDto(ExampleProjection example);
 
     @Mapping(source = "definitionId", target = "id")

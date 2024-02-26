@@ -125,43 +125,47 @@ public class ExpressionControllerV2 {
 
     /**
      * Endpoint to retrieve a paginated list of examples based on the search string
-     * and the expression language searched for.
+     * and the expression language searched for, and it's also possible to filter by tag.
      *
      * @param searchString The search string to match examples.
      * @param exLang       The language of the 'example source' or 'example translation'.
      * @param pageSize     The number of examples per page (default is 10).
      * @param currentPage  The current page number (default is 0).
+     * @param tag          The tag to search for (default is null).
      * @return a ResponseEntity object containing a PaginationResponseDto with ExpressionAndExampleDto data.
      */
     @GetMapping("/search/examples")
-    public ResponseEntity<PaginationResponseDto<ExampleProjection, ExpressionAndExampleDto>> findExamplesBySearchString(
+    public ResponseEntity<PaginationResponseDto<ExampleProjection, ExpressionAndExampleDto>> searchExamplesBySearchString(
             @RequestParam(name = "searchString") String searchString,
             @RequestParam(name = "exLang") String exLang,
             @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
-            @RequestParam(name = "currentPage", defaultValue = "0") Integer currentPage) throws Exception {
+            @RequestParam(name = "currentPage", defaultValue = "0") Integer currentPage,
+            @RequestParam(name = "tag", required = false) String tag) throws Exception {
         final PaginationResponseDto<ExampleProjection, ExpressionAndExampleDto> paginationResponse
-                = expService.getExpressionsAndExamples(searchString, exLang, pageSize, currentPage);
+                = expService.getExpressionsAndExamples(searchString, exLang, pageSize, currentPage, tag);
         return ResponseEntity.ok(paginationResponse);
     }
 
     /**
      * Endpoint to retrieve a paginated list of expressions and definitions based on the search string
-     * and expression language.
+     * and expression language, and it's also possible to filter by tag.
      *
      * @param searchString The search string to search definitions.
      * @param defLang      The language of the definition.
      * @param pageSize     The number of examples per page (default is 10).
      * @param currentPage  The current page number (default is 0).
+     * @param tag          The tag to search for (default is null).
      * @return a ResponseEntity object containing a PaginationResponseDto with ExpressionAndDefinitionDto data.
      */
     @GetMapping("/search/definitions")
-    public ResponseEntity<PaginationResponseDto<DefinitionProjection, ExpressionAndDefinitionDto>> searchExpressionAndDefinitionsBySearchString(
+    public ResponseEntity<PaginationResponseDto<DefinitionProjection, ExpressionAndDefinitionDto>> searchDefinitionsBySearchString(
             @RequestParam(name = "searchString") String searchString,
             @RequestParam(name = "defLang") String defLang,
             @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
-            @RequestParam(name = "currentPage", defaultValue = "0") Integer currentPage) throws Exception {
+            @RequestParam(name = "currentPage", defaultValue = "0") Integer currentPage,
+            @RequestParam(name = "tag", required = false) String tag) throws Exception {
         final PaginationResponseDto<DefinitionProjection, ExpressionAndDefinitionDto> paginationResponse
-                = expService.getExpressionsAndDefinitions(searchString, defLang, pageSize, currentPage);
+                = expService.getExpressionsAndDefinitions(searchString, defLang, pageSize, currentPage, tag);
         return ResponseEntity.ok(paginationResponse);
     }
 
