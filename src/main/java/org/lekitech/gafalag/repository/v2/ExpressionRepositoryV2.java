@@ -160,94 +160,80 @@ public interface ExpressionRepositoryV2 extends JpaRepository<Expression, UUID> 
      *                                  The expressions are ordered by their spelling.
      */
     @Query(value = """
-            -- SELECT на поиск tag на уровне definition_details
+            -- SELECT to search for a tag in definition_details.
             SELECT exp.*
             FROM expression exp
                      JOIN expression_match_details emd ON emd.expression_id = exp.id
-                     JOIN expression_details ed ON ed.id = emd.expression_details_id
-                     JOIN definition_details dd ON dd.expression_details_id = ed.id
+                     JOIN definition_details dd ON dd.expression_details_id = emd.expression_details_id
                      JOIN definition_details_tag ddt ON dd.id = ddt.definition_details_id
             WHERE ddt.tag_abbr = :tag
-            AND exp.language_id = :expLang
-
+              AND exp.language_id = :expLang
             UNION
-            -- SELECT на поиск tag внутри definition
+            -- SELECT to search for a tag in definition.
             SELECT exp.*
             FROM expression exp
                      JOIN expression_match_details emd ON emd.expression_id = exp.id
-                     JOIN expression_details ed ON ed.id = emd.expression_details_id
-                     JOIN definition_details dd ON dd.expression_details_id = ed.id
+                     JOIN definition_details dd ON dd.expression_details_id = emd.expression_details_id
                      JOIN definition d ON dd.id = d.definition_details_id
                      JOIN definition_tag dt ON d.id = dt.definition_id
             WHERE dt.tag_abbr = :tag
-            AND exp.language_id = :expLang
-
+              AND exp.language_id = :expLang
             UNION
-            --  SELECT на поиск tag в example внутри definition
+            -- SELECT to search for a tag in definition_example.
             SELECT exp.*
             FROM expression exp
                      JOIN expression_match_details emd ON emd.expression_id = exp.id
-                     JOIN expression_details ed ON ed.id = emd.expression_details_id
-                     JOIN definition_details dd ON dd.expression_details_id = ed.id
+                     JOIN definition_details dd ON dd.expression_details_id = emd.expression_details_id
                      JOIN definition_example de ON dd.id = de.definition_details_id
                      JOIN example ex ON de.example_id = ex.id
                      JOIN example_tag et ON et.example_id = ex.id
             WHERE et.tag_abbr = :tag
-            AND exp.language_id = :expLang
-
+              AND exp.language_id = :expLang
             UNION
-            -- SELECT на поиск tag на example внутри expression_details
+            -- SELECT to search for a tag in expression_example.
             SELECT exp.*
             FROM expression exp
                      JOIN expression_match_details emd ON emd.expression_id = exp.id
-                     JOIN expression_details ed ON ed.id = emd.expression_details_id
-                     JOIN expression_example ee ON ee.expression_details_id = ed.id
+                     JOIN expression_example ee ON ee.expression_details_id = emd.expression_details_id
                      JOIN example ex ON ex.id = ee.example_id
                      JOIN example_tag et ON et.example_id = ex.id
             WHERE et.tag_abbr = :tag
-            AND exp.language_id = :expLang
+              AND exp.language_id = :expLang
             ORDER BY spelling
             """,
             countQuery = """
                     SELECT count(*)
-                    FROM (SELECT exp.id
+                    FROM (SELECT exp.*
                           FROM expression exp
                                    JOIN expression_match_details emd ON emd.expression_id = exp.id
-                                   JOIN expression_details ed ON ed.id = emd.expression_details_id
-                                   JOIN definition_details dd ON dd.expression_details_id = ed.id
+                                   JOIN definition_details dd ON dd.expression_details_id = emd.expression_details_id
                                    JOIN definition_details_tag ddt ON dd.id = ddt.definition_details_id
                           WHERE ddt.tag_abbr = :tag
                             AND exp.language_id = :expLang
-                                        
                           UNION
-                          SELECT exp.id
+                          SELECT exp.*
                           FROM expression exp
                                    JOIN expression_match_details emd ON emd.expression_id = exp.id
-                                   JOIN expression_details ed ON ed.id = emd.expression_details_id
-                                   JOIN definition_details dd ON dd.expression_details_id = ed.id
+                                   JOIN definition_details dd ON dd.expression_details_id = emd.expression_details_id
                                    JOIN definition d ON dd.id = d.definition_details_id
                                    JOIN definition_tag dt ON d.id = dt.definition_id
                           WHERE dt.tag_abbr = :tag
                             AND exp.language_id = :expLang
-                                        
                           UNION
-                          SELECT exp.id
+                          SELECT exp.*
                           FROM expression exp
                                    JOIN expression_match_details emd ON emd.expression_id = exp.id
-                                   JOIN expression_details ed ON ed.id = emd.expression_details_id
-                                   JOIN definition_details dd ON dd.expression_details_id = ed.id
+                                   JOIN definition_details dd ON dd.expression_details_id = emd.expression_details_id
                                    JOIN definition_example de ON dd.id = de.definition_details_id
                                    JOIN example ex ON de.example_id = ex.id
                                    JOIN example_tag et ON et.example_id = ex.id
                           WHERE et.tag_abbr = :tag
                             AND exp.language_id = :expLang
-                                        
                           UNION
-                          SELECT exp.id
+                          SELECT exp.*
                           FROM expression exp
                                    JOIN expression_match_details emd ON emd.expression_id = exp.id
-                                   JOIN expression_details ed ON ed.id = emd.expression_details_id
-                                   JOIN expression_example ee ON ee.expression_details_id = ed.id
+                                   JOIN expression_example ee ON ee.expression_details_id = emd.expression_details_id
                                    JOIN example ex ON ex.id = ee.example_id
                                    JOIN example_tag et ON et.example_id = ex.id
                           WHERE et.tag_abbr = :tag

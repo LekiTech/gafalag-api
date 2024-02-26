@@ -42,8 +42,7 @@ public interface DefinitionRepositoryV2 extends JpaRepository<Definition, UUID> 
                    dt.tag_abbr             AS "definitionTags"
             FROM expression exp
                      JOIN expression_match_details emd ON emd.expression_id = exp.id
-                     JOIN expression_details ed ON ed.id = emd.expression_details_id
-                     JOIN definition_details dd ON dd.expression_details_id = ed.id
+                     JOIN definition_details dd ON dd.expression_details_id = emd.expression_details_id
                      JOIN definition d ON d.definition_details_id = dd.id
                      LEFT JOIN definition_tag dt ON dt.definition_id = d.id
             WHERE (:tag IS NULL OR dt.tag_abbr = CAST(:tag AS varchar))
@@ -56,8 +55,7 @@ public interface DefinitionRepositoryV2 extends JpaRepository<Definition, UUID> 
                     SELECT count(*)
                     FROM expression exp
                              JOIN expression_match_details emd ON emd.expression_id = exp.id
-                             JOIN expression_details ed ON ed.id = emd.expression_details_id
-                             JOIN definition_details dd ON dd.expression_details_id = ed.id
+                             JOIN definition_details dd ON dd.expression_details_id = emd.expression_details_id
                              JOIN definition d ON d.definition_details_id = dd.id
                              LEFT JOIN definition_tag dt ON dt.definition_id = d.id
                     WHERE (:tag IS NULL OR dt.tag_abbr = CAST(:tag AS varchar))
