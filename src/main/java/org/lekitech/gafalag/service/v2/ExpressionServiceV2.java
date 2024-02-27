@@ -44,15 +44,15 @@ public class ExpressionServiceV2 {
     private final DefinitionRepositoryV2 definitionRepo;
 
     /**
-     * Retrieves a page of search suggestions based on the provided expression, source language,
+     * Retrieves a page of search suggestions based on the provided expression, language of expression,
      * and pageable information.
      *
      * @param spelling The expression to search for.
-     * @param expLang  The source language for the expression.
+     * @param expLang  The language of the expression.
      * @param size     The limit of the suggestions.
      * @return a List of strings containing search suggestions.
      */
-    public List<SimilarDto> getSuggestions(String spelling, String expLang, String defLang, Integer size) {
+    public List<SimilarDto> searchSuggestions(String spelling, String expLang, String defLang, Integer size) {
         final List<Expression> expressions = expressionRepo.fuzzySearchSpellingsListBySpellingAndExpLang(
                 normalizeString(spelling),
                 expLang,
@@ -95,10 +95,10 @@ public class ExpressionServiceV2 {
      * expressions or a list of suggested similar expressions if the expression is not found.
      */
     @Transactional
-    public ExpressionAndSimilarDto getExpressionAndSimilarBySpellingAndLangOfExpAndDef(String spelling,
-                                                                                       String expLang,
-                                                                                       String defLang,
-                                                                                       Integer similarCount) {
+    public ExpressionAndSimilarDto searchExpressionAndSimilarBySpellingAndLangOfExpAndDef(String spelling,
+                                                                                          String expLang,
+                                                                                          String defLang,
+                                                                                          Integer similarCount) {
         final Optional<Expression> expOptional = expressionRepo.findExpressionBySpellingAndLanguageAndDefLanguage(
                 normalizeString(spelling),
                 expLang,
@@ -108,13 +108,13 @@ public class ExpressionServiceV2 {
             final Expression expression = expOptional.get();
             return getExpressionAndSimilar(expression, defLang, similarCount);
         } else {
-            final List<SimilarDto> similarDtos = getSuggestions(spelling, expLang, defLang, similarCount);
+            final List<SimilarDto> similarDtos = searchSuggestions(spelling, expLang, defLang, similarCount);
             return new ExpressionAndSimilarDto(null, similarDtos);
         }
     }
 
     /**
-     * The method returns the expression and similar expressions based on the provided Expression object,
+     * The private method returns the expression and similar expressions based on the provided Expression object,
      * definition language and count of similar expressions.
      *
      * @param expression   The Expression object for which details and similar expressions are to be retrieved.
@@ -133,7 +133,7 @@ public class ExpressionServiceV2 {
                     return expDetails;
                 }).toList();
         final ExpressionResponseDto expressionResponseDto = mapper.toDto(expression.getId(), expression.getSpelling(), expressionDetails);
-        final List<SimilarDto> similarDtos = getSuggestions(expression.getSpelling(), expression.getLanguage().getId(), defLang, similarCount);
+        final List<SimilarDto> similarDtos = searchSuggestions(expression.getSpelling(), expression.getLanguage().getId(), defLang, similarCount);
         return new ExpressionAndSimilarDto(expressionResponseDto, similarDtos);
     }
 
@@ -191,7 +191,7 @@ public class ExpressionServiceV2 {
      * expression language, and pagination parameters. And it's also possible to filter by tag.
      *
      * @param searchString The string to search for within expressions.
-     * @param exLang       The language of the 'example source' or 'example translation'.
+     * @param exampleLang  The language of the 'example source' or 'example translation'.
      * @param pageSize     The size of each page in the pagination.
      * @param currentPage  The current page number of the pagination.
      * @param tag          The tag to search for (default is null).
@@ -202,23 +202,23 @@ public class ExpressionServiceV2 {
      *                                   or if the current page number is greater than and equal to 99_999.
      */
     @Transactional
-    public PaginationResponseDto<ExampleProjection, ExpressionAndExampleDto> getExpressionsAndExamples(String searchString,
-                                                                                                       String exLang,
-                                                                                                       Integer pageSize,
-                                                                                                       Integer currentPage,
-                                                                                                       String tag) throws ExpressionNotFound {
-        currentPage = inputValidation(searchString, exLang, pageSize, currentPage);
+    public PaginationResponseDto<ExampleProjection, ExpressionAndExampleDto> searchExpressionsAndExamples(String searchString,
+                                                                                                          String exampleLang,
+                                                                                                          Integer pageSize,
+                                                                                                          Integer currentPage,
+                                                                                                          String tag) throws ExpressionNotFound {
+        currentPage = inputValidation(searchString, exampleLang, pageSize, currentPage);
         final Page<ExampleProjection> exampleProjectionPage
-                = exampleRepo.findExpressionAndExample(normalizeString(searchString), exLang, PageRequest.of(currentPage, pageSize), tag);
+                = exampleRepo.findExpressionAndExample(normalizeString(searchString), exampleLang, PageRequest.of(currentPage, pageSize), tag);
         final List<ExampleProjection> exampleProjections = exampleProjectionPage.getContent();
         if (exampleProjections.isEmpty()) {
             throw new ExpressionNotFound("Not found: " + searchString);
         }
         List<ExpressionAndExampleDto> expAndExampleDtos = exampleProjections.stream()
-                .map(examplePrj -> new ExpressionAndExampleDto(
-                                examplePrj.getExpressionId(),
-                                examplePrj.getExpressionSpelling(),
-                                mapper.toDto(examplePrj)
+                .map(exampleProjection -> new ExpressionAndExampleDto(
+                                exampleProjection.getExpressionId(),
+                                exampleProjection.getExpressionSpelling(),
+                                mapper.toDto(exampleProjection)
                         )
                 ).toList();
         return new PaginationResponseDto<>(exampleProjectionPage, expAndExampleDtos);
@@ -240,11 +240,11 @@ public class ExpressionServiceV2 {
      *                                   or if the current page number is greater than and equal to 99_999.
      */
     @Transactional
-    public PaginationResponseDto<DefinitionProjection, ExpressionAndDefinitionDto> getExpressionsAndDefinitions(String searchString,
-                                                                                                                String defLang,
-                                                                                                                Integer pageSize,
-                                                                                                                Integer currentPage,
-                                                                                                                String tag) throws ExpressionNotFound {
+    public PaginationResponseDto<DefinitionProjection, ExpressionAndDefinitionDto> searchExpressionsAndDefinitions(String searchString,
+                                                                                                                   String defLang,
+                                                                                                                   Integer pageSize,
+                                                                                                                   Integer currentPage,
+                                                                                                                   String tag) throws ExpressionNotFound {
         currentPage = inputValidation(searchString, defLang, pageSize, currentPage);
         final Page<DefinitionProjection> defProjectionPage
                 = definitionRepo.findExpressionsAndDefinitions(normalizeString(searchString), defLang, PageRequest.of(currentPage, pageSize), tag);
@@ -253,10 +253,10 @@ public class ExpressionServiceV2 {
             throw new ExpressionNotFound("Not found: " + searchString);
         }
         final List<ExpressionAndDefinitionDto> expAndDefDto = definitionProjections.stream()
-                .map(definitionPrj -> new ExpressionAndDefinitionDto(
-                                definitionPrj.getExpressionId(),
-                                definitionPrj.getExpressionSpelling(),
-                                mapper.toDto(definitionPrj)
+                .map(definitionProjection -> new ExpressionAndDefinitionDto(
+                                definitionProjection.getExpressionId(),
+                                definitionProjection.getExpressionSpelling(),
+                                mapper.toDto(definitionProjection)
                         )
                 ).toList();
         return new PaginationResponseDto<>(defProjectionPage, expAndDefDto);
@@ -277,10 +277,10 @@ public class ExpressionServiceV2 {
      *                                   or if the current page number is greater than and equal to 99_999.
      */
     @Transactional
-    public PaginationResponseDto<Expression, ExpressionByTagDto> getExpressionsByTagAndExpLang(String tag,
-                                                                                               String expLang,
-                                                                                               Integer pageSize,
-                                                                                               Integer currentPage) throws ExpressionNotFound {
+    public PaginationResponseDto<Expression, ExpressionByTagDto> searchExpressionsByTagAndExpLang(String tag,
+                                                                                                  String expLang,
+                                                                                                  Integer pageSize,
+                                                                                                  Integer currentPage) throws ExpressionNotFound {
         currentPage = inputValidation(tag, expLang, pageSize, currentPage);
         final Page<Expression> expressionsPage
                 = expressionRepo.findExpressionsByTagAndExpLang(tag, expLang, PageRequest.of(currentPage, pageSize));

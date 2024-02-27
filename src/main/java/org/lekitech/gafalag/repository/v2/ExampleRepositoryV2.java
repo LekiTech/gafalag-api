@@ -17,12 +17,13 @@ import java.util.UUID;
 public interface ExampleRepositoryV2 extends JpaRepository<Example, UUID> {
 
     /**
-     * Executes a native SQL query to find expressions and examples based on the provided search string and language, with pagination.
+     * Executes a native SQL query to find examples with the reference to belonging expression, based on the provided
+     * search string and language, with pagination.
      * This method performs a search for expressions and examples matching the given search string and expression language.
      * And it's also possible to filter by tag.
      *
      * @param searchString The string to search for within example raw text.
-     * @param exLang       The language of the 'example source' or 'example translation'.
+     * @param exampleLang  The language of the 'example source' or 'example translation'.
      * @param pageable     Pagination information for the query results.
      * @param tag          The tag to search for (default is null).
      * @return a {@link Page} containing {@link ExampleProjection} objects representing the expressions and examples found.
@@ -49,7 +50,7 @@ public interface ExampleRepositoryV2 extends JpaRepository<Example, UUID> {
                      JOIN expression_match_details emd ON dd.expression_details_id = emd.expression_details_id
                      JOIN expression exp ON emd.expression_id = exp.id
             WHERE (:tag IS NULL OR et.tag_abbr = CAST(:tag AS varchar))
-              AND (ex.src_lang_id = :exLang OR ex.trl_lang_id = :exLang)
+              AND (ex.src_lang_id = :exampleLang OR ex.trl_lang_id = :exampleLang)
               AND (to_tsvector('simple', ex."raw") @@ to_tsquery('simple', replace(:searchString, ' ', ' & ') || ':*')
                 OR ex."raw" ILIKE '%' || :searchString || '%')
                         
@@ -70,7 +71,7 @@ public interface ExampleRepositoryV2 extends JpaRepository<Example, UUID> {
                      JOIN expression_match_details emd ON ee.expression_details_id = emd.expression_details_id
                      JOIN expression exp ON emd.expression_id = exp.id
             WHERE (:tag IS NULL OR et.tag_abbr = CAST(:tag AS varchar))
-              AND (ex.src_lang_id = :exLang OR ex.trl_lang_id = :exLang)
+              AND (ex.src_lang_id = :exampleLang OR ex.trl_lang_id = :exampleLang)
               AND (to_tsvector('simple', ex."raw") @@ to_tsquery('simple', replace(:searchString, ' ', ' & ') || ':*')
                 OR ex."raw" ILIKE '%' || :searchString || '%')
             ORDER BY "expressionSpelling"
@@ -93,7 +94,7 @@ public interface ExampleRepositoryV2 extends JpaRepository<Example, UUID> {
                                    JOIN expression_match_details emd ON dd.expression_details_id = emd.expression_details_id
                                    JOIN expression exp ON emd.expression_id = exp.id
                           WHERE (:tag IS NULL OR et.tag_abbr = CAST(:tag AS varchar))
-                            AND (ex.src_lang_id = :exLang OR ex.trl_lang_id = :exLang)
+                            AND (ex.src_lang_id = :exampleLang OR ex.trl_lang_id = :exampleLang)
                             AND (to_tsvector('simple', ex."raw") @@ to_tsquery('simple', replace(:searchString, ' ', ' & ') || ':*')
                               OR ex."raw" ILIKE '%' || :searchString || '%')
                                         
@@ -114,13 +115,13 @@ public interface ExampleRepositoryV2 extends JpaRepository<Example, UUID> {
                                    JOIN expression_match_details emd ON ee.expression_details_id = emd.expression_details_id
                                    JOIN expression exp ON emd.expression_id = exp.id
                           WHERE (:tag IS NULL OR et.tag_abbr = CAST(:tag AS varchar))
-                            AND (ex.src_lang_id = :exLang OR ex.trl_lang_id = :exLang)
+                            AND (ex.src_lang_id = :exampleLang OR ex.trl_lang_id = :exampleLang)
                             AND (to_tsvector('simple', ex."raw") @@ to_tsquery('simple', replace(:searchString, ' ', ' & ') || ':*')
                               OR ex."raw" ILIKE '%' || :searchString || '%')) AS result
                     """,
             nativeQuery = true)
     Page<ExampleProjection> findExpressionAndExample(@NonNull @Param("searchString") String searchString,
-                                                     @NonNull @Param("exLang") String exLang,
+                                                     @NonNull @Param("exampleLang") String exampleLang,
                                                      Pageable pageable,
                                                      @Nullable @Param("tag") String tag);
 }

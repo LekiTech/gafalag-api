@@ -17,9 +17,10 @@ import java.util.UUID;
 public interface DefinitionRepositoryV2 extends JpaRepository<Definition, UUID> {
 
     /**
-     * Executes a native SQL query to find expressions and their associated definitions based on the provided search string
-     * and language, with pagination. This method performs a search for expressions and their definitions matching
-     * the given search string and expression language. And it's also possible to filter by tag.
+     * Executes a native SQL query to find definitions with the reference to belonging expression, based
+     * on the provided search string and language, with pagination. This method performs a search for expressions
+     * and their definitions matching the given search string and expression language.
+     * And it's also possible to filter by tag.
      *
      * @param searchString The string to search for within definition values.
      * @param defLang      The language of the definition to search within.

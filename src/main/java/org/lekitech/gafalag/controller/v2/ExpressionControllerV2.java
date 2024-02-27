@@ -34,10 +34,10 @@ public class ExpressionControllerV2 {
     private final ExpressionServiceV2 expService;
 
     /**
-     * Endpoint for retrieving search suggestions based on the provided expression and source language.
+     * Endpoint for retrieving search suggestions based on the provided expression and language of expression.
      *
      * @param spelling The expression to search for.
-     * @param expLang  The source language for the expression.
+     * @param expLang  The language of the expression.
      * @param size     The limit of the suggestions (default is 10).
      * @return a ResponseEntity containing a List of search suggestions as strings.
      */
@@ -51,7 +51,7 @@ public class ExpressionControllerV2 {
             if (size > 50) {
                 throw new IllegalArgumentException("similar count cannot be greater than 50");
             }
-            final List<SimilarDto> suggestions = expService.getSuggestions(spelling, expLang, defLang, size);
+            final List<SimilarDto> suggestions = expService.searchSuggestions(spelling, expLang, defLang, size);
             return ResponseEntity.ok(suggestions);
         } catch (Exception e) {
             log.error("Error occurred while retrieving search suggestions: {}", e.getMessage(), e);
@@ -62,15 +62,15 @@ public class ExpressionControllerV2 {
     }
 
     /**
-     * Endpoint to search for an expression and similar expressions based on a given ID and source language.
+     * Endpoint to get for an expression and similar expressions based on a given ID and language of definition.
      *
      * @param id           ID of the expression being searched for
-     * @param defLang      The source language for the expression.
+     * @param defLang      The language of the definition.
      * @param similarCount The limit of the suggestions (default is 10).
      * @return a ExpressionAndSimilar containing the found expression and similar expressions.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<ExpressionAndSimilarDto> searchExpressionById(
+    public ResponseEntity<ExpressionAndSimilarDto> getExpressionById(
             @PathVariable(name = "id") UUID id,
             @RequestParam(name = "defLang") String defLang,
             @RequestParam(name = "similarCount", defaultValue = "10") Integer similarCount) {
@@ -87,11 +87,12 @@ public class ExpressionControllerV2 {
     }
 
     /**
-     * Endpoint to search for an expression and similar expressions based on a given spelling and source language.
+     * Endpoint to search for an expression and similar expressions based on a given spelling and languages
+     * of expression and definition.
      *
      * @param spelling     The expression to search for.
-     * @param expLang      The source language of the search expression.
-     * @param defLang      The source language of the definition.
+     * @param expLang      The language of the expression.
+     * @param defLang      The language of the definition.
      * @param similarCount The limit of the suggestions (default is 10).
      * @return a ExpressionAndSimilarDto containing the found expression and similar expressions.
      */
@@ -105,19 +106,19 @@ public class ExpressionControllerV2 {
             throw new IllegalArgumentException("similarCount cannot be greater than 50");
         }
         final ExpressionAndSimilarDto expressionAndSimilar
-                = expService.getExpressionAndSimilarBySpellingAndLangOfExpAndDef(spelling, expLang, defLang, similarCount);
+                = expService.searchExpressionAndSimilarBySpellingAndLangOfExpAndDef(spelling, expLang, defLang, similarCount);
         return ResponseEntity.ok(expressionAndSimilar);
     }
 
     /**
      * Endpoint to get a random expression based on the date.
      *
-     * @param currentDate The source date to get the expression in the format yyy-MM-dd.
+     * @param currentDate The current date for which we are getting a unique expression in the format yyy-MM-dd.
      * @return a ExpressionResponseDto containing the found expression.
      * @throws IllegalArgumentException if the date is entered in an invalid format.
      */
     @GetMapping("/day")
-    public ResponseEntity<ExpressionResponseDto> searchWordOfTheDay(
+    public ResponseEntity<ExpressionResponseDto> getWordOfTheDay(
             @RequestParam(name = "currentDate") String currentDate) {
         final ExpressionResponseDto expressionResponse = expService.getExpressionOfTheDay(currentDate);
         return ResponseEntity.ok(expressionResponse);
@@ -128,7 +129,7 @@ public class ExpressionControllerV2 {
      * and the expression language searched for, and it's also possible to filter by tag.
      *
      * @param searchString The search string to match examples.
-     * @param exLang       The language of the 'example source' or 'example translation'.
+     * @param exampleLang  The language of the 'example source' or 'example translation'.
      * @param pageSize     The number of examples per page (default is 10).
      * @param currentPage  The current page number (default is 0).
      * @param tag          The tag to search for (default is null).
@@ -137,12 +138,12 @@ public class ExpressionControllerV2 {
     @GetMapping("/search/examples")
     public ResponseEntity<PaginationResponseDto<ExampleProjection, ExpressionAndExampleDto>> searchExamplesBySearchString(
             @RequestParam(name = "searchString") String searchString,
-            @RequestParam(name = "exLang") String exLang,
+            @RequestParam(name = "exampleLang") String exampleLang,
             @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
             @RequestParam(name = "currentPage", defaultValue = "0") Integer currentPage,
             @RequestParam(name = "tag", required = false) String tag) throws Exception {
         final PaginationResponseDto<ExampleProjection, ExpressionAndExampleDto> paginationResponse
-                = expService.getExpressionsAndExamples(searchString, exLang, pageSize, currentPage, tag);
+                = expService.searchExpressionsAndExamples(searchString, exampleLang, pageSize, currentPage, tag);
         return ResponseEntity.ok(paginationResponse);
     }
 
@@ -165,7 +166,7 @@ public class ExpressionControllerV2 {
             @RequestParam(name = "currentPage", defaultValue = "0") Integer currentPage,
             @RequestParam(name = "tag", required = false) String tag) throws Exception {
         final PaginationResponseDto<DefinitionProjection, ExpressionAndDefinitionDto> paginationResponse
-                = expService.getExpressionsAndDefinitions(searchString, defLang, pageSize, currentPage, tag);
+                = expService.searchExpressionsAndDefinitions(searchString, defLang, pageSize, currentPage, tag);
         return ResponseEntity.ok(paginationResponse);
     }
 
@@ -187,7 +188,7 @@ public class ExpressionControllerV2 {
             @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
             @RequestParam(name = "currentPage", defaultValue = "0") Integer currentPage) throws ExpressionNotFound {
         final PaginationResponseDto<Expression, ExpressionByTagDto> paginationResponse
-                = expService.getExpressionsByTagAndExpLang(tag, expLang, pageSize, currentPage);
+                = expService.searchExpressionsByTagAndExpLang(tag, expLang, pageSize, currentPage);
         return ResponseEntity.ok(paginationResponse);
     }
 }
