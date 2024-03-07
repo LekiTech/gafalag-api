@@ -28,6 +28,7 @@ public class WrittenSource {
     @JoinColumn(name = "source_id")
     private Source source;
 
+    // TODO: rename `name` to `title` and fix this in `SourceMapperV2` afterwards
     @Column(name = "name")
     private String name;
 

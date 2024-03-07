@@ -2,12 +2,8 @@ package org.lekitech.gafalag.service.v2;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.lekitech.gafalag.dto.v2.DefinitionDetailsDto;
-import org.lekitech.gafalag.dto.v2.DefinitionDto;
-import org.lekitech.gafalag.dto.v2.DictionaryDto;
-import org.lekitech.gafalag.dto.v2.ExampleDto;
-import org.lekitech.gafalag.dto.v2.ExpressionDetailsDto;
-import org.lekitech.gafalag.dto.v2.ExpressionDto;
+import org.lekitech.gafalag.dto.v2.*;
+import org.lekitech.gafalag.dto.v2.mapper.SourceMapperV2;
 import org.lekitech.gafalag.entity.v2.Definition;
 import org.lekitech.gafalag.entity.v2.DefinitionDetails;
 import org.lekitech.gafalag.entity.v2.DefinitionDetailsTag;
@@ -48,9 +44,14 @@ public class DictionaryService {
     private final ExpressionRepositoryV2 expressionRepositoryV2;
     private final ExpressionDetailsRepositoryV2 expressionDetailsRepositoryV2;
     private final WrittenSourceRepository writtenSourceRepository;
+    private final SourceMapperV2 sourceMapper;
     private final SourceRepositoryV2 sourceRepositoryV2;
     private final LanguageRepositoryV2 languageRepositoryV2;
     private final TagRepository tagRepositoryV2;
+
+    public List<WrittenSourceDto> getAllWrittenSources() {
+        return writtenSourceRepository.findAll().stream().map(ws ->sourceMapper.mapToDto(ws)).toList();
+    }
 
     @Transactional
     public void saveDictionary(DictionaryDto dto) {

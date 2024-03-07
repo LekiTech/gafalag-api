@@ -7,10 +7,12 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring", uses = {
         ExpressionExampleMapper.class,
-        ExpressionDefinitionDetailsMapper.class
+        ExpressionDefinitionDetailsMapper.class,
+        SourceMapperV2.class
 })
 public interface ExpressionDetailsMapper {
 
     @Mapping(source = "expressionExamples", target = "examples")
+    @Mapping(source = "source.writtenSources", target = "writtenSources")
     ExpressionDetailsDto mapToDto(ExpressionDetails expressionDetails);
 }

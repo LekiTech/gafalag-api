@@ -16,12 +16,15 @@ import java.util.UUID;
  * @param inflection
  * @param definitionDetails {@link DefinitionDetailsDto}
  * @param examples          {@link ExampleDto}
+ * @param writtenSources    {@link WrittenSourceShortDto}
  */
 public record ExpressionDetailsDto(
         UUID id,
         String gr,
         String inflection,
         List<DefinitionDetailsDto> definitionDetails,
-        List<ExampleDto> examples
+        List<ExampleDto> examples,
+
+        List<WrittenSourceShortDto> writtenSources
 ) {
 }

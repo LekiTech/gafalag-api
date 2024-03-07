@@ -6,17 +6,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.lekitech.gafalag.dto.v2.DictionaryDto;
+import org.lekitech.gafalag.dto.v2.WrittenSourceDto;
 import org.lekitech.gafalag.service.v2.DictionaryService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -25,6 +23,11 @@ import java.io.IOException;
 public class DictionaryController {
 
     private final DictionaryService dictionaryService;
+
+    @GetMapping("/sources")
+    public List<WrittenSourceDto> getAllWrittenSources(){
+        return dictionaryService.getAllWrittenSources();
+    }
 
     @PostMapping(consumes = "multipart/form-data")
     public void saveDictionary(@RequestPart("file") MultipartFile file) {
