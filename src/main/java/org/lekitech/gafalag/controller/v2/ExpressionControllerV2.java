@@ -47,10 +47,10 @@ public class ExpressionControllerV2 {
             @RequestParam(name = "expLang") String expLang,
             @RequestParam(name = "defLang") String defLang,
             @RequestParam(name = "size", defaultValue = "10") Integer size) {
+        if (size > 50) {
+            throw new IllegalArgumentException("similar count cannot be greater than 50");
+        }
         try {
-            if (size > 50) {
-                throw new IllegalArgumentException("similar count cannot be greater than 50");
-            }
             final List<SimilarDto> suggestions = expService.searchSuggestions(spelling, expLang, defLang, size);
             return ResponseEntity.ok(suggestions);
         } catch (Exception e) {
@@ -74,10 +74,10 @@ public class ExpressionControllerV2 {
             @PathVariable(name = "id") UUID id,
             @RequestParam(name = "defLang") String defLang,
             @RequestParam(name = "similarCount", defaultValue = "10") Integer similarCount) {
+        if (similarCount > 50) {
+            throw new IllegalArgumentException("similarCount cannot be greater than 50");
+        }
         try {
-            if (similarCount > 50) {
-                throw new IllegalArgumentException("similarCount cannot be greater than 50");
-            }
             final ExpressionAndSimilarDto expressionAndSimilar = expService.getExpressionById(id, defLang, similarCount);
             return ResponseEntity.ok(expressionAndSimilar);
         } catch (Exception e) {
