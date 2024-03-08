@@ -8,7 +8,6 @@ import org.lekitech.gafalag.exception.ExpressionNotFound;
 import org.lekitech.gafalag.projection.DefinitionProjection;
 import org.lekitech.gafalag.projection.ExampleProjection;
 import org.lekitech.gafalag.service.v2.ExpressionServiceV2;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,15 +49,8 @@ public class ExpressionControllerV2 {
         if (size > 50) {
             throw new IllegalArgumentException("similar count cannot be greater than 50");
         }
-        try {
-            final List<SimilarDto> suggestions = expService.searchSuggestions(spelling, expLang, defLang, size);
-            return ResponseEntity.ok(suggestions);
-        } catch (Exception e) {
-            log.error("Error occurred while retrieving search suggestions: {}", e.getMessage(), e);
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body(List.of());
-        }
+        final List<SimilarDto> suggestions = expService.searchSuggestions(spelling, expLang, defLang, size);
+        return ResponseEntity.ok(suggestions);
     }
 
     /**
@@ -77,13 +69,8 @@ public class ExpressionControllerV2 {
         if (similarCount > 50) {
             throw new IllegalArgumentException("similarCount cannot be greater than 50");
         }
-        try {
-            final ExpressionAndSimilarDto expressionAndSimilar = expService.getExpressionById(id, defLang, similarCount);
-            return ResponseEntity.ok(expressionAndSimilar);
-        } catch (Exception e) {
-            log.error("Error occurred while retrieving search expression and similar: {}", e.getMessage(), e);
-            return ResponseEntity.notFound().build();
-        }
+        final ExpressionAndSimilarDto expressionAndSimilar = expService.getExpressionById(id, defLang, similarCount);
+        return ResponseEntity.ok(expressionAndSimilar);
     }
 
     /**
