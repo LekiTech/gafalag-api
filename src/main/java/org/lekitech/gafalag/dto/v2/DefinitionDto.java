@@ -11,6 +11,7 @@ import java.util.UUID;
 public record DefinitionDto(
         UUID id,
         String value,
+        String defLangId,
         List<String> tags
 ) {
 }

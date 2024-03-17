@@ -24,11 +24,14 @@ public interface DictionaryMapper {
     @Mapping(source = "raw", target = "raw")
     @Mapping(source = "source", target = "src")
     @Mapping(source = "translation", target = "trl")
+    @Mapping(source = "srcLangId", target = "srcLangId")
+    @Mapping(source = "trlLangId", target = "trlLangId")
     @Mapping(source = "exampleTags", target = "tags")
     ExampleDto toDto(ExampleProjection example);
 
     @Mapping(source = "definitionId", target = "id")
     @Mapping(source = "definitionValue", target = "value")
     @Mapping(source = "definitionTags", target = "tags")
+    @Mapping(source = "defLangId", target = "defLangId")
     DefinitionDto toDto(DefinitionProjection definitionProjection);
 }

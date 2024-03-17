@@ -256,6 +256,7 @@ public class ExpressionServiceV2 {
                 .map(definitionProjection -> new ExpressionAndDefinitionDto(
                                 definitionProjection.getExpressionId(),
                                 definitionProjection.getExpressionSpelling(),
+                                definitionProjection.getExpLangId(),
                                 mapper.toDto(definitionProjection)
                         )
                 ).toList();

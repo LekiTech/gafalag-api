@@ -15,6 +15,8 @@ public record ExampleDto(
         String raw,
         String src,
         String trl,
+        String srcLangId,
+        String trlLangId,
         List<String> tags
 ) {
 }

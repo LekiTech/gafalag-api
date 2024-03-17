@@ -13,5 +13,9 @@ public interface DefinitionProjection {
 
     String getDefinitionValue();
 
+    String getExpLangId();
+
+    String getDefLangId();
+
     List<String> getDefinitionTags();
 }

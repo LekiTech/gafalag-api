@@ -40,7 +40,9 @@ public interface DefinitionRepositoryV2 extends JpaRepository<Definition, UUID> 
                    exp.spelling            AS "expressionSpelling",
                    CAST(d.id as varchar)   AS "definitionId",
                    d.value                 AS "definitionValue",
-                   dt.tag_abbr             AS "definitionTags"
+                   dt.tag_abbr             AS "definitionTags",
+                   exp.language_id         AS "expLangId",
+                   dd.language_id          AS "defLangId"
             FROM expression exp
                      JOIN expression_match_details emd ON emd.expression_id = exp.id
                      JOIN definition_details dd ON dd.expression_details_id = emd.expression_details_id

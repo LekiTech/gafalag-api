@@ -5,6 +5,7 @@ import java.util.UUID;
 public record ExpressionAndDefinitionDto(
         UUID id,
         String spelling,
+        String expLangId,
         DefinitionDto definition
 ) {
 }
